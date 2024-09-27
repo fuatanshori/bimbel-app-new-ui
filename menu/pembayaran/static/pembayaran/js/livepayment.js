@@ -1,9 +1,11 @@
 var statusTransaksi = document.getElementById("status_transaksi");
 var expiryTime = document.getElementById("expirytime");
-'{% if status_transaksi == "Belum Dibayar" %}'
+const transStatusElement = document.getElementById('trans-status');
+const status_transaksi = transDataElement.getAttribute('data-status-trans');
+if (status_transaksi == "Belum Dibayar"){
 var btnStatus = document.querySelector('#btn_status');
 var btnStatusInvoice = document.getElementById("btn_status_invoice")
-'{% endif %}'
+}
 var modul = document.querySelector('#modul');
 var ujian = document.querySelector('#ujian');
 var nilai = document.querySelector('#nilai');
@@ -20,9 +22,9 @@ socket.onmessage = function(event) {
     const data = JSON.parse(event.data);
 
     if (data === 'Telah Dibayar'){
-        '{% if status_transaksi == "Belum Dibayar" %}'
+        if (status_transaksi == "Belum Dibayar"){
         btnStatus.style.display='none';
-        '{% endif %}'
+        }
 
         statusTransaksi.textContent = `${data}`;
         modul.style.display='block';
