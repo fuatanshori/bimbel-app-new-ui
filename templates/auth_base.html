@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+{% load static %}
+<html
+  lang="en"
+  class="light-style customizer-hide"
+  dir="ltr"
+  data-theme="theme-default"
+  data-template="vertical-menu-template-free"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+
+    <title>{% block title %}{% endblock title %}</title>
+
+    <meta name="description" content="" />
+
+    {% include "includes/menu/auth/styles.html" %}
+
+  </head>
+
+  <body>
+    <!-- Content -->
+    <div class="container-xxl">
+        <div class="authentication-wrapper authentication-basic container-p-y">
+          <div class="authentication-inner">
+            <div class="card">
+              <div class="card-body">
+                <div class="app-brand justify-content-center">
+                    <span class="app-brand-text demo text-body fw-bolder" style="text-transform: capitalize;">{% block title_form %}{% endblock title_form %}</span>
+                  </div>
+                {% block form %}{% endblock form %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% include "includes/menu/auth/scripts.html" %}
+  </body>
+</html>

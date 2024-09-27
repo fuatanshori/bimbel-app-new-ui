@@ -1,0 +1,218 @@
+version: '3.8'
+
+services:
+  django_app_bimbel:
+    container_name: django_app_bimbel
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fuatanshori12/bimbel-app
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /etc/letsencrypt:/etc/letsencrypt
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -e ssl:443:privateKey=/etc/letsencrypt/live/bimbelbanua.my.id/privkey.pem:certKey=/etc/letsencrypt/live/bimbelbanua.my.id/fullchain.pem -b 0.0.0.0 -p 8000 core.asgi:application"
+    depends_on:
+      redis_container:
+        condition: service_healthy
+      mysql_container:
+        condition: service_healthy
+      celery_worker:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      bimbel-net:
+        ipv4_address: 192.168.1.100
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'  # Limit to 2 CPUs
+          memory: 8G   # Limit to 8 GB
+
+  redis_container:
+    container_name: redis_container
+    image: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+  
+  mysql_container:
+    container_name: mysql_container
+    image: mysql
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 60s
+      timeout: 2s
+      retries: 3
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'  # Limit to 1 CPU
+          memory: 4G    # Limit to 4 GB
+
+  celery_worker:
+    container_name: celery_worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A core worker --loglevel=info
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'  # Limit to 1 CPU
+          memory: 2G    # Limit to 2 GB
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin:latest
+    restart: always
+    environment:
+      PMA_HOST: mysql_container
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+  portainer:
+    image: portainer/portainer-ce:2.21.2
+    container_name: portainer
+    env_file:
+      - .env
+    restart: always
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST_PORTAINER}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      bimbel-net:
+        ipv4_address: 192.168.1.15
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - bimbel-net
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Change this to a secure password
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: fuatanshori12/nginx-app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    depends_on:
+      django_app_bimbel:
+        condition: service_started
+      phpmyadmin:
+        condition: service_started
+      portainer:
+        condition: service_started
+      grafana:
+        condition: service_started
+    networks:
+      - bimbel-net
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'  # Limit to 1 CPU
+          memory: 2G    # Limit to 2 GB
+
+volumes:
+  db_volume:
+  portainer_data:
+  grafana_data:
+
+networks:
+  bimbel-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1

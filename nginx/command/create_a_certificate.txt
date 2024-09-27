@@ -1,0 +1,9 @@
+docker-compose run --rm nginx certbot certonly --webroot --webroot-path=/var/www/certbot -d bimbelbanua.my.id -d www.bimbelbanua.my.id
+
+docker-compose run --rm nginx certbot certonly --webroot --webroot-path=/var/www/certbot -d db.bimbelbanua.my.id -d www.db.bimbelbanua.my.id
+
+docker-compose run --rm nginx certbot certonly --webroot --webroot-path=/var/www/certbot -d monitor.bimbelbanua.my.id -d www.monitor.bimbelbanua.my.id
+
+docker-compose run --rm nginx certbot certonly --webroot --webroot-path=/var/www/certbot -d portainer.bimbelbanua.my.id -d www.portainer.bimbelbanua.my.id
+
+docker-compose run --rm nginx certbot certonly --webroot --webroot-path=/var/www/certbot -d prometheus.bimbelbanua.my.id -d www.prometheus.bimbelbanua.my.id

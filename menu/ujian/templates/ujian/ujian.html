@@ -1,0 +1,64 @@
+{% extends "base_menu.html" %}
+
+{% block content_menu %}
+<div class="col-md-12 grid-margin">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex flex-row flex-wrap justify-content-center">
+          <h2 class="card-title mb-4 ">Ujian {{mata_pelajaran}} {{total_soal}} Soal</h2>
+        </div>
+        <div class="row">
+          <div class="col-md-12 d-flex flex-column gap-3">
+            <form method='post' action='{% url "menu:ujian" id_mapel=id_mapel %}'>
+              {% csrf_token %}
+              {% for soal_ujian_obj in soal_ujian_objs %}
+              <section>
+                {% if soal_ujian_obj.gambar_soal %}
+                <div class="form-group">
+                  <img style="max-width: 200px;" src="{{soal_ujian_obj.gambar_soal.url}}" alt="">
+                </div>
+                {% endif %}
+                <div class="form-group">
+                  {{ forloop.counter }}.) <label for="question">{{soal_ujian_obj.soal}}</label>
+                </div>
+                <div class="form-check">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios1" value="jawaban1">
+                    <label class="form-check-label" for="gridRadios1">
+                      {{soal_ujian_obj.jawaban_1}}
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios2" value="jawaban2">
+                    <label class="form-check-label" for="gridRadios2">
+                      {{soal_ujian_obj.jawaban_2}}
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios1" value="jawaban3">
+                    <label class="form-check-label" for="gridRadios1">
+                      {{soal_ujian_obj.jawaban_3}}
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios2" value="jawaban4">
+                    <label class="form-check-label" for="gridRadios2">
+                      {{soal_ujian_obj.jawaban_4}}
+                    </label>
+                  </div>
+                </div>
+              </section>
+              <br>
+              {% endfor %}
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content_menu %}

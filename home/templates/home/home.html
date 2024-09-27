@@ -1,0 +1,22 @@
+{% extends  "base.html" %}
+{% load static %}
+{% block title %} Home Page{% endblock title %}
+{% block style %}
+{% include "includes/style.html" %}
+<link rel="stylesheet" href="{% static "home/css/home.css" %}">
+{% endblock style %}
+
+{% block content %}
+<div class="container">
+    {% include "includes/header.html" %}
+    <aside>
+        <h1>Bimbingan Belajar Banua</h1>
+        <p>
+            Capai Suksesmu dengan Bimbingan Belajar Kami! Tutor berpengalaman, metode efektif. Bergabunglah sekarang untuk prestasi gemilang
+        </p>
+        {% if request.user.is_authenticated %} <a href="{% url "menu:menu" %}">Buka Menu</a> {% else %}<a href="{% url "user:daftar" %}">Daftar Sekarang</a>{% endif %}
+    </aside>
+    <main>Bimbingan belajar adalah sebuah proses pembelajaran tambahan di luar lingkungan sekolah yang dirancang untuk membantu siswa meningkatkan pemahaman, keterampilan, dan prestasi akademik mereka. Bimbingan belajar menyediakan lingkungan yang terstruktur dan terfokus di mana siswa dapat mendapatkan bantuan tambahan dalam memahami materi pelajaran, mengatasi kesulitan belajar, dan mengembangkan strategi belajar yang efektif.</main>
+    {% include "includes/footer.html" %}
+</div>
+{% endblock content %}

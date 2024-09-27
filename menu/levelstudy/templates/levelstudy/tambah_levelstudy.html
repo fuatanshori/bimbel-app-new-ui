@@ -1,0 +1,21 @@
+{% extends "base_menu.html" %}
+{% block content_menu %}
+<div class="col-12 grid-margin">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Level Study</h4>
+      <form class="forms-sample" method="post" action="{% url "menu:tambah-levelstudy" %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Level Study</label>
+          {{level_study_form.level_study}}
+          <small class="text-muted">{{ level_study_form.level_study.errors }}</small>
+        </div>
+        <button type="submit" class="btn btn-primary me-2">
+          Submit
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content_menu %}

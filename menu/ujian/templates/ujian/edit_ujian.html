@@ -1,0 +1,55 @@
+{% extends "base_menu.html" %}
+
+{% block content_menu %}
+<div class="col-12 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Edit Ujian</h4>
+        <form class="forms-sample" method="post" enctype="multipart/form-data" action="{% url "menu:edit-ujian" id_mapel=id_mapel id_soal_ujian=id_soal_ujian %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <label>Soal Gambar upload</label>
+            <input type="file" name="img[]" class="file-upload-default">
+            <div class="input-group col-xs-12 d-flex flex-column">
+              {{soal_ujian_forms.gambar_soal}}
+              <div class="text-danger">
+                {{ soal_ujian_forms.gambar_soal.errors }}
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="exampleInputName1">Soal</label>
+           {{soal_ujian_forms.soal}}
+          </div>
+          <div class="form-group">
+            <label for="">Jawaban 1</label>
+            {{soal_ujian_forms.jawaban_1}}
+          </div>
+          <div class="form-group">
+            <label for="">Jawaban 2</label>
+            {{soal_ujian_forms.jawaban_2}}
+          </div>
+          <div class="form-group">
+            <label for="">Jawaban 3</label>
+            {{soal_ujian_forms.jawaban_3}}
+          </div>
+          <div class="form-group">
+            <label for="">Jawaban 4</label>
+            {{soal_ujian_forms.jawaban_4}}
+          </div>
+
+          <div class="form-group">
+            <label for="">Pilih Jawaban Benar</label>
+            {{soal_ujian_forms.pilih_jawaban_benar}}
+          </div>
+
+          <button type="submit" class="btn btn-primary me-2">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    var clear_image = document.getElementById("gambar_soal-clear_id");
+    clear_image.classList.add("form-check-input","my-2");
+  </script>
+{% endblock content_menu %}

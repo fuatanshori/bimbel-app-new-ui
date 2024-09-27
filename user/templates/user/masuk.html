@@ -1,0 +1,67 @@
+{% extends "auth_base.html" %}
+{% block title %}{% endblock title %}
+{% block title_form %}
+{% if request.GET.command != 'verification' %}
+Masuk
+{% endif %}
+{% endblock title_form %}
+
+{% block form %}
+{% if request.GET.command == 'verification' %}
+<div class="alert" role="alert">
+    <p>
+        Trimakasih telah mendaftar. verifikasi telah dikirim melalui email [{{request.GET.email}}] Mungkin saja email yang dikirim berada di spam pada email anda Masuk? <a href="{% url 'user:masuk' %}">Login</a>
+    </p>
+</div>
+{% else %}
+<form id="formAuthentication" class="mb-3" action="{% url "user:masuk" %}" method="POST">
+  {% csrf_token %}
+  
+  <div class="mb-3">
+    <label for="email" class="form-label">Email</label>
+    <input
+      type="email"
+      class="form-control"
+      id="email"
+      name="email"
+      placeholder="Enter your email "
+      autofocus
+      required
+    />
+  </div>
+  <div class="mb-3 form-password-toggle">
+    <div class="d-flex justify-content-between">
+      <label class="form-label" for="password">Password</label>
+      <a href="{% url "user:lupapassword" %}">
+        <small>Forgot Password?</small>
+      </a>
+    </div>
+    <div class="input-group input-group-merge">
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        name="password"
+        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+        aria-describedby="password"
+        required
+      />
+      <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+    </div>
+  </div>
+  <div class="mb-3">
+    <button class="btn btn-primary d-grid w-100" type="submit">masuk</button>
+  </div>
+</form>
+<p class="text-center">
+  <span>Belum mendaftar?</span>
+  <a href="{% url "user:daftar" %}">
+    <span>Daftar</span>
+  </a>
+</p>
+<div class="d-flex w-100 justify-content-center">
+  {% include "includes/auth/error_message.html" %}
+</div>
+
+{% endif %}
+{% endblock form %}

@@ -1,0 +1,38 @@
+{% extends "base_menu.html" %}
+
+{% block content_menu %}
+<div class="col-12 grid-margin">
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Data Mapel</h4>
+      
+      {% if mapel_forms.non_field_errors %}
+        <div class="alert alert-danger text-center" id="message" data-duration="4000">
+          {% for error in mapel_forms.non_field_errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <form class="forms-sample" method="post" action="{% url "menu:tambah-mapel" id_levelstudy=id_levelstudy %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+          <label>Nama Mapel</label>
+          {{ mapel_forms.nama_mapel }}
+          <small class="text-muted">{{ mapel_forms.nama_mapel.errors }}</small>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          {{ mapel_forms.description }}
+          <small class="text-muted">{{ mapel_forms.description.errors }}</small>
+        </div>
+        
+        <button type="submit" class="btn btn-primary me-2">
+          Submit
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock content_menu %}

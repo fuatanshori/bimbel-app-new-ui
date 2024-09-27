@@ -1,0 +1,175 @@
+version: '3.8'
+
+services:
+  django_app_bimbel:
+    container_name: django_app_bimbel
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fuatanshori12/bimbel-app
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /etc/letsencrypt:/etc/letsencrypt
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver"
+    depends_on:
+      redis_container:
+        condition: service_healthy
+      mysql_container:
+        condition: service_healthy
+      celery_worker:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      bimbel-net:
+        
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'  # Limit to 2 CPUs
+          memory: 8G   # Limit to 8 GB
+
+  redis_container:
+    container_name: redis_container
+    image: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+  
+  mysql_container:
+    container_name: mysql_container
+    image: mysql
+    restart: always
+    env_file:
+      - .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - db_volume:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 20s
+      timeout: 2s
+      retries: 3
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'  # Limit to 1 CPU
+          memory: 4G    # Limit to 4 GB
+
+  celery_worker:
+    container_name: celery_worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A core worker --loglevel=info
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'  # Limit to 1 CPU
+          memory: 2G    # Limit to 2 GB
+
+  portainer:
+    image: portainer/portainer-ce:2.21.2
+    container_name: portainer
+    env_file:
+      - .env
+    restart: always
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST_PORTAINER}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - bimbel-net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      bimbel-net:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - bimbel-net
+    ports:
+      - 9443:9443
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - 3000:3000
+    networks:
+      - bimbel-net
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Change this to a secure password
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
+
+
+volumes:
+  db_volume:
+  portainer_data:
+  grafana_data:
+
+networks:
+  bimbel-net:
+    driver: bridge

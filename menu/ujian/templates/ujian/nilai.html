@@ -1,0 +1,42 @@
+{% extends "base_menu.html" %}
+
+{% block content_menu %}
+<div class="col-sm-8">
+    <div class="card-body">
+        <h2 class="card-title text-black">Nilai Ujian</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Mata Pelajaran</th>
+                        <th>Nilai</th>
+                        <th>Predikat</th>
+                        <th>Status</th>
+                        <th>=========</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{request.user.full_name}}</td>
+                        <td>{{mapel}}</td>
+                        <td>{{nilai}}</td>
+                        <td>{{predikat}}</td>
+                        <td><label class="badge badge-{% if status == "lulus" %}success{% else %}danger{% endif %}">{{status}}</label></td>
+                        <td>
+                        {% if sertifikat_obj %}
+                            <a href="{{sertifikat_obj.sertifikat.url}}"class="badge badge-primary text-decoration-none text-white">Sertifikat</a>
+                        {% else %}
+                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran.pk id_nilai=nilai_obj.pk %}" class="badge badge text-decoration-none text-white" style="background-color:#8929e3;">
+                                Lakukan Ujian Ulang
+                            </a>
+                        {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content_menu %}

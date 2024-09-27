@@ -1,0 +1,70 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-04-13 00:15+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: user/managers.py:15 user/tests/test_models.py:43
+msgid "The Email must be set"
+msgstr "Email harus di set"
+
+#: user/managers.py:18 user/tests/test_models.py:54
+msgid "The Full name must be set"
+msgstr "Nama Lengkap Harus set"
+
+#: user/models.py:21
+msgid "full name"
+msgstr "nama lengkap"
+
+#: user/models.py:22
+msgid "email"
+msgstr "email"
+
+#: user/models.py:23
+msgid "role"
+msgstr "role"
+
+#: user/models.py:23
+msgid "To enter the Django dashboard, change to admin or pemateri"
+msgstr "untuk masuk Django dashboard ubah ke admin atau pemateri"
+
+#: user/tests/test_views.py:66 user/tests/test_views.py:74
+#: user/tests/test_views.py:82 user/views.py:25
+msgid "Full name is invalid"
+msgstr "Nama lengkap tidak valid"
+
+#: user/tests/test_views.py:90 user/views.py:33
+#, fuzzy
+#| msgid "The Full name must be set"
+msgid "The full name has too many spaces"
+msgstr "Nama lengkap memiliki terlalu banyak spasi"
+
+#: user/tests/test_views.py:98 user/views.py:40
+msgid "Invalid email address"
+msgstr "Alamat email tidak valid"
+
+#: user/views.py:45
+msgid "Different Passwords"
+msgstr "Password berbeda"
+
+#: user/views.py:52
+msgid "Password cannot contain spaces or be empty"
+msgstr "Kata sandi tidak boleh berisi spasi atau kosong"
+
+#: user/views.py:64
+msgid "User with email already exists"
+msgstr "Pengguna dengan email sudah ada"

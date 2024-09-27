@@ -1,0 +1,33 @@
+{% extends "base_menu.html" %}
+
+{% block content_menu %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm border-0 rounded">
+        <div class="card-body">
+          <h1 class="card-title ">{{ modul_obj.nama_modul }}</h1>
+          {% if modul_obj.modul %}
+            <div class="d-flex align-items-center mb-4">
+              <a href="{{ modul_obj.modul.url }}" class="btn btn-primary py-2">Lihat Modul</a>
+              {% if modul_obj.vidio.url is not None %}
+              <a href="{{ modul_obj.vidio.url }}" class="btn btn-youtube mx-2 "><i class="mdi mdi-play"></i></a>
+              {% endif %}
+            </div>
+          {% endif %}
+          <p class="card-text" style="text-align:justify;">
+            {{ modul_obj.description|safe }}
+          </p>
+          <div class="d-flex justify-content-between mt-4">
+            <small class="text-muted">Dibuat pada {{ modul_obj.created_at|date:"d M Y" }}</small>
+            {% if modul_obj.author %}
+              <small class="text-muted">Di Publish oleh {{ modul_obj.author.full_name }}</small>
+            {% endif %}
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content_menu %}

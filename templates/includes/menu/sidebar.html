@@ -1,0 +1,115 @@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+    <div class="app-brand demo">
+      <a href="index.html" class="app-brand-link">
+        
+        <span class="app-brand-text demo menu-text fw-bolder ms-2">Bimbel Banua</span>
+      </a>
+
+      <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
+        <i class="bx bx-chevron-left bx-sm align-middle"></i>
+      </a>
+    </div>
+
+    <div class="menu-inner-shadow"></div>
+
+    <ul class="menu-inner py-1">
+      <!-- Dashboard -->
+      <li class="menu-item {% if request.path == '/menu/' or request.path|slice:'0:16' == "/ubah-password/" %}active{% endif %}">
+        <a href="{% url "menu:menu" %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-home-circle"></i>
+          <div data-i18n="Analytics">Menu</div>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="{% url "menu:pembayaran" %}" class="menu-link {% if request.user.role == 'pemateri' %}display:none;{% endif %}" class="nav-item menu-items {% if request.path|slice:"0:16" == '/menu/pembayaran' or request.path|slice:'0:12' == '/menu/invoice'%}active{% endif %}">
+          <i class="menu-icon tf-icons bx bx-money"></i>
+          <div data-i18n="Analytics">Pembayaran</div>
+        </a>
+      </li>
+      <li class="menu-item {% if request.path|slice:'0:17' == "/menu/levelstudy/"%}active{% endif %}" style="
+        {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
+            display:block;
+        {% else %}
+            display:none;
+        {% endif %}">
+        <a href="{% url "menu:levelstudy" %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bxs-graduation"></i>
+          <div data-i18n="Analytics">Level Study</div>
+        </a>
+      </li>
+      <li class="menu-item {% if request.path|slice:'0:11' == "/menu/mapel"%}active{% endif %}" style="
+        {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
+            display:block;
+        {% else %}
+            display:none;
+        {% endif %}">
+        <a href="{% url "menu:mapel-levelstudy" %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-book-content"></i>
+          <div data-i18n="Analytics">mata pelajaran</div>
+        </a>
+      </li>
+      <li class="menu-item {% if request.path|slice:'0:11' == "/menu/modul"%}active{% endif %}" style="
+        {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
+            display:block;
+        {% elif request.user.role == 'pelajar' %}
+            {% if status_transaksi %}
+                {% if status_transaksi != 'Telah Dibayar' %}
+                    display:none;
+                {% endif %}
+            {% else %}
+                display:none;
+            {% endif %}
+        {% endif %}">
+        <a href="{% url "menu:levelstudy-modul" %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-book-open"></i>
+          <div data-i18n="Analytics">Modul</div>
+        </a>
+      </li>
+      <li class="menu-item {% if request.path|slice:'0:11' == "/menu/ujian"%}active{% endif %}" style="
+        {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
+            display:block;
+        {% elif request.user.role == 'pelajar' %}
+            {% if status_transaksi %}
+                {% if status_transaksi != 'Telah Dibayar' %}
+                    display:none;
+                {% endif %}
+            {% else %}
+                display:none;
+            {% endif %}
+        {% endif %}">
+        <a href="{% url "menu:levelstudy-ujian" %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bxs-vial"></i>
+          <div data-i18n="Analytics">Ujian</div>
+        </a>
+      </li>
+      <li class="menu-item {% if request.path|slice:'0:17' == "/menu/levelstudy/"%}active{% endif %}" style="
+        {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
+            display:block;
+        {% else %}
+            display:none;
+        {% endif %}">
+        <a href="{% url "menu:levelstudy" %}" class="menu-link">
+          <i class="menu-icon tf-icons bx bx-trophy"></i>
+          <div data-i18n="Analytics">Nilai</div>
+        </a>
+      </li>
+      <li class="menu-header small text-uppercase">
+        <span class="menu-header-text">Account</span>
+      </li>
+      <li class="menu-item">
+        <a href="javascript:void(0);" class="menu-link menu-toggle">
+          <i class="menu-icon tf-icons bx bx-dock-top"></i>
+          <div data-i18n="Account Settings">Account Settings</div>
+        </a>
+        <ul class="menu-sub">
+            <li class="menu-item">
+              <a href="{% url "user:add-profile" %}" class="menu-link">
+                <div data-i18n="Account">Account</div>
+              </a>
+            </li>
+           
+          </ul>
+      </li>
+      
+    </ul>
+  </aside>

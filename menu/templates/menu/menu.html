@@ -1,0 +1,96 @@
+{% extends "menu_base.html" %}
+
+{% block title %}menu{% endblock title %}
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row">
+      <div class="col-lg-12 order-1">
+        <div class="row">
+          <div class="col-lg-6 col-md-12 col-12 mb-4 row-2"  style="{% if request.user.role == 'pemateri' %}display:none;{% endif %}">
+            <div class="card">
+              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
+                <div class="w-100">
+                  <i class='bx bx-money text-success' style="font-size: 60px;"></i>
+                </div>
+                <div class="w-100">
+                  <h3 class="card-title mb-4">Pembayaran</h3>
+                <a href="{% url "menu:pembayaran" %}" class="btn btn-primary">kunjungi</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if status_transaksi == "Telah Dibayar" or request.user.role == 'admin' or request.user.role == 'pemateri' %}
+          <div class="col-lg-6 col-md-12 col-12 mb-4">
+            <div class="card">
+              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
+                <div class="w-100">
+                  <i class='bx bxs-graduation text-success' style="font-size: 60px;"></i>
+                </div>
+                <div class="w-100">
+                  <h3 class="card-title mb-4">Level Study</h3>
+                  <a href="{% url "menu:levelstudy" %}" class="btn btn-primary">kunjungi</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-12 col-12 mb-4">
+            <div class="card">
+              <div class="card-body d-flex flex-row align-items-center justify-content-around">
+                <div class="w-100">
+                  <i class='bx bx-book-content text-primary' style="font-size: 60px;"></i>
+                </div>
+                <div class="w-100">
+                  <h3 class="card-title mb-4">Mata Pelajaran</h3>
+                  <a href="{% url "menu:mapel-levelstudy" %}" class="btn btn-primary">kunjungi</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if request.user.role != "pelajar" %}
+          <div class="col-lg-6 col-md-12 col-12 mb-4">
+            <div class="card">
+              <div class="card-body d-flex flex-row  align-items-center justify-content-around">
+                <div class="w-100">
+                  <i class='bx bx-book-open text-primary' style="font-size: 60px;"></i>
+                </div>
+                <div class="w-100">
+                  <h3 class="card-title mb-4">Modul</h3>
+                  <a href="{% url "menu:levelstudy-modul" %}" class="btn btn-primary">kunjungi</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-md-12 col-12 mb-4">
+            <div class="card">
+              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
+                <div class="w-100">
+                  <i class='bx bxs-vial text-warning' style="font-size: 60px;"></i>
+                </div>
+                <div class="w-100">
+                  <h3 class="card-title mb-4">Ujian</h3>
+                  <a href="{% url "menu:levelstudy-ujian" %}" class="btn btn-primary">kunjungi</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="col-lg-6 col-md-12 col-12 mb-4">
+            <div class="card">
+              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
+                <div class="w-100">
+                  <i class='bx bx-trophy text-warning' style="font-size: 60px;"></i>
+                </div>
+                <div class="w-100">
+                  <h3 class="card-title mb-4">Nilai</h3>
+                  <a href="{% url "menu:pembayaran" %}" class="btn btn-primary">kunjungi</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

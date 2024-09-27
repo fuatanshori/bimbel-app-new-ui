@@ -1,0 +1,130 @@
+
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block style %}
+{% include "includes/ca/style.html" %}
+{% endblock style %}
+
+{% block title %}{% endblock title %}
+
+{% block content %}
+<div class="container-scroller">
+    
+    {% load static %}
+    <!-- partial:partials/_sidebar.html --> 
+    {% include "includes/ca/sidebar.html" %}
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+    <!-- partial:partials/_navbar.html -->
+    {% include "includes/ca/navbar.html" %}
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <div class="row">
+                <div class="col-md-12 d-flex justify-content-center">
+                <div class="card col-sm-8">
+                    <h2 class="card-header card-title text-center">Invoice</h2>
+                    <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 d-flex flex-row flex-wrap gap-4 justify-content-lg-around  ">
+                            <div>
+                                <div><h4>Lakukan Pembayaran Dibawah ini</h4></div>
+                                <div class="text-medium mx-1">
+                                        <div>Bank : {{bank|upper}}</div>
+                                        <div>Total : Rp. {{harga}}</div>
+                                        <div class="d-flex flex-row align-baseline gap-1">
+                                            <div>Nomor virtual : </div>
+                                            <div onclick="copyHandler()" id="virtual_number">{{vn}}</div>
+                                        </div>
+                                        <div id="expirytime">Bayar Sebelum : {{expiry_time}} WIB</div>
+                                        <div id="status_transaksi">Status : {{status_transaksi}}</div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center align-items-center gap-2">
+                            {% if status_transaksi == "Belum Dibayar"%}
+                                <a id="btn_status" class="btn btn-info"  href="{% url "menu:batalkan_pesanan" id_transaksi=id_transaksi %}">Batalkan Pembayaran</a>
+                                <a id="btn_status_invoice" class="btn btn-dark"  href="{% url "menu:laporan-invoice" %}">Cetak Invoice</a>
+                            {% elif status_transaksi == "Pembayaran Melebihi Batas Waktu" %}
+                                <a id="btn_status" class="btn btn-info"  href="{% url "menu:batalkan_pesanan" id_transaksi=id_transaksi %}">Lakukan Pembayaran Lagi</a>
+                            {% elif status_transaksi == "Telah Dibayar" %}
+                                <a id="btn_status" class="btn btn-dark"  href="{% url "menu:laporan-invoice" %}">Cetak Invoice</a>
+                            {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Invoice ini sah diterbitkan langsung oleh pihak bimbingan belajar banua
+                      </div>
+                </div>
+                </div>
+        </div>
+    </div>
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->
+    {% include "includes/ca/footer.html" %}
+    <!-- partial -->
+    {% comment %} btnStatus.style.display = 'none'; {% endcomment %}
+</div>
+
+
+
+<script >
+var statusTransaksi = document.getElementById("status_transaksi");
+var expiryTime = document.getElementById("expirytime");
+'{% if status_transaksi == "Belum Dibayar" %}'
+var btnStatus = document.querySelector('#btn_status');
+var btnStatusInvoice = document.getElementById("btn_status_invoice")
+'{% endif %}'
+var modul = document.querySelector('#modul');
+var ujian = document.querySelector('#ujian');
+var nilai = document.querySelector('#nilai');
+var quizBtn = document.getElementById('quiz');
+var socket = new WebSocket('wss://'+ window.location.host +'/ws/pembayaran/'+'{{ id_transaksi }}/');
+
+socket.onopen = function(event) {
+    console.log('Koneksi WebSocket dibuka');
+};
+
+socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+
+    if (data === 'Telah Dibayar'){
+        '{% if status_transaksi == "Belum Dibayar" %}'
+        btnStatus.style.display='none';
+        '{% endif %}'
+
+        statusTransaksi.textContent = `Status : ${data}`;
+        modul.style.display='block';
+        ujian.style.display='block';
+        nilai.style.display='block';    
+        socket.onclose();   
+    }
+    else if (data === 'Pembayaran Melebihi Batas Waktu'){
+        statusTransaksi.textContent = `Status : ${data}`;
+        btnStatusInvoice.style.display='none'
+        btnStatus.textContent = 'Lakukan Pembayaran Lagi';
+        socket.onclose();       
+    }
+};
+socket.onerror = function(error) {
+    console.error('Kesalahan koneksi WebSocket:', error);
+};
+socket.onclose = function(event) {
+    console.log('Koneksi WebSocket ditutup');
+};
+
+var virtualNumber = document.getElementById("virtual_number").innerHTML;
+const copyHandler = async () => {
+    try {
+        await navigator.clipboard.writeText(virtualNumber);
+        alert("berhasil di copy")
+    } catch (err) {
+        alert("gagal di copy")
+      
+    }
+  }
+</script>
+{% include "includes/ca/script.html" %}
+{% endblock content %}
