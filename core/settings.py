@@ -201,7 +201,7 @@ LOCALE_PATHS = [BASE_DIR/'locale']
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR/'staticfiles'
+STATIC_ROOT = 'nginx/staticfiles'
 CKEDITOR_BASEPATH = STATIC_ROOT
 if DEBUG:
     STATICFILES_DIRS = [
