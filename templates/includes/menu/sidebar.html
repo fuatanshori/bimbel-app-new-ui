@@ -48,7 +48,7 @@
           <div data-i18n="Analytics">mata pelajaran</div>
         </a>
       </li>
-      <li class="menu-item {% if request.path|slice:'0:11' == "/menu/modul"%}active{% endif %}" style="
+      <li id="modul" class="menu-item {% if request.path|slice:'0:11' == "/menu/modul"%}active{% endif %}" style="
         {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
         {% elif request.user.role == 'pelajar' %}
@@ -65,7 +65,7 @@
           <div data-i18n="Analytics">Modul</div>
         </a>
       </li>
-      <li class="menu-item {% if request.path|slice:'0:11' == "/menu/ujian"%}active{% endif %}" style="
+      <li id="ujian" class="menu-item {% if request.path|slice:'0:11' == "/menu/ujian"%}active{% endif %}" style="
         {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
         {% elif request.user.role == 'pelajar' %}
@@ -82,7 +82,7 @@
           <div data-i18n="Analytics">Ujian</div>
         </a>
       </li>
-      <li class="menu-item {% if request.path|slice:'0:17' == "/menu/levelstudy/"%}active{% endif %}" style="
+      <li id="nilai" class="menu-item {% if request.path|slice:'0:17' == "/menu/levelstudy/"%}active{% endif %}" style="
         {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
         {% else %}
