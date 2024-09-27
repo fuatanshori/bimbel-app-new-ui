@@ -1,131 +1,79 @@
-
-
-{% extends "base.html" %}
+{% extends "menu_base.html" %}
 {% load static %}
-
-{% block style %}
-{% include "includes/ca/style.html" %}
-{% endblock style %}
-
-{% block title %}{% endblock title %}
-
+{% block title %}Invoice{% endblock title %}
 {% block content %}
-<div class="container-scroller">
-    
-    {% load static %}
-    <!-- partial:partials/_sidebar.html --> 
-    {% include "includes/ca/sidebar.html" %}
-    <!-- partial -->
-    <div class="container-fluid page-body-wrapper">
-    <!-- partial:partials/_navbar.html -->
-    {% include "includes/ca/navbar.html" %}
-    <div class="main-panel">
-        <div class="content-wrapper">
-            <div class="row">
-                <div class="col-md-12 d-flex justify-content-center">
-                <div class="card col-sm-8">
-                    <h2 class="card-header card-title text-center">Invoice</h2>
-                    <div class="card-body">
-                    <div class="row">
-                        <div class="col-12 d-flex flex-row flex-wrap gap-4 justify-content-lg-around">
-                            <div class="d-flex flex-column justify-content-center align-items-center gap-2 mx-auto">
-                                <div><h4>Lakukan Pembayaran Dibawah ini</h4></div>
-                                <div class="text-medium mx-1">
-                                        <div>Layanan Pembayaran : {{layanan_pembayaran|upper}}</div>
-                                        <div>Total : Rp. {{harga}}</div>
-                                        <div id="expirytime">Bayar Sebelum : {{expiry_time}} WIB</div>
-                                        <div id="status_transaksi">Status : {{status_transaksi}}</div>
-                                </div>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row justify-content-center">
+        <!-- Invoice -->
+        <div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mb-6">
+            <div class="card invoice-preview-card p-4 p-md-5 p-lg-6">
+                <div class="card-body invoice-preview-header rounded">
+                    <div class="d-flex justify-content-between flex-lg-row flex-md-column flex-sm-column flex-column align-items-lg-center align-items-md-start align-items-sm-center align-items-start">
+                        <div class="mb-lg-0 mb-4 text-heading">
+                            <div class="d-flex svg-illustration mb-3 gap-2 align-items-center">
+                                <span class="app-brand-text demo fw-bold ms-50 lh-1">Bimbel Banua</span>
                             </div>
-                            {% if status_transaksi == "Belum Dibayar"%}
-                            <div class=" mx-auto" id="qrcode">
-                                <img src="{{qr_code}}" alt="qrcode" width="200" height="200">
+                        </div>
+                        <div>
+                            <h5 class="mb-0">Invoice #{{ id_transaksi }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="trans-data" style="display:none;" data-id="{{ id_transaksi }}"></div>
+
+                <div class="table-responsive border border-bottom-0 border-top-0 rounded">
+                    <table class="table m-0">
+                        <thead>
+                            <tr>
+                                <th>Bank</th>
+                                <th>Bayar Sebelum</th>
+                                <th>Status</th>
+                                <th>Total Harga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-nowrap text-heading">{{layanan_pembayaran|upper}}</td>
+                                <td>{{ status_transaksi }}</td>
+                                <td id="expirytime">{{ expiry_time }}</td>
+                                <td class="text-nowrap" id="status_transaksi">Rp. {{ harga }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="card mt-3">
+                        <div class="card-body text-center">
+                            {% if status_transaksi == "Belum Dibayar" %}
+                            <div class="qrcode-container mb-4">
+                                <img class="img-fluid" src="{{qr_code}}" alt="qrcode" width="200" height="200">
                             </div>
                             {% endif %}
-                            <div class="d-flex justify-content-center align-items-center gap-2 mx-auto">
-                            {% if status_transaksi == "Belum Dibayar"%}
-                                <a id="btn_status" class="btn btn-info"  href="{% url "menu:batalkan_pesanan" id_transaksi=id_transaksi %}">Batalkan Pembayaran</a>
-                                <a id="btn_status_invoice" class="btn btn-dark"  href="{% url "menu:laporan-invoice" %}">Cetak Invoice</a>
-                                <a id="btn_bayar" class="btn btn-primary"  href="{{deep_link_redirect}}">Bayar Sekarang</a>
-                            {% elif status_transaksi == "Pembayaran Melebihi Batas Waktu" %}
-                                <a id="btn_status" class="btn btn-info"  href="{% url "menu:batalkan_pesanan" id_transaksi=id_transaksi %}">Lakukan Pembayaran Lagi</a>
-                            {% elif status_transaksi == "Telah Dibayar" %}
-                                <a id="btn_status" class="btn btn-dark"  href="{% url "menu:laporan-invoice" %}">Cetak Invoice</a>
-                            {% endif %}
+
+                            <div class="d-grid gap-2 d-md-block">
+                                {% if status_transaksi == "Belum Dibayar" %}
+                                    <a id="btn_status" class="btn btn-info mb-2" href="{% url "menu:batalkan_pesanan" id_transaksi=id_transaksi %}">Batalkan Pembayaran</a>
+                                    <a id="btn_status_invoice" class="btn btn-dark mb-2" href="{% url "menu:laporan-invoice" %}">Cetak Invoice</a>
+                                    <a id="btn_bayar" class="btn btn-primary mb-2" href="{{deep_link_redirect}}">Bayar Sekarang</a>
+                                {% elif status_transaksi == "Pembayaran Melebihi Batas Waktu" %}
+                                    <a id="btn_status" class="btn btn-info mb-2" href="{% url "menu:batalkan_pesanan" id_transaksi=id_transaksi %}">Lakukan Pembayaran Lagi</a>
+                                {% elif status_transaksi == "Telah Dibayar" %}
+                                    <a id="btn_status" class="btn btn-dark mb-2" href="{% url "menu:laporan-invoice" %}">Cetak Invoice</a>
+                                {% endif %}
+                            </div>
+
+                            <div class="text-muted mt-3">
+                                Invoice ini sah diterbitkan langsung oleh pihak Bimbingan Belajar Banua.
                             </div>
                         </div>
                     </div>
-                    </div>
-                    
-                    <div class="card-footer text-muted">
-                        Invoice ini sah diterbitkan langsung oleh pihak bimbingan belajar banua
-                      </div>
                 </div>
-                </div>
+            </div>
         </div>
+        <!-- /Invoice -->
     </div>
-    <!-- content-wrapper ends -->
-    <!-- partial:partials/_footer.html -->
-    {% include "includes/ca/footer.html" %}
-    <!-- partial -->
-    {% comment %} btnStatus.style.display = 'none'; {% endcomment %}
 </div>
 
-
-
-<script >
-var statusTransaksi = document.getElementById("status_transaksi");
-var expiryTime = document.getElementById("expirytime");
-
-'{% if status_transaksi == "Belum Dibayar" %}'
-var btnStatus = document.querySelector('#btn_status');
-var qrCode = document.querySelector('#qrcode');
-var btnBayar = document.getElementById("btn_bayar")
-var btnStatusInvoice = document.getElementById("btn_status_invoice")
-'{% endif %}'
-
-var modul = document.querySelector('#modul');
-var ujian = document.querySelector('#ujian');
-var nilai = document.querySelector('#nilai');
-var quizBtn = document.getElementById('quiz');
-var socket = new WebSocket('wss://'+ window.location.host +'/ws/pembayaran/'+'{{ id_transaksi }}/');
-socket.onopen = function(event) {
-    console.log('Koneksi WebSocket dibuka');
-};
-
-socket.onmessage = function(event) {
-    const data = JSON.parse(event.data);
-
-    if (data === 'Telah Dibayar'){
-        '{% if status_transaksi == "Belum Dibayar" %}'
-            btnStatus.style.display='none';
-            qrCode.remove()
-            btnBayar.style.display='none'; 
-        '{% endif %}'
-
-        statusTransaksi.textContent = `Status : ${data}`;
-        modul.style.display='block';
-        ujian.style.display='block';
-        nilai.style.display='block';   
-        
-        socket.onclose();   
-    }
-    else if (data === 'Pembayaran Melebihi Batas Waktu'){
-        statusTransaksi.textContent = `Status : ${data}`;
-        btnStatusInvoice.style.display='none';
-        btnStatus.textContent = 'Lakukan Pembayaran Lagi';
-        qrCode.remove()
-        btnBayar.style.display='none'; 
-        socket.onclose();       
-    }
-};
-socket.onerror = function(error) {
-    console.error('Kesalahan koneksi WebSocket:', error);
-};
-socket.onclose = function(event) {
-    console.log('Koneksi WebSocket ditutup');
-};
-
-</script>
-{% include "includes/ca/script.html" %}
+<script src="{% static 'pembayaran/js/livepayment_gopay.js' %}"></script>
 {% endblock content %}

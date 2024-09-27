@@ -14,13 +14,13 @@
 
     <ul class="menu-inner py-1">
       <!-- Dashboard -->
-      <li class="menu-item {% if request.path == '/menu/' or request.path|slice:'0:16' == "/ubah-password/" %}active{% endif %}">
+      <li class="menu-item {% if request.path == '/menu/'%}active{% endif %}">
         <a href="{% url "menu:menu" %}" class="menu-link">
           <i class="menu-icon tf-icons bx bx-home-circle"></i>
           <div data-i18n="Analytics">Menu</div>
         </a>
       </li>
-      <li class="menu-item">
+      <li class="menu-item {% if request.path|slice:"0:17" == '/menu/pembayaran/'%}active{% endif %}">
         <a href="{% url "menu:pembayaran" %}" class="menu-link {% if request.user.role == 'pemateri' %}display:none;{% endif %}" class="nav-item menu-items {% if request.path|slice:"0:16" == '/menu/pembayaran' or request.path|slice:'0:12' == '/menu/invoice'%}active{% endif %}">
           <i class="menu-icon tf-icons bx bx-money"></i>
           <div data-i18n="Analytics">Pembayaran</div>
