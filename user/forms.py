@@ -45,7 +45,6 @@ class AddProfileForm(forms.ModelForm):
         super(AddProfileForm, self).__init__(*args, **kwargs)
         self.fields['nama_lengkap'].widget.attrs['class'] = 'form-control'
         self.fields['jenis_kelamin'].widget.attrs['class'] = 'form-select'
-        self.fields['jenis_kelamin'].widget.attrs['style'] = 'border: 1px solid #2c2e33;'
         self.fields['tempat_tinggal'].widget.attrs['class'] = 'form-control w-100'
         self.fields['foto'].widget.attrs['class'] = 'form-control w-100'
         self.fields['nomor_telepon'].widget.attrs['class'] = 'form-control w-100'

@@ -1,96 +1,69 @@
 {% extends "menu_base.html" %}
+{% load static %}
 
-{% block title %}menu{% endblock title %}
+{% block title %}account settings{% endblock title %}
 {% block content %}
+<!-- Content -->
 
 <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="row">
-      <div class="col-lg-12 order-1">
-        <div class="row">
-          <div class="col-lg-6 col-md-12 col-12 mb-4 row-2"  style="{% if request.user.role == 'pemateri' %}display:none;{% endif %}">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bx-money text-success' style="font-size: 60px;"></i>
-                </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Pembayaran</h3>
-                <a href="{% url "menu:pembayaran" %}" class="btn btn-primary">kunjungi</a>
-                </div>
+  <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Account Settings /</span> Account</h4>
+  <div class="row">
+    <div class="col-md-12">
+      {% include "includes/menu/auth/navigasi_account.html" %}
+      <div class="card mb-4">
+        <h5 class="card-header">Profile Details</h5>
+        <!-- Account -->
+        {% if messages %}
+          {% for message in messages %}
+          <div id="message" class="container" data-duration="4000">
+              <div{% if message.tags %} class="text-center alert alert-{{ message.tags }}"{% endif %}>
+                  {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                  <i class="fa-sharp fa-solid fa-triangle-exclamation"></i>
+                  {% endif %}
+                  {{ message }}
               </div>
-            </div>
           </div>
-          {% if status_transaksi == "Telah Dibayar" or request.user.role == 'admin' or request.user.role == 'pemateri' %}
-          <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bxs-graduation text-success' style="font-size: 60px;"></i>
-                </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Level Study</h3>
-                  <a href="{% url "menu:levelstudy" %}" class="btn btn-primary">kunjungi</a>
-                </div>
+          {% endfor %}
+        {% endif %}
+        <hr class="my-0" />
+        <div class="card-body">
+          <form id="formAccountSettings" method="POST" action="{% url "user:add-profile" %}" enctype="multipart/form-data" >
+            {% csrf_token %}
+            <div class="row">
+              <div class="mb-3 col-md-6">
+                <label for="id_nama_lengkap" class="form-label">Nama Lengkap</label>
+                {{ forms.nama_lengkap }}
               </div>
-            </div>
-          </div>
-          <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around">
-                <div class="w-100">
-                  <i class='bx bx-book-content text-primary' style="font-size: 60px;"></i>
-                </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Mata Pelajaran</h3>
-                  <a href="{% url "menu:mapel-levelstudy" %}" class="btn btn-primary">kunjungi</a>
-                </div>
+              <div class="mb-3 col-md-6">
+                <label for="id_foto" class="form-label">Foto</label>
+                {{ forms.foto }}
               </div>
-            </div>
-          </div>
-          {% if request.user.role != "pelajar" %}
-          <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row  align-items-center justify-content-around">
-                <div class="w-100">
-                  <i class='bx bx-book-open text-primary' style="font-size: 60px;"></i>
-                </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Modul</h3>
-                  <a href="{% url "menu:levelstudy-modul" %}" class="btn btn-primary">kunjungi</a>
-                </div>
+              <div class="mb-3 col-md-6">
+                <label for="id_jenis_kelamin" class="form-label">Jenis Kelamin</label>
+              {{ forms.jenis_kelamin }}
               </div>
-            </div>
-          </div>
-          <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bxs-vial text-warning' style="font-size: 60px;"></i>
-                </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Ujian</h3>
-                  <a href="{% url "menu:levelstudy-ujian" %}" class="btn btn-primary">kunjungi</a>
-                </div>
+              <div class="mb-3 col-md-6">
+                <label for="id_tempat_tinggal" class="form-label">Tempat Tinggal</label>
+              {{ forms.tempat_tinggal }}
               </div>
-            </div>
-          </div>
-          {% endif %}
-          <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bx-trophy text-warning' style="font-size: 60px;"></i>
-                </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Nilai</h3>
-                  <a href="{% url "menu:pembayaran" %}" class="btn btn-primary">kunjungi</a>
-                </div>
+              <div class="mb-3 col-md-6">
+                <label for="id_nomor_telepon" class="form-label">No telepon</label>
+              {{ forms.nomor_telepon }}
               </div>
+              <div class="mb-3 col-md-6">
+                <label for="id_tanggal_lahir" class="form-label">Tanggal Lahir</label>
+              {{ forms.tanggal_lahir }}
+              </div>
+            <div class="mt-2">
+              <button type="submit" class="btn btn-primary me-2">Save changes</button>
+              <button type="reset" class="btn btn-outline-secondary">Reset Form</button>
             </div>
-          </div>
-          {% endif %}
+          </form>
         </div>
+        <!-- /Account -->
       </div>
     </div>
   </div>
+</div>
+<!-- / Content -->
 {% endblock content %}
