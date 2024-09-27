@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div id="trans-data" style="display:none;" data-id="{{ id_transaksi }}"></div>
-                <div id="trans-status" style="display:none;" data-status-trans="{{ status_transaksi }}"></div>
+                <div id="trans-status" style="display:none;" data-status="{{ status_transaksi }}"></div>
                 <div class="table-responsive border border-bottom-0 border-top-0 rounded">
                     <table class="table m-0">
                         <thead>
@@ -45,7 +45,7 @@
                     <div class="card mt-3">
                         <div class="card-body text-center">
                             {% if status_transaksi == "Belum Dibayar" %}
-                            <div class="qrcode-container mb-4">
+                            <div class="qrcode-container mb-4" id="qrcode">
                                 <img class="img-fluid" src="{{qr_code}}" alt="qrcode" width="200" height="200">
                             </div>
                             {% endif %}
