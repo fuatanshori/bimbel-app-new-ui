@@ -64,6 +64,7 @@
         <!-- /Invoice -->
     </div>
 </div>
-
+{% if status_transaksi == "Belum Dibayar" %}
 <script src="{% static 'pembayaran/js/livepayment.js' %}"></script>
+{% endif %}
 {% endblock content %}
