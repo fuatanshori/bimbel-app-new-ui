@@ -63,7 +63,7 @@ services:
       - db_volume:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 60s
+      interval: 15s
       timeout: 2s
       retries: 3
     networks:
