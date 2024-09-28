@@ -16,9 +16,13 @@
               <li class="scroll-to-section"><a href="#about">About</a></li>
               <li class="scroll-to-section"><a href="#pricing">Pricing</a></li>
               {% if request.user.is_authenticated %}
-              <li><div class="gradient-button"><a href="{% url "user:keluar" %}">Logout</a></div></li> 
+              <li class="scroll-to-section"><a href="{% url "menu:menu" %}">menu</a></li>
+              {% if request.user.role == "admin" %}
+              <li class="scroll-to-section"><a href="{% url "admin:index" %}">administrator</a></li>
+                {% endif %}
+                <li><div class="gradient-button"><a href="{% url "user:keluar" %}">Logout</a></div></li> 
               {% else %}
-              <li><div class="gradient-button"><a href="{% url "user:masuk" %}">Login</a></div></li> 
+                <li><div class="gradient-button"><a href="{% url "user:masuk" %}">Login</a></div></li> 
               {% endif %}
             </ul>        
             <a class='menu-trigger'>

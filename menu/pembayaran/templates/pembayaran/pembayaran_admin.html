@@ -1,76 +1,56 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "menu_base.html" %}
 
-{% block style %}
-{% include "includes/ca/style.html" %}
-{% endblock style %}
-
-{% block title %}{% endblock title %}
-
+{% block title %}menu{% endblock title %}
 {% block content %}
-<div class="container-scroller">
-    
-    {% include "includes/ca/sidebar.html" %}
-    <!-- partial -->
-    <div class="container-fluid page-body-wrapper">
-    <!-- partial:partials/_navbar.html -->
-    {% include "includes/ca/navbar.html" %}
-    <!-- partial -->
-   <!-- partial -->
-        <div class="main-panel">
-          <div class="content-wrapper">
-            <div class="row">
-                <div class="col-lg-12 grid-margin">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="d-flex flex-row justify-content-between">
-                      <h4 class="card-title mb-1">Transaksi User</h4>
-                      <a href="{% url "menu:laporan-transaksi" %}" class="btn btn-primary px-4"><i class="mdi mdi-file-excel"></i></a>
-                    </div>
-                    <div class="w-25 py-2 rounded">
-                    <form method="get"class="nav-link mt-2 mt-md-0 d-none d-lg-flex search" >
-                      <input style="border-radius: 4px;" type="text" name="cari_transaksi" value="{{request.GET.cari_transaksi}}" class="form-control text-black mx-2" placeholder="cari pembayaran">
-                      <button type="submit" class="btn btn-primary px-4">go</submit>
-                    </form>
 
-                  </div>
-                    <div class="table-responsive">
-                      <table class="table">
-                        <thead>
-                          <tr>
-                            <th>User Email</th>
-                            <th>Id Transaksi</th>
-                            <th>Va Number</th>
-                            <th>Tarif</th>
-                            <th>bank</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            {% for transaksi_obj in transaksi_objs %}
-                          <tr>
-                            <td>{{transaksi_obj.user}}</td>
-                            <td>{{transaksi_obj.id_transaksi}}</td>
-                            <td>{{transaksi_obj.va_number}}</td>
-                            <td>{{transaksi_obj.tarif.harga}}</td>
-                            <td>{{transaksi_obj.layanan_pembayaran}}</td>
-                            {% if transaksi_obj.transaksi_status == 'settlement' %}
-                            <td><label class="badge badge-primary">Telah Dibayar</label></td>
-                            {% elif transaksi_obj.transaksi_status == 'pending' %}
-                            <td><label class="badge badge-danger">Belum Dibayar</label></td>
-                            {% elif transaksi_obj.transaksi_status == 'expire' %}
-                            <td><label class="badge badge-danger">Pembayaran Melebihi Batas Waktu</label></td>
-                            {% endif %}
-                          </tr>
-                          {% endfor %}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              
-            </div>
-          </div>
-</div>
-{% include "includes/ca/script.html" %}
+<div class="container-xxl flex-grow-1 container-p-y ">
+    <div class="row justify-content-center">
+      <div class="card">
+        <h5 class="card-header">Transaksi User</h5>
+        <div class="d-flex flex-column gap-2 col-lg-4">
+          <a href="{% url 'menu:laporan-transaksi' %}" class="btn btn-primary col-lg-6">Cetak Laporan <i class="bx bxs-report"></i></a>
+          <form method="get" class="d-flex align-items-center gap-2">
+              <input style="border-radius: 4px;" type="text" name="cari_transaksi" value="{{ request.GET.cari_transaksi }}" class="form-control text-black" placeholder="cari pembayaran">
+              <button type="submit" class="btn btn-primary px-4">go</button>
+          </form>
+      </div>
+      
+        
+        <div class="table-responsive text-nowrap">
+          <table class="table table-borderless">
+            <thead>
+              <tr>
+                <th>User Email</th>
+                <th>Id Transaksi</th>
+                <th>Va Number</th>
+                <th>Tarif</th>
+                <th>bank</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {% for transaksi_obj in transaksi_objs %}
+                  <tr>
+                    <td>{{transaksi_obj.user}}</td>
+                    <td>{{transaksi_obj.id_transaksi}}</td>
+                    <td>{{transaksi_obj.va_number}}</td>
+                    <td>{{transaksi_obj.tarif.harga}}</td>
+                    <td>{{transaksi_obj.layanan_pembayaran}}</td>
+                    {% if transaksi_obj.transaksi_status == 'settlement' %}
+                    <td><label class="badge bg-primary">Telah Dibayar</label></td>
+                    {% elif transaksi_obj.transaksi_status == 'pending' %}
+                    <td><label class="badge bg-danger">Belum Dibayar</label></td>
+                    {% elif transaksi_obj.transaksi_status == 'expire' %}
+                    <td><label class="badge bg-danger">Pembayaran Melebihi Batas Waktu</label></td>
+                    {% endif %}
+                  </tr>
+                  {% endfor %}
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}

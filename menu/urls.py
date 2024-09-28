@@ -26,6 +26,10 @@ urlpatterns += [
     path("laporan-invoice/",views_pembayaran.laporan_invoice,name="laporan-invoice"),
     path("pembayaran/invoice-gopay/<str:id_transaksi>/",views_pembayaran.invoice_gopay,name="invoice-gopay"),
     re_path(r'^pembayaran/[^/]+/$', views_pembayaran.pembayaran, name='pembayaran-gopay-redirect'),
+    path("tarif/",views_pembayaran.tarif,name="tarif"),
+    path("tarif/delete/<id_tarif>/",views_pembayaran.delete_tarif,name="delete-tarif"),
+    path("tarif/add/",views_pembayaran.add_tarif,name="add-tarif"),
+    path("tarif/edit/<id_tarif>/",views_pembayaran.edit_tarif,name="edit-tarif"),
 ]
 
 # modul

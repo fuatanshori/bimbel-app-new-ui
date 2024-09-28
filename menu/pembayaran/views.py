@@ -2,7 +2,7 @@ import datetime
 import babel.dates
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from django.shortcuts import render, redirect,HttpResponse
+from django.shortcuts import render, redirect,HttpResponse,get_object_or_404,get_list_or_404
 import requests
 from .models import Tarif, Transaksi,Diskon
 from config import midtrans
@@ -25,6 +25,9 @@ from django.http import Http404
 import pytz
 from core.utils.decorator import admin_pemateri_required
 from django.utils import timezone
+from .forms import TarifForm
+
+
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
@@ -615,3 +618,42 @@ def pembayaran_admin_list(request):
     }
     # return redirect("menu:mapel-modul")
     return render(request, 'pembayaran/pembayaran_admin.html',context)
+
+def tarif(request):
+    tarif_form = TarifForm()
+    tarif_objs = Tarif.objects.all()
+    context={
+    "tarif_objs":tarif_objs,
+    "tarif_form":tarif_form,   
+    }
+    return render(request,"pembayaran/tarif.html",context)
+
+def delete_tarif(request,id_tarif):
+    tarif_objs = get_list_or_404(Tarif)
+    tarif_obj = get_object_or_404(Tarif,pk=id_tarif)
+    if len(tarif_objs)>1:
+        tarif_obj.delete()
+        messages.success(request,"berhasil dihapus")
+        return redirect("menu:tarif")
+    else:
+        messages.error(request,"Tarif tidak boleh dihapus. sisakan 1 tarif")
+        return redirect("menu:tarif")
+
+def add_tarif(request):
+    if request.method == "POST":
+        tarif_form = TarifForm(request.POST)
+        if tarif_form.is_valid():
+            tarif_form.save()
+        messages.success(request,"berhasil ditambahkan")
+        return redirect("menu:tarif")
+    return redirect("menu:tarif")
+    
+def edit_tarif(request,id_tarif):
+    if request.method == "POST":
+        tarif_obj = get_object_or_404(Tarif,pk=id_tarif)
+        tarif_form = TarifForm(request.POST,instance=tarif_obj)
+        if tarif_form.is_valid():
+            messages.success(request,"berhasil diedit")
+            tarif_form.save()
+        return redirect("menu:tarif")
+    return redirect("menu:tarif")

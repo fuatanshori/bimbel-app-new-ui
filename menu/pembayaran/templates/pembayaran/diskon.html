@@ -1,0 +1,139 @@
+{% extends "menu_base.html" %}
+
+{% block title %}menu{% endblock title %}
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y ">
+    <div class="row justify-content-center">
+      <div class="card py-4">
+        {% if messages %}
+            {% for message in messages %}
+            <div id="message" class="container" data-duration="4000">
+                <div{% if message.tags %} class="text-center alert alert-{{ message.tags }}"{% endif %}>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <i class="fa-sharp fa-solid fa-triangle-exclamation"></i>
+                    {% endif %}
+                    {{ message }}
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+        <div class="card-header">
+            <h4 class="mb-4">Tarif Pembayaran</h4>
+            <button class="btn btn-primary" 
+            data-bs-toggle="modal"
+            data-bs-target="#modalAddTarif">add tarif</button>
+        </div>
+        <div class="modal fade" id="modalAddTarif" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalAddTarifTitle">Add Tarif</h5>
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <form method="POST" action="{% url "menu:add-tarif" %}">
+                {% csrf_token %}
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col mb-3">
+                    <label for="id_subject" class="form-label">Subject</label>
+                    {{tarif_form.subject}}
+                  </div>
+                </div>
+                <div class="row g-2">
+                  <div class="col mb-0">
+                    <label for="id_harga" class="form-label">Harga</label>
+                    {{tarif_form.harga}}
+                  </div>
+                  
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                  Close
+                </button>
+                <button type="submit" class="btn btn-primary">Tambah Tarif</button>
+              </div>
+            </form>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive text-nowrap">
+                <table class="table table-borderless">
+                  <thead>
+                    <tr>
+                      <th>Subject</th>
+                      <th>Harga</th>
+                      <th>Action</th>
+                      <th>Diskon</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for tarif_obj in tarif_objs %}
+                    <tr>
+                      <td><i class=""></i>{{tarif_obj.subject}}</td>
+                      <td>{{tarif_obj.harga}}</td>
+                      <td>
+                       <button
+                       type="button"
+                        class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalEditTarif{{tarif_obj.pk}}"
+                       >edit</button>
+                       <a href="{% url "menu:delete-tarif" id_tarif=tarif_obj.pk %}" class="btn btn-danger">delete</a>
+                      </td>
+                      <td><a href="" class="btn btn-primary">Lihat diskon</a></td>
+                    </tr>
+                    <div class="modal fade" id="modalEditTarif{{tarif_obj.pk}}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditTarif{{tarif_obj.pk}}Title">Edit Tarif</h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <form method="POST" action="{% url "menu:edit-tarif" id_tarif=tarif_obj.pk %}">
+                            {% csrf_token %}
+                          <div class="modal-body">
+                            <div class="row">
+                              <div class="col mb-3">
+                                <label for="id_subject" class="form-label">Subject</label>
+                                <input id="id_subject" value="{{tarif_obj.subject}}" class="form-control" name="subject">
+                              </div>
+                            </div>
+                            <div class="row g-2">
+                              <div class="col mb-0">
+                                <label for="id_harga" class="form-label">Harga</label>
+                                <input id="id_harga" value="{{tarif_obj.harga}}" class="form-control" name="harga">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                              Close
+                            </button>
+                            <button type="submit" class="btn btn-primary">Edit Tarif</button>
+                          </div>
+                        </form>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
