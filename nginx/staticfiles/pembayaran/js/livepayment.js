@@ -26,14 +26,14 @@ socket.onmessage = function(event) {
         btnStatus.style.display='none';
         }
 
-        statusTransaksi.textContent = `${data}`;
+        statusTransaksi.textContent = data;
         modul.style.display='block';
         ujian.style.display='block';
         nilai.style.display='block';    
         socket.onclose();   
     }
     else if (data === 'Pembayaran Melebihi Batas Waktu'){
-        statusTransaksi.textContent = `${data}`;
+        statusTransaksi.textContent = data;
         btnStatusInvoice.style.display='none'
         btnStatus.textContent = 'Lakukan Pembayaran Lagi';
         socket.onclose();       
