@@ -2,6 +2,9 @@ var statusTransaksi = document.getElementById("status_transaksi");
 var expiryTime = document.getElementById("expirytime");
 const transStatusElement = document.getElementById('trans-status');
 const status_trans = transDataElement.getAttribute('data-status');
+const transDataElement = document.getElementById('trans-data');
+const id_transaksi = transDataElement.getAttribute('data-id');
+
 if (status_trans === "Belum Dibayar"){
     var btnStatus = document.querySelector('#btn_status');
     var qrCode = document.querySelector('#qrcode');
@@ -11,8 +14,7 @@ if (status_trans === "Belum Dibayar"){
 var modul = document.querySelector('#modul');
 var ujian = document.querySelector('#ujian');
 var nilai = document.querySelector('#nilai');
-const transDataElement = document.getElementById('trans-data');
-const id_transaksi = transDataElement.getAttribute('data-id');
+
 var socket = new WebSocket('wss://'+ window.location.host +'/ws/pembayaran/'+id_transaksi+"/");
 
 socket.onopen = function(event) {
