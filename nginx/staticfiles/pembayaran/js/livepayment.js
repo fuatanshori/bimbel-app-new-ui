@@ -1,7 +1,7 @@
 var statusTransaksi = document.getElementById("status_transaksi");
 var expiryTime = document.getElementById("expirytime");
 const transStatusElement = document.getElementById('trans-status');
-const status_transaksi = transDataElement.getAttribute('data-status-trans');
+const status_transaksi = transStatusElement.getAttribute('data-status');
 if (status_transaksi === "Belum Dibayar"){
 var btnStatus = document.querySelector('#btn_status');
 var btnStatusInvoice = document.getElementById("btn_status_invoice")

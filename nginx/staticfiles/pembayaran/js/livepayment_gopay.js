@@ -1,7 +1,7 @@
 var statusTransaksi = document.getElementById("status_transaksi");
 var expiryTime = document.getElementById("expirytime");
 const transStatusElement = document.getElementById('trans-status');
-const status_trans = transDataElement.getAttribute('data-status');
+const status_trans = transStatusElement.getAttribute('data-status');
 const transDataElement = document.getElementById('trans-data');
 const id_transaksi = transDataElement.getAttribute('data-id');
 
