@@ -24,6 +24,7 @@ import logging
 from django.http import Http404
 import pytz
 from core.utils.decorator import admin_pemateri_required
+from django.utils import timezone
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
@@ -496,6 +497,7 @@ def laporan_invoice(request):
     except Transaksi.DoesNotExist:
         return redirect("menu:pembayaran")
     # Data invoice
+    waktu_transaksi = timezone.localtime(transaksi_obj.transaction_time)
     data = {
         'title': 'Bimbingan belajar banua',
         'date': babel.dates.format_date(datetime.date.today(),locale="id"),
@@ -504,7 +506,7 @@ def laporan_invoice(request):
         'status': midtrans.PAYMENT_STATUS[transaksi_obj.transaksi_status],
         'virtual_number': transaksi_obj.va_number,
         'layanan_pembayaran': str(transaksi_obj.layanan_pembayaran).upper(),
-        'waktu_transaksi':transaksi_obj.transaction_time.strftime("%d-%m-%Y %H:%M WIB"),
+        'waktu_transaksi':waktu_transaksi,
         'note': '*Invoice ini sah diterbitkan langsung oleh pihak bimbingan belajar banua'
     }
     # Ukuran kertas setengah dari A4
