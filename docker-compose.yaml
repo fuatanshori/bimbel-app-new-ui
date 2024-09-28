@@ -59,8 +59,10 @@ services:
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: Asia/Jakarta
     volumes:
       - db_volume:/var/lib/mysql
+    command: --default-time-zone='Asia/Jakarta'
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 15s
