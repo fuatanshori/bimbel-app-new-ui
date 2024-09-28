@@ -506,7 +506,7 @@ def laporan_invoice(request):
         'status': midtrans.PAYMENT_STATUS[transaksi_obj.transaksi_status],
         'virtual_number': transaksi_obj.va_number,
         'layanan_pembayaran': str(transaksi_obj.layanan_pembayaran).upper(),
-        'waktu_transaksi':waktu_transaksi,
+        'waktu_transaksi':waktu_transaksi.strftime("%d-%m-%Y %H:%M WIB"),
         'note': '*Invoice ini sah diterbitkan langsung oleh pihak bimbingan belajar banua'
     }
     # Ukuran kertas setengah dari A4
