@@ -36,6 +36,7 @@ class Diskon(models.Model):
     id_diskon           = models.BigAutoField(unique=True,primary_key=True)
     diskon_name         = models.CharField(max_length=100)
     diskon_code         = models.CharField(max_length=100,unique=True,db_collation='utf8mb4_bin')
+    is_publish           = models.BooleanField(default=False)
     persentase_diskon   = models.SmallIntegerField(help_text='pilih diskon dari 1 sampai 100 akan dihitung sebagai persen')
     tarif               = models.ForeignKey(Tarif,on_delete=models.CASCADE)
     kedaluwarsa         = models.DateField()
