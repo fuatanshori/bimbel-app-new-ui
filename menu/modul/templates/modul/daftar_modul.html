@@ -1,71 +1,72 @@
-{% extends "base_menu.html" %}
+{% extends "menu_base.html" %}
 
-{% block content_menu %}
-<div class="col-md-12 grid-margin">
-    <div class="card">
-        <div class="card-body">
-            {% if messages %}
-                {% for message in messages %}
-                <div id="message" class="container" data-duration="4000">
-                    <div{% if message.tags %} class="text-center alert alert-{{ message.tags }}"{% endif %}>
-                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
-                        <i class="fa-sharp fa-solid fa-triangle-exclamation"></i>
-                        {% endif %}
-                        {{ message }}
-                    </div>
+{% block title %}menu{% endblock title %}
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y ">
+    <div class="row justify-content-center">
+      <div class="card py-4">
+        {% if messages %}
+            {% for message in messages %}
+            <div id="message" class="container" data-duration="4000">
+                <div{% if message.tags %} class="text-center alert alert-{{ message.tags }}"{% endif %}>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <i class="fa-sharp fa-solid fa-triangle-exclamation"></i>
+                    {% endif %}
+                    {{ message }}
                 </div>
-                {% endfor %}
+            </div>
+            {% endfor %}
+        {% endif %}
+        {% if levelstudy_objs.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field, errors in levelstudy_objs.errors.items %}
+                        <li>{{ field }}: {{ errors|striptags }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <div class="card-header">
+          <div><h4 class="mb-3">Mata Pelajaran</h4></div>
+          <div>
+            <a href="{% url "menu:mapel-modul" id_levelstudy=id_levelstudy %}" class="btn btn-dark text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
+            {% if request.user.role == 'admin' or request.user.role == 'pemateri' %}
+            <a href="{% url "menu:tambah-modul" id_levelstudy=id_levelstudy id_mapel=id_mapel %}" class="text-white btn btn-primary">Tambah Modul</a>
             {% endif %}
-            <div class="d-flex flex-row justify-content-between">
-                <h4 class="card-title mb-1">Modul</h4>
-                {% if request.user.role == 'admin' or request.user.role == 'pemateri' %}
-                <a href="{% url "menu:tambah-modul" id_mapel=id_mapel %}" class="btn btn-primary">+</a>
-                {% endif %}
-            </div>
-            <div class="row">
-                <div class="col-12">
-                <div class="preview-list">
-                    
-                    {% for modul_obj in modul_objs %}
-                    <div class="preview-item border-bottom">
-                    <div class="preview-thumbnail">
-                        <div class="rounded-1 preview-icon bg-primary">
-                        <i  class="mdi mdi-file-document text-white"></i>
-                        </div>
-                    </div>
-                    <div class="preview-item-content d-sm-flex flex-grow">
-                        <div class="flex-grow">
-                        <h6 class="preview-subject">{{modul_obj.nama_modul}}</h6>
-                        <p class="text-muted">{{ modul_obj.description|truncatechars_html:100|safe }}</p>
-                        </div>
-                        <div class="me-auto text-sm-right pt-2 pt-sm-0">
-                        <a href="{% url "menu:detail-modul" id_mapel=id_mapel id_modul=modul_obj.pk %}" class="btn btn-primary px-3 py-2">Lihat Materi</a>
-                        {% if request.user.role == 'admin' or request.user.role == 'pemateri' %}
-                        <a href="{% url "menu:edit-modul" id_mapel=id_mapel id_modul=modul_obj.pk %}" class="btn btn-warning px-3 py-2">Edit </a>
-                        <a href="{% url "menu:hapus-modul" id_mapel=id_mapel id_modul=modul_obj.pk %}" class="btn btn-danger px-3 py-2">Hapus </a>
-                        {% endif %}
-                        </div>
-                
-                    </div>
-                    </div>   
-                    {% endfor %}                             
-                </div>
-                </div>
-            </div>
         </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive text-nowrap">
+                <table class="table table-borderless">
+                  <thead>
+                    <tr>
+                      <th>Mata Pealajaran</th>
+                      <th>Deskripsi</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for modul_obj in modul_objs %}
+                    <tr>
+                      <td>{{modul_obj.nama_modul}}</td>
+                      <td>{{modul_obj.description|truncatechars_html:100|safe}}</td>
+                      </td>
+                      <td>
+                        <a href="{% url "menu:detail-modul" id_mapel=id_mapel id_modul=modul_obj.get_id_safe %}" class="btn btn-primary px-3 py-2">Lihat Materi</a>
+                        {% if request.user.role == 'admin' or request.user.role == 'pemateri' %}
+                        <a href="{% url "menu:edit-modul" id_mapel=id_mapel id_modul=modul_obj.get_id_safe %}" class="btn btn-warning px-3 py-2">Edit </a>
+                        <a href="{% url "menu:hapus-modul" id_mapel=id_mapel id_modul=modul_obj.get_id_safe %}" class="btn btn-danger px-3 py-2">Hapus </a>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                {% include "includes/menu/pagination.html" with queryset=modul_objs custom_range=custom_range %}
+              </div>
+        </div>
+      </div>
     </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Display message for a certain time before fading out
-        const messageElement = document.getElementById('message');
-        if (messageElement) {
-            setTimeout(() => {
-                messageElement.style.opacity = 0;
-                setTimeout(() => messageElement.remove(), 500); // Remove element after fade out
-            }, 3000); // Adjust the delay as needed
-        }
-    });
-  </script>
-{% endblock content_menu %}
+  </div>
+{% endblock content %}

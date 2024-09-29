@@ -11,6 +11,8 @@ import os
 from django.contrib import messages
 from .forms import ModulForm
 from core.utils.decorator import admin_pemateri_required
+from menu.utils.encode_url import decode_id
+from menu.utils.pagination import pagination_queryset
 
 
 # Create your views here.
@@ -35,7 +37,8 @@ def modul_levelstudy(request):
 
 @login_required(login_url='user:masuk')
 def modul_mapel(request,id_levelstudy):
-    mapel_objs = MataPelajaran.objects.filter(level_study__pk=id_levelstudy)
+    pk =decode_id(id_levelstudy)
+    mapel_objs = MataPelajaran.objects.filter(level_study__pk=pk)
     try:
         Transaksi.objects.get(user=request.user, transaksi_status="settlement")
     except Transaksi.DoesNotExist:
@@ -44,22 +47,25 @@ def modul_mapel(request,id_levelstudy):
     
     context = {
         'mapel_objs': mapel_objs,
+        "id_levelstudy":id_levelstudy
     }
     return render(request, 'modul/modul_mapel.html', context)
 
 
 @login_required(login_url='user:masuk')
-def daftar_modul(request, id_mapel):
+def daftar_modul(request,id_levelstudy, id_mapel):
     try:
         Transaksi.objects.get(user=request.user, transaksi_status="settlement")
     except Transaksi.DoesNotExist:
         if request.user.role not in ["pemateri","admin"]:
             return redirect("menu:pembayaran")
-    
-    modul_objs = Modul.objects.filter(mata_pelajaran__pk=id_mapel)
+    pk = decode_id(id_mapel)
+    custom_range,modul_objs = pagination_queryset(request,Modul.objects.filter(mata_pelajaran__pk=pk),5)
     context = {
         'id_mapel':id_mapel,
         'modul_objs': modul_objs,
+        'custom_range':custom_range,
+        "id_levelstudy":id_levelstudy
     }
     return render(request, 'modul/daftar_modul.html', context)
 
@@ -81,10 +87,11 @@ def hapusModul(request,id_mapel, id_modul):
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
-def tambah_modul(request,id_mapel):
+def tambah_modul(request,id_levelstudy,id_mapel):
     if request.method == "POST":
+        pk = decode_id(id_mapel)
         try:
-            mapel_obj = MataPelajaran.objects.get(pk=id_mapel)
+            mapel_obj = MataPelajaran.objects.get(pk=pk)
         except MataPelajaran.DoesNotExist:
             return JsonResponse({
                 "message":"data not a valid",
@@ -106,7 +113,8 @@ def tambah_modul(request,id_mapel):
             messages.success(request,f"selamat modul {nama_modul} berhasil di tambahkan")
             return JsonResponse({
                 "message":"data uploaded",
-                "id_mapel":id_mapel
+                "id_mapel":id_mapel,
+                "id_levelstudy":id_levelstudy,
             })
         else:
             return JsonResponse({
@@ -115,7 +123,8 @@ def tambah_modul(request,id_mapel):
     modul_forms = ModulForm(request.POST or None,request.FILES or None)
     context={
         "modul_forms": modul_forms,
-        "id_mapel": id_mapel
+        "id_mapel": id_mapel,
+        "id_levelstudy":id_levelstudy,
     }
     return render(request, 'modul/tambah_modul.html',context)
 
