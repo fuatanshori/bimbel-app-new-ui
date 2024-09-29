@@ -18,6 +18,16 @@
             </div>
             {% endfor %}
         {% endif %}
+        {{tarif_form.error}}
+        {% if tarif_form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field, errors in tarif_form.errors.items %}
+                        <li>{{ field }}: {{ errors|striptags }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         <div class="card-header">
             <h4 class="mb-4">Tarif Pembayaran</h4>
             <button class="btn btn-primary" 

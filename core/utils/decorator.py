@@ -13,3 +13,15 @@ def admin_pemateri_required(function):
             raise Http404
         return function(request, *args, **kwargs)
     return wrap
+
+
+def admin_required(function):
+    """
+    Decorator untuk memastikan pengguna adalah admin dan pemateri
+    """
+    @wraps(function)
+    def wrap(request, *args, **kwargs):
+        if request.user.role not in ["admin"]:
+            raise Http404
+        return function(request, *args, **kwargs)
+    return wrap

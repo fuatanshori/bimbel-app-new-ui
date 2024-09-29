@@ -23,9 +23,9 @@ import babel
 import logging
 from django.http import Http404
 import pytz
-from core.utils.decorator import admin_pemateri_required
+from core.utils.decorator import admin_pemateri_required,admin_required
 from django.utils import timezone
-from .forms import TarifForm
+from .forms import TarifForm,DiskonForm
 
 
 
@@ -598,10 +598,13 @@ def laporan_invoice(request):
 
     return response
 
+@login_required(login_url='user:masuk')
+@admin_required
 def menu_pembayaran(request):
-    
     return render(request, 'pembayaran/menu_pembayaran.html')
 
+@login_required(login_url='user:masuk')
+@admin_required
 def pembayaran_admin_list(request):
     if request.user.role != "admin":
         raise Http404
@@ -619,6 +622,8 @@ def pembayaran_admin_list(request):
     # return redirect("menu:mapel-modul")
     return render(request, 'pembayaran/pembayaran_admin.html',context)
 
+@login_required(login_url='user:masuk')
+@admin_required
 def tarif(request):
     tarif_form = TarifForm()
     tarif_objs = Tarif.objects.all()
@@ -628,6 +633,8 @@ def tarif(request):
     }
     return render(request,"pembayaran/tarif.html",context)
 
+@login_required(login_url='user:masuk')
+@admin_required
 def delete_tarif(request,id_tarif):
     tarif_objs = get_list_or_404(Tarif)
     tarif_obj = get_object_or_404(Tarif,pk=id_tarif)
@@ -639,21 +646,49 @@ def delete_tarif(request,id_tarif):
         messages.error(request,"Tarif tidak boleh dihapus. sisakan 1 tarif")
         return redirect("menu:tarif")
 
+@login_required(login_url='user:masuk')
+@admin_required
 def add_tarif(request):
     if request.method == "POST":
         tarif_form = TarifForm(request.POST)
         if tarif_form.is_valid():
             tarif_form.save()
-        messages.success(request,"berhasil ditambahkan")
+            messages.success(request, "Tarif berhasil di tambahkan.")
+        else:
+            error_messages = []
+            for field, errors in tarif_form.errors.items():
+                for error in errors:
+                    error_messages.append(f"{field}: {error}")    
+        messages.error(request, " | ".join(error_messages))
         return redirect("menu:tarif")
     return redirect("menu:tarif")
     
-def edit_tarif(request,id_tarif):
+    
+@login_required(login_url='user:masuk')
+@admin_required 
+def edit_tarif(request, id_tarif):
     if request.method == "POST":
-        tarif_obj = get_object_or_404(Tarif,pk=id_tarif)
-        tarif_form = TarifForm(request.POST,instance=tarif_obj)
+        tarif_obj = get_object_or_404(Tarif, pk=id_tarif)
+        tarif_form = TarifForm(request.POST, instance=tarif_obj)
         if tarif_form.is_valid():
-            messages.success(request,"berhasil diedit")
             tarif_form.save()
+            messages.success(request, "Tarif berhasil diedit.")
+        else:
+            error_messages = []
+            for field, errors in tarif_form.errors.items():
+                for error in errors:
+                    error_messages.append(f"{field}: {error}")
+            messages.error(request, " | ".join(error_messages))
         return redirect("menu:tarif")
     return redirect("menu:tarif")
+
+@login_required(login_url='user:masuk')
+@admin_required
+def diskon(request,id_tarif):
+    diskon_form = DiskonForm()
+    diskon_objs=get_list_or_404(Diskon,tarif__pk=id_tarif)
+    context={
+        "diskon_objs":diskon_objs,
+        "diskon_form":diskon_form,
+    }
+    return render(request,"pembayaran/diskon.html",context)

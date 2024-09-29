@@ -1,6 +1,6 @@
+from typing import Any
 from django import forms
-from .models import Tarif
-
+from .models import Tarif,Diskon
 
 class TarifForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -11,3 +11,16 @@ class TarifForm(forms.ModelForm):
     class Meta:
         model = Tarif
         exclude=[]
+
+class DiskonForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(DiskonForm, self).__init__(*args, **kwargs)
+        self.fields['diskon_name'].widget.attrs['class'] = 'form-control'
+        self.fields['diskon_code'].widget.attrs['class'] = 'form-control'
+        self.fields['is_publish'].widget.attrs['class'] = 'form-check-input'
+        self.fields['persentase_diskon'].widget.attrs['class'] = 'form-control'
+        self.fields['kedaluwarsa'].widget.attrs['class'] = 'form-control'
+    
+    class Meta:
+        model = Diskon
+        exclude=["tarif"]
