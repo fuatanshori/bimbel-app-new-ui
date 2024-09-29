@@ -5,6 +5,7 @@ from core.utils.decorator import admin_pemateri_required
 from .models import LevelStudy
 from .forms import LevelStudyForm
 from menu.utils.pagination import pagination_queryset
+from menu.utils.encode_url import encode_id,decode_id
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
@@ -12,7 +13,6 @@ def levelstudy(request):
     amount_perpage = 5
     levelstudy_queryset = LevelStudy.objects.all()  # Ambil queryset
     custom_range, levelstudy_objs = pagination_queryset(request, levelstudy_queryset, amount_perpage)
-    
     context = {
         "levelstudy_objs": levelstudy_objs,
         "custom_range": custom_range,
@@ -39,7 +39,8 @@ def tambah_levelstudy(request):
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def hapus_levelstudy(request, id_levelstudy):
-    levelstudy_obj = get_object_or_404(LevelStudy, pk=id_levelstudy)  # Menggunakan get_object_or_404
+    pk = decode_id(id_levelstudy)
+    levelstudy_obj = get_object_or_404(LevelStudy, pk=pk)  # Menggunakan get_object_or_404
     levelstudy_obj.delete()
     messages.success(request, f"Selamat, level study {levelstudy_obj.level_study} berhasil dihapus.")
     return redirect("menu:levelstudy")
@@ -47,7 +48,8 @@ def hapus_levelstudy(request, id_levelstudy):
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def edit_levelstudy(request, id_levelstudy):
-    levelstudy_obj = get_object_or_404(LevelStudy, pk=id_levelstudy)  # Menggunakan get_object_or_404
+    pk = decode_id(id_levelstudy)
+    levelstudy_obj = get_object_or_404(LevelStudy, pk=pk)  # Menggunakan get_object_or_404
     if request.method == "POST":
         level_study_form = LevelStudyForm(request.POST, instance=levelstudy_obj)
         if level_study_form.is_valid():

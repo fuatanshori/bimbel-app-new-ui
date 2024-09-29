@@ -11,6 +11,7 @@ load_dotenv(".env")
 
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_SALT = os.getenv("SECRET_SALT")
 
 # DEBUG = str(os.getenv("STATUS_DEBUG")).lower()=="true"
 DEBUG = True

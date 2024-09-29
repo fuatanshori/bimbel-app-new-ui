@@ -7,8 +7,7 @@ def add_is_used_tarif(sender, instance, created, **kwargs):
     if instance.is_used:
         Tarif.objects.filter(is_used=True).exclude(
             pk=instance.pk).update(is_used=False)
-    else:
-        Tarif.objects.filter(is_used=False).exclude(pk=instance.pk).update(is_used=True)
+    
 
     tarif_obj = Tarif.objects.all()
     is_used_list = []

@@ -7,6 +7,7 @@ class TarifForm(forms.ModelForm):
         super(TarifForm, self).__init__(*args, **kwargs)
         self.fields['subject'].widget.attrs['class'] = 'form-control'
         self.fields['harga'].widget.attrs['class'] = 'form-control'
+        self.fields['is_used'].widget.attrs['class'] = 'form-check-input'
 
     class Meta:
         model = Tarif
@@ -25,4 +26,5 @@ class DiskonForm(forms.ModelForm):
         exclude=["tarif"]
         widgets = {
             'kedaluwarsa': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'persentase_diskon': forms.NumberInput(attrs={"min":"0","max":"99"}),
         }

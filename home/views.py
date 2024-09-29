@@ -5,7 +5,7 @@ from menu.pembayaran.models import Tarif,Diskon
 # Create your views here.
 def home(request):
     try:
-        tarif_obj = Tarif.objects.get(is_used=True)
+        tarif_obj = Tarif.get_tarif_is_used()
     except Tarif.DoesNotExist:
         tarif_obj = None
     try:

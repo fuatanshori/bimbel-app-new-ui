@@ -28,11 +28,13 @@
             </div>
         {% endif %}
         <div class="card-header">
-          <a href="{% url "menu:tarif" %}" class="btn btn-dark mb-4 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
-            <h4 class="mb-3">Diskon Pembayaran</h4>
-            <button class="btn btn-primary" 
-            data-bs-toggle="modal"
-            data-bs-target="#modalAddDiskon">add diskon</button>
+            <div><h4 class="mb-3">Diskon Pembayaran</h4></div>
+            <div>
+              <a href="{% url "menu:tarif" %}" class="btn btn-dark text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
+              <button class="btn btn-primary" 
+              data-bs-toggle="modal"
+              data-bs-target="#modalAddDiskon">add diskon</button>
+            </div>
         </div>
         <div class="modal fade" id="modalAddDiskon" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
@@ -116,16 +118,16 @@
                        type="button"
                         class="btn btn-primary"
                         data-bs-toggle="modal"
-                        data-bs-target="#modalEditDiskon{{diskon_obj.pk}}"
+                        data-bs-target="#modalEditDiskon{{ forloop.counter }}"
                        >edit</button>
-                       <a href="{% url "menu:delete-diskon" id_tarif=id_tarif id_diskon=diskon_obj.pk %}" class="btn btn-danger">delete</a>
+                       <a href="{% url "menu:delete-diskon" id_tarif=id_tarif id_diskon=diskon_obj.get_id_safe %}" class="btn btn-danger">delete</a>
                       </td>
                     </tr>
-                    <div class="modal fade" id="modalEditDiskon{{diskon_obj.pk}}" tabindex="-1" aria-hidden="true">
+                    <div class="modal fade" id="modalEditDiskon{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
                       <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
                           <div class="modal-header">
-                            <h5 class="modal-title" id="modalEditDiskon{{diskon_obj.pk}}Title">Edit Tarif</h5>
+                            <h5 class="modal-title" id="modalEditDiskon{{ forloop.counter }}Title">Edit Tarif</h5>
                             <button
                               type="button"
                               class="btn-close"

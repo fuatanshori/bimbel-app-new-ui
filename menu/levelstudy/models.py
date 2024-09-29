@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxLengthValidator
+from menu.utils.encode_url import decode_id,encode_id
 
 class LevelStudy(models.Model):
     level_study = models.CharField(
@@ -7,10 +8,15 @@ class LevelStudy(models.Model):
         unique=True,
         validators=[MaxLengthValidator(100)]  # Validator untuk memastikan tidak lebih dari 100 karakter
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return self.level_study  # Cukup sederhana
 
     class Meta:
-        verbose_name_plural = "Level Studies"  # Memperbaiki kesesuaian plural
-        ordering = ['level_study']  # Mengurutkan berdasarkan level_study
+        verbose_name_plural = "Level Studi"  # Memperbaiki kesesuaian plural
+        ordering = ['-created_at']  # Mengurutkan berdasarkan level_study
+    
+    def get_id_safe(self):
+        return encode_id(self.pk)

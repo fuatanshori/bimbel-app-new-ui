@@ -9,7 +9,8 @@ from django.contrib import messages
 from django.db.models import ProtectedError
 from django.core.exceptions import ValidationError
 from menu.levelstudy.models import LevelStudy
-
+from menu.utils.pagination import pagination_queryset
+from menu.utils.encode_url import decode_id,encode_id
 # Create your views here.
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
@@ -19,27 +20,34 @@ PAYMENT_STATUS = midtrans.PAYMENT_STATUS
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def levelstudy_mapel(request):
-    levelstudy_objs = LevelStudy.objects.all()
+    amount_perpage=5
+    custom_range,levelstudy_objs = pagination_queryset(request,LevelStudy.objects.all(),amount_perpage)
     context = {
         'levelstudy_objs': levelstudy_objs,
+        "custom_range":custom_range,
     }
     return render(request, 'mapel/levelstudy_mapel.html', context)
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def mapel(request,id_levelstudy):
-    mapel_objs = MataPelajaran.objects.filter(level_study__pk=id_levelstudy)
+    pk = decode_id(id_levelstudy)
+    amount_perpage=5
+    custom_range,mapel_objs = pagination_queryset(request,MataPelajaran.objects.filter(level_study__pk=pk),amount_perpage) 
     context = {
         'mapel_objs': mapel_objs,
         'id_levelstudy':id_levelstudy,
+        "custom_range":custom_range,
     }
     return render(request, 'mapel/mapel.html', context)
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def hapus_mapel(request,id_levelstudy, id_mapel):
+    pk_levelstudy = decode_id(id_levelstudy)
+    pk_mapel = decode_id(id_mapel)
     try:
-        mapel_obj = MataPelajaran.objects.get(pk=id_mapel,level_study__pk=id_levelstudy)
+        mapel_obj = MataPelajaran.objects.get(pk=pk_mapel,level_study__pk=pk_levelstudy)
         mapel_obj.delete()
         messages.success(request, f"Selamat, mata pelajaran {mapel_obj.nama_mapel} berhasil dihapus.")
     except MataPelajaran.DoesNotExist:
@@ -52,7 +60,8 @@ def hapus_mapel(request,id_levelstudy, id_mapel):
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def tambah_mapel(request, id_levelstudy):
-    levelstudy_obj = get_object_or_404(LevelStudy, pk=id_levelstudy)
+    pk = decode_id(id_levelstudy)
+    levelstudy_obj = get_object_or_404(LevelStudy, pk=pk)
     if request.method == "POST":
         mapel_forms = MapelForm(request.POST)
         if mapel_forms.is_valid():
@@ -84,8 +93,12 @@ def tambah_mapel(request, id_levelstudy):
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def edit_mapel(request, id_levelstudy, id_mapel):
-    mapel_obj = get_object_or_404(MataPelajaran, pk=id_mapel, level_study__pk=id_levelstudy)
+    pk_levelstudy = decode_id(id_levelstudy)
+    pk_mapel = decode_id(id_mapel)
     
+    print(pk_levelstudy,pk_mapel,"====================")
+    mapel_obj = get_object_or_404(MataPelajaran, pk=pk_mapel, level_study__pk=pk_levelstudy)
+    print(mapel_obj)
     if request.method == "POST":
         mapel_forms = MapelForm(request.POST, instance=mapel_obj)
         if mapel_forms.is_valid():
@@ -104,5 +117,6 @@ def edit_mapel(request, id_levelstudy, id_mapel):
     context = {
         "mapel_obj": mapel_obj,
         "mapel_forms": mapel_forms,
+        "id_levelstudy":id_levelstudy
     }
     return render(request, 'mapel/edit_mapel.html', context)

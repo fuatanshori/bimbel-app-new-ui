@@ -28,12 +28,16 @@
             </div>
         {% endif %}
         <div class="card-header">
-            <a href="{% url "menu:pembayaran-menu" %}" class="btn btn-dark mb-4 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
+          <div>
             <h4 class="mb-3">Tarif Pembayaran</h4>
+          </div>
+          <div>
+            <a href="{% url "menu:pembayaran-menu" %}" class="btn btn-dark text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
             <button class="btn btn-primary" 
             data-bs-toggle="modal"
             data-bs-target="#modalAddTarif">add tarif</button>
-        </div>
+          </div>
+        </div>   
         <div class="modal fade" id="modalAddTarif" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -46,7 +50,7 @@
                   aria-label="Close"
                 ></button>
               </div>
-              <form method="POST" action="{% url "menu:add-tarif" %}">
+              <form method="POST" action="{% url "menu:add-tarif"%}">
                 {% csrf_token %}
               <div class="modal-body">
                 <div class="row">
@@ -60,7 +64,12 @@
                     <label for="id_harga" class="form-label">Harga</label>
                     {{tarif_form.harga}}
                   </div>
-                  
+                </div>
+                <div class="row">
+                  <div class="col mb-3">
+                    <label for="id_is_used" class="form-label">Is Used</label> <br>
+                    {{tarif_form.is_used}}
+                  </div>
                 </div>
               </div>
               <div class="modal-footer">
@@ -80,6 +89,7 @@
                     <tr>
                       <th>Subject</th>
                       <th>Harga</th>
+                      <th>Is Used</th>
                       <th>Action</th>
                       <th>Diskon</th>
                     </tr>
@@ -89,22 +99,23 @@
                     <tr>
                       <td>{{tarif_obj.subject}}</td>
                       <td>{{tarif_obj.harga}}</td>
+                      <td><input class="form-check-input" type="checkbox" id="disabledCheck2" disabled="" {% if tarif_obj.is_used == True %}checked=""{% endif %}></td>
                       <td>
                        <button
                        type="button"
                         class="btn btn-primary"
                         data-bs-toggle="modal"
-                        data-bs-target="#modalEditTarif{{tarif_obj.pk}}"
-                       >edit</button>
-                       <a href="{% url "menu:delete-tarif" id_tarif=tarif_obj.pk %}" class="btn btn-danger">delete</a>
+                        data-bs-target="#modalEditTarif{{ forloop.counter }}"
+                       >edit  </button>
+                       <a href="{% url "menu:delete-tarif" id_tarif=tarif_obj.get_id_safe %}" class="btn btn-danger">delete</a>
                       </td>
-                      <td><a href="{% url "menu:diskon" id_tarif=tarif_obj.pk %}" class="btn btn-primary">Lihat diskon</a></td>
+                      <td><a href="{% url "menu:diskon" id_tarif=tarif_obj.get_id_safe %}" class="btn btn-primary">Lihat diskon</a></td>
                     </tr>
-                    <div class="modal fade" id="modalEditTarif{{tarif_obj.pk}}" tabindex="-1" aria-hidden="true">
+                    <div class="modal fade" id="modalEditTarif{{ forloop.counter }}" tabindex="-1" aria-hidden="true">
                       <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
                           <div class="modal-header">
-                            <h5 class="modal-title" id="modalEditTarif{{tarif_obj.pk}}Title">Edit Tarif</h5>
+                            <h5 class="modal-title" id="modalEditTarif{{ forloop.counter }}Title">Edit Tarif</h5>
                             <button
                               type="button"
                               class="btn-close"
@@ -112,7 +123,7 @@
                               aria-label="Close"
                             ></button>
                           </div>
-                          <form method="POST" action="{% url "menu:edit-tarif" id_tarif=tarif_obj.pk %}">
+                          <form method="POST" action="{% url "menu:edit-tarif" id_tarif=tarif_obj.get_id_safe %}">
                             {% csrf_token %}
                           <div class="modal-body">
                             <div class="row">
@@ -125,6 +136,12 @@
                               <div class="col mb-0">
                                 <label for="id_harga" class="form-label">Harga</label>
                                 <input id="id_harga" value="{{tarif_obj.harga}}" class="form-control" name="harga" reqired>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col mb-3">
+                                <label for="id_is_used" class="form-label">Is Used</label> <br>
+                                <input class="form-check-input" type="checkbox" id="disabledCheck2" name="is_used" {% if tarif_obj.is_used == True %}checked=""{% endif %}>
                               </div>
                             </div>
                           </div>

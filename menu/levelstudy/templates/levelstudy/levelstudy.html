@@ -28,9 +28,11 @@
             </div>
         {% endif %}
         <div class="card-header">
-            <a href="{% url "menu:menu" %}" class="btn btn-dark mb-2 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
-            <h4 class="mb-3">Level Study</h4>
+          <div><h4 class="mb-3">Level Study</h4></div>
+          <div>
+            <a href="{% url "menu:menu" %}" class="btn btn-dark text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
             <a href="{% url "menu:tambah-levelstudy" %}" class="text-white btn btn-primary">Tambah Level Study</a>
+          </div>
         </div>
         <div class="card-body">
             <div class="table-responsive text-nowrap">
@@ -47,8 +49,8 @@
                       <td>{{levelstudy_obj.level_study}}</td>
                       </td>
                       <td>
-                        <a href="{% url "menu:hapus-levelstudy" id_levelstudy=levelstudy_obj.pk %}" class="btn btn-danger">delete</a>
-                        <a href="{% url "menu:edit-levelstudy" id_levelstudy=levelstudy_obj.pk %}" class="btn btn-primary">Edit Level Study</a>
+                        <a href="{% url "menu:hapus-levelstudy" id_levelstudy=levelstudy_obj.get_id_safe %}" class="btn btn-danger">delete</a>
+                        <a href="{% url "menu:edit-levelstudy" id_levelstudy=levelstudy_obj.get_id_safe %}" class="btn btn-primary">Edit Level Study</a>
                       </td>
                     </tr>
                     {% endfor %}

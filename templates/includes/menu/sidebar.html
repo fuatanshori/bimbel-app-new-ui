@@ -20,7 +20,9 @@
           <div data-i18n="Analytics">Menu</div>
         </a>
       </li>
-      <li class="menu-item {% if request.path|slice:"0:16" == '/menu/pembayaran' or request.path|slice:"0:12" == '/menu/tarif/' or request.path|slice:"0:13" == '/menu/diskon/' %}active{% endif %}">
+      <li class="menu-item {% if request.path|slice:"0:16" == '/menu/pembayaran' or request.path|slice:"0:12" == '/menu/tarif/' or request.path|slice:"0:13" == '/menu/diskon/' %}active{% endif %}" 
+        style="{% if request.user.role == 'pemateri'%}
+        display:none; {% endif %}">
         <a href="{% url "menu:pembayaran" %}" class="menu-link {% if request.user.role == 'pemateri' %}display:none;{% endif %}" class="nav-item menu-items {% if request.path|slice:"0:16" == '/menu/pembayaran' or request.path|slice:'0:12' == '/menu/invoice'%}active{% endif %}">
           <i class="menu-icon tf-icons bx bx-money"></i>
           <div data-i18n="Analytics">Pembayaran</div>
@@ -82,13 +84,19 @@
           <div data-i18n="Analytics">Ujian</div>
         </a>
       </li>
-      <li id="nilai" class="menu-item {% if request.path|slice:'0:17' == "/menu/levelstudy/"%}active{% endif %}" style="
-        {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
+      <li id="nilai" class="menu-item {% if request.path|slice:'0:13' == "/menu/nilai/"%}active{% endif %}" style="
+         {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
-        {% else %}
-            display:none;
+        {% elif request.user.role == 'pelajar' %}
+            {% if status_transaksi %}
+                {% if status_transaksi != 'Telah Dibayar' %}
+                    display:none;
+                {% endif %}
+            {% else %}
+                display:none;
+            {% endif %}
         {% endif %}">
-        <a href="{% url "menu:levelstudy" %}" class="menu-link">
+        <a href="" class="menu-link">
           <i class="menu-icon tf-icons bx bx-trophy"></i>
           <div data-i18n="Analytics">Nilai</div>
         </a>

@@ -10,10 +10,10 @@
         <h5 class="mb-0">Tambah Level Study</h5>
       </div>
       <div class="card-body">
-        <form method="post" action="{% url "menu:edit-levelstudy" id_levelstudy=levelstudy_obj.pk %}">
+        <form method="post" action="{% url "menu:edit-levelstudy" id_levelstudy=levelstudy_obj.get_id_safe %}">
           {% csrf_token %}
           <div class="row mb-3">
-            <label class="col-sm-2 col-form-label" for="basic-default-name">Name</label>
+            <label class="col-sm-2 col-form-label" for="id_level_study">Level Study</label>
             <div class="col-sm-10">
               {{level_study_form.level_study}}
               <small class="text-muted">{{ level_study_form.level_study.errors }}</small>

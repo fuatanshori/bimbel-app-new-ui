@@ -3,7 +3,7 @@ from user.models import Users
 from config import midtrans
 from django.core.exceptions import ValidationError
 import uuid
-
+from menu.utils.encode_url import encode_id
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
 # Create your models here.
 
@@ -13,11 +13,13 @@ class Tarif(models.Model):
     subject         = models.CharField(max_length=50)
     harga           = models.PositiveBigIntegerField()
     is_used         = models.BooleanField(default=False)
-
+    created_at      = models.DateTimeField(auto_now_add=True)
+    updated_at      = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name_plural = 'Tarif'
-
+        ordering = ["-created_at"]
+        
     def __str__(self):
         return f"{self.subject}"
     
@@ -32,6 +34,9 @@ class Tarif(models.Model):
         if self.harga < 1 or self.harga > 99999999999:
             raise ValidationError(f'jumlah kurang dari 1 dan lebih dari 99999999999')
 
+    def get_id_safe(self):
+        return encode_id(self.pk)
+    
 class Diskon(models.Model):
     id_diskon           = models.BigAutoField(unique=True,primary_key=True)
     diskon_name         = models.CharField(max_length=100)
@@ -40,11 +45,12 @@ class Diskon(models.Model):
     persentase_diskon   = models.SmallIntegerField(help_text='pilih diskon dari 1 sampai 100 akan dihitung sebagai persen')
     tarif               = models.ForeignKey(Tarif,on_delete=models.CASCADE)
     kedaluwarsa         = models.DateField()
-    created_at          = models.DateField(auto_now_add=True)
-    updated_at          = models.DateField(auto_now=True)
+    created_at          = models.DateTimeField(auto_now_add=True)
+    updated_at          = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name_plural = "Diskon"
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.diskon_name
@@ -54,7 +60,10 @@ class Diskon(models.Model):
             raise ValidationError('diskon code tidak boleh spasi.')
         if self.persentase_diskon > 99 or self.persentase_diskon < 1:
             raise ValidationError(f'diskon tidak boleh melebihi 99 persen atau kurang dari 0 persen')
-
+    
+    def get_id_safe(self):
+        return encode_id(self.pk)
+    
 class Transaksi(models.Model):
     id_transaksi        = models.UUIDField(unique=True, primary_key=True)
     user                = models.OneToOneField(Users, on_delete=models.CASCADE)

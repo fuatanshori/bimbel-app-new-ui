@@ -27,6 +27,8 @@ from core.utils.decorator import admin_pemateri_required,admin_required
 from django.utils import timezone
 from .forms import TarifForm,DiskonForm
 from menu.utils.pagination import pagination_queryset
+from menu.utils.encode_url import encode_id,decode_id
+from django.urls import reverse
 
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
@@ -638,15 +640,18 @@ def tarif(request):
 @login_required(login_url='user:masuk')
 @admin_required
 def delete_tarif(request,id_tarif):
+    pk = decode_id(id_tarif)
     tarif_objs = get_list_or_404(Tarif)
-    tarif_obj = get_object_or_404(Tarif,pk=id_tarif)
+    tarif_obj = get_object_or_404(Tarif,pk=pk)
     if len(tarif_objs)>1:
         tarif_obj.delete()
         messages.success(request,"berhasil dihapus")
-        return redirect("menu:tarif")
+        page = request.GET.get('page') 
+        return redirect(f"{reverse('menu:tarif')}?page={page}")
     else:
         messages.error(request,"Tarif tidak boleh dihapus. sisakan 1 tarif")
-        return redirect("menu:tarif")
+        page = request.GET.get('page') 
+        return redirect(f"{reverse('menu:tarif')}?page={page}")
 
 @login_required(login_url='user:masuk')
 @admin_required
@@ -656,13 +661,14 @@ def add_tarif(request):
         if tarif_form.is_valid():
             tarif_form.save()
             messages.success(request, "Tarif berhasil di tambahkan.")
+            return redirect('menu:tarif')
         else:
             error_messages = []
             for field, errors in tarif_form.errors.items():
                 for error in errors:
                     error_messages.append(f"{field}: {error}")    
-        messages.error(request, " | ".join(error_messages))
-        return redirect("menu:tarif")
+            messages.error(request, " | ".join(error_messages))
+            return redirect('menu:tarif')
     raise Http404
     
     
@@ -670,28 +676,33 @@ def add_tarif(request):
 @admin_required 
 def edit_tarif(request, id_tarif):
     if request.method == "POST":
-        tarif_obj = get_object_or_404(Tarif, pk=id_tarif)
+        pk = decode_id(id_tarif)
+        tarif_obj = get_object_or_404(Tarif, pk=pk)
         tarif_form = TarifForm(request.POST, instance=tarif_obj)
         if tarif_form.is_valid():
             tarif_form.save()
             messages.success(request, "Tarif berhasil diedit.")
+            page = request.GET.get('page') 
+            return redirect(f"{reverse('menu:tarif')}?page={page}")
         else:
             error_messages = []
             for field, errors in tarif_form.errors.items():
                 for error in errors:
                     error_messages.append(f"{field}: {error}")
             messages.error(request, " | ".join(error_messages))
-        return redirect("menu:tarif")
+            page = request.GET.get('page') 
+            return redirect(f"{reverse('menu:tarif')}?page={page}")
     raise Http404
 
 
 @login_required(login_url='user:masuk')
 @admin_required
 def diskon(request,id_tarif):
+    pk =decode_id(id_tarif)
     diskon_form = DiskonForm()
-    amount_perpage=4
+    amount_perpage=5
     try:
-        custom_range,diskon_objs = pagination_queryset(request,Diskon.objects.filter(tarif__pk=id_tarif),amount_perpage)
+        custom_range,diskon_objs = pagination_queryset(request,Diskon.objects.filter(tarif__pk=pk),amount_perpage)
     except Diskon.DoesNotExist:
         diskon_objs = None
     
@@ -706,7 +717,8 @@ def diskon(request,id_tarif):
 @login_required(login_url='user:masuk')
 @admin_required
 def add_diskon(request, id_tarif):
-    tarif_obj = get_object_or_404(Tarif, pk=id_tarif)
+    pk= decode_id(id_tarif)
+    tarif_obj = get_object_or_404(Tarif, pk=pk)
     if request.method == "POST":
         diskon_form = DiskonForm(request.POST)
         
@@ -715,24 +727,26 @@ def add_diskon(request, id_tarif):
             diskon_obj = diskon_form.save(commit=False)
             diskon_obj.tarif = tarif_obj  # Menambahkan objek tarif yang terkait
             diskon_obj.save()  # Simpan objek diskon
-
             messages.success(request, "Selamat, Diskon berhasil ditambahkan")
-            return redirect("menu:diskon", id_tarif=id_tarif)
+            return redirect("menu:diskon",id_tarif=id_tarif)
         else:
+            print("not a valid")
             error_messages = []
             for _, errors in diskon_form.errors.items():
                 for error in errors:
                     error_messages.append(f"{error}")
             messages.error(request, " | ".join(error_messages))
-            return redirect("menu:diskon", id_tarif=id_tarif)
+            return redirect("menu:diskon",id_tarif=id_tarif)
 
 @login_required(login_url='user:masuk')
 @admin_required
 def delete_diskon(request,id_tarif,id_diskon):
-    diskon_obj = get_object_or_404(Diskon,pk=id_diskon)
+    pk = decode_id(id_diskon)
+    diskon_obj = get_object_or_404(Diskon,pk=pk)
     diskon_obj.delete()
     messages.success(request,"berhasil di hapus")
-    return redirect("menu:diskon", id_tarif=id_tarif)
+    page = request.GET.get('page') 
+    return redirect(f"{reverse('menu:diskon', kwargs={'id_tarif': id_tarif})}?page={page}")
 
 @login_required(login_url='user:masuk')
 @admin_required
@@ -743,11 +757,14 @@ def edit_diskon(request,id_tarif,id_diskon):
         if diskon_form.is_valid():
             diskon_form.save()
             messages.success(request, "Diskon berhasil diedit.")
+            page = request.GET.get('page') 
+            return redirect(f"{reverse('menu:diskon', kwargs={'id_tarif': id_tarif})}?page={page}")
         else:
             error_messages = []
             for field, errors in diskon_form.errors.items():
                 for error in errors:
                     error_messages.append(f"{field}: {error}")
             messages.error(request, " | ".join(error_messages))
-        return redirect("menu:diskon",id_tarif=id_tarif)
+            page = request.GET.get('page') 
+            return redirect(f"{reverse('menu:diskon', kwargs={'id_tarif': id_tarif})}?page={page}")
     raise Http404
