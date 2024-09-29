@@ -41,11 +41,11 @@ urlpatterns += [
     path("modul/levelstudy/", views_modul.modul_levelstudy, name='levelstudy-modul'),
     path("modul/mapel/<id_levelstudy>/", views_modul.modul_mapel, name='mapel-modul'),
     path("modul/daftar-modul/<id_levelstudy>/<id_mapel>/", views_modul.daftar_modul, name='daftar-modul'),
-    path('modul/delete-modul/<id_mapel>/<id_modul>/',views_modul.hapusModul, name='hapus-modul'),
+    path('modul/delete-modul/<id_levelstudy>/<id_mapel>/<id_modul>/',views_modul.hapusModul, name='hapus-modul'),
     path('modul/tambah/<id_levelstudy>/<id_mapel>/', views_modul.tambah_modul, name='tambah-modul'),
     path('modul/edit/<id_mapel>/<id_modul>/', views_modul.edit_modul, name='edit-modul'),
     
-    path('modul/detail/<id_mapel>/<id_modul>/', views_modul.detailmodul, name='detail-modul'),
+    path('modul/detail/<id_levelstudy>/<id_mapel>/<id_modul>/', views_modul.detailmodul, name='detail-modul'),
 ]
 
 

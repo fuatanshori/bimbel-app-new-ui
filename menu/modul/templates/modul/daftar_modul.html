@@ -28,7 +28,7 @@
             </div>
         {% endif %}
         <div class="card-header">
-          <div><h4 class="mb-3">Mata Pelajaran</h4></div>
+          <div><h4 class="mb-3">Modul</h4></div>
           <div>
             <a href="{% url "menu:mapel-modul" id_levelstudy=id_levelstudy %}" class="btn btn-dark text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
             {% if request.user.role == 'admin' or request.user.role == 'pemateri' %}
@@ -41,7 +41,7 @@
                 <table class="table table-borderless">
                   <thead>
                     <tr>
-                      <th>Mata Pealajaran</th>
+                      <th>Nama Modul</th>
                       <th>Deskripsi</th>
                       <th>Action</th>
                     </tr>
@@ -53,10 +53,10 @@
                       <td>{{modul_obj.description|truncatechars_html:100|safe}}</td>
                       </td>
                       <td>
-                        <a href="{% url "menu:detail-modul" id_mapel=id_mapel id_modul=modul_obj.get_id_safe %}" class="btn btn-primary px-3 py-2">Lihat Materi</a>
+                        <a href="{% url "menu:detail-modul" id_levelstudy=id_levelstudy id_mapel=id_mapel id_modul=modul_obj.get_id_safe %}" class="btn btn-primary px-3 py-2">Lihat Materi</a>
                         {% if request.user.role == 'admin' or request.user.role == 'pemateri' %}
                         <a href="{% url "menu:edit-modul" id_mapel=id_mapel id_modul=modul_obj.get_id_safe %}" class="btn btn-warning px-3 py-2">Edit </a>
-                        <a href="{% url "menu:hapus-modul" id_mapel=id_mapel id_modul=modul_obj.get_id_safe %}" class="btn btn-danger px-3 py-2">Hapus </a>
+                        <a href="{% url "menu:hapus-modul" id_levelstudy=id_levelstudy id_mapel=id_mapel id_modul=modul_obj.get_id_safe %}" class="btn btn-danger px-3 py-2">Hapus </a>
                         {% endif %}
                       </td>
                     </tr>

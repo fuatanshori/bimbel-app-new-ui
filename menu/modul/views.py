@@ -72,17 +72,22 @@ def daftar_modul(request,id_levelstudy, id_mapel):
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
-def hapusModul(request,id_mapel, id_modul):
+def hapusModul(request,id_levelstudy,id_mapel, id_modul):
+    pk_mapel = decode_id(id_mapel)
+    pk_modul = decode_id(id_modul)
     try:
-        modul_obj = Modul.objects.get(pk=id_modul)
+        modul_obj = Modul.objects.get(pk=pk_modul)
     except Modul.DoesNotExist:
-        return redirect("menu:daftar-modul",id_mapel=id_mapel)
+        return redirect("menu:daftar-modul",id_levelstudy=id_levelstudy,id_mapel=pk_mapel)
     if modul_obj.modul:
         if os.path.isfile(modul_obj.modul.path):
            os.remove(modul_obj.modul.path)
+    if modul_obj.vidio:
+        if os.path.isfile(modul_obj.vidio.path):
+           os.remove(modul_obj.vidio.path)
     messages.success(request,f"selamat modul {modul_obj.nama_modul} berhasil dihapus")
     modul_obj.delete()
-    return redirect('menu:daftar-modul', id_mapel=modul_obj.mata_pelajaran.pk)
+    return redirect('menu:daftar-modul',id_levelstudy=id_levelstudy, id_mapel=id_mapel)
 
 
 @login_required(login_url='user:masuk')
@@ -131,13 +136,12 @@ def tambah_modul(request,id_levelstudy,id_mapel):
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def edit_modul(request, id_mapel, id_modul):
+    pk_modul = decode_id(id_modul)
     if request.user.role not in ["pemateri", "admin"]:
         return redirect("menu:daftar-modul", id_mapel=id_mapel)
-
-    modul_obj = Modul.objects.get(pk=id_modul)
-    
+    modul_obj = Modul.objects.get(pk=pk_modul)
     if request.method == "POST":
-        modul_forms = ModulForm(request.POST, request.FILES, instance=modul_obj)
+        modul_forms = ModulForm(request.POST, request.FILES, instance=modul_obj)  
         if modul_forms.is_valid():
             modul_forms.save()
             messages.success(request,f"selamat modul {modul_obj.nama_modul} berhasil di edit")
@@ -160,17 +164,21 @@ def edit_modul(request, id_mapel, id_modul):
     return render(request, 'modul/edit_modul.html', context)
 
 @login_required(login_url="user:masuk")
-def detailmodul(request,id_mapel,id_modul):
+def detailmodul(request,id_levelstudy,id_mapel,id_modul):
+    pk_mapel=decode_id(id_mapel)
+    pk_modul=decode_id(id_modul)
     try:
         Transaksi.objects.get(user=request.user, transaksi_status="settlement")
     except Transaksi.DoesNotExist:
         if request.user.role not in ["pemateri","admin"]:
             return redirect("menu:pembayaran")
     try:
-        modul_obj = Modul.objects.get(pk=id_modul,mata_pelajaran__pk=id_mapel)
+        modul_obj = Modul.objects.get(pk=pk_modul,mata_pelajaran__pk=pk_mapel)
     except Modul.DoesNotExist:
         raise Http404
     context = {
-        "modul_obj":modul_obj
+        "modul_obj":modul_obj,
+        "id_mapel":id_mapel,
+        "id_levelstudy":id_levelstudy,
     }
     return render(request,'modul/detail_modul.html',context)
