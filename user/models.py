@@ -80,49 +80,5 @@ class Profile(models.Model):
     tanggal_lahir   = models.DateField(null=True)
     
 
-    
-    def save(self, *args, **kwargs):
-        if self.foto:
-            # Open the uploaded image
-            img = PILImage.open(self.foto)
-
-            # Convert image to RGB if it's in RGBA mode
-            if img.mode in ("RGBA", "P"):
-                img = img.convert("RGB")
-
-            # Get the size for cropping
-            width, height = img.size
-            new_size = min(width, height)  # Use the smaller dimension for the square size
-
-            # Calculate cropping box
-            left = (width - new_size) / 2
-            top = (height - new_size) / 2
-            right = (width + new_size) / 2
-            bottom = (height + new_size) / 2
-
-            # Crop the image to a square
-            img = img.crop((left, top, right, bottom))
-
-            # Save the image to a BytesIO object
-            img_io = io.BytesIO()
-            img.save(img_io, format='JPEG', quality=85)  # Adjust quality as needed
-            img_file = ContentFile(img_io.getvalue(), name=os.path.basename(self.foto.name))
-
-            # Delete the old image if it exists
-            if self.pk:  # Only do this if the object already exists
-                try:
-                    # Get the old file path and delete the old file
-                    old_file = self.__class__.objects.get(pk=self.pk).foto.path
-                    if os.path.isfile(old_file):
-                        os.remove(old_file)
-                except Exception as e:
-                    print(f"Error deleting old file: {e}")
-
-            # Replace the original image with the cropped image
-            self.foto.save(os.path.basename(self.foto.name), img_file, save=False)
-
-        super().save(*args, **kwargs)
-
-
     def __str__(self):
         return f"{self.nama_lengkap}"
