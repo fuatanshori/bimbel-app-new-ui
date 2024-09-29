@@ -390,23 +390,23 @@ header
   padding-right: 20px;
 }
 
-.header-area .main-nav .nav li:nth-child(6) {
+.header-area .main-nav .nav li:nth-child(7) {
   padding-right: 0px;
   padding-left: 40px;
 }
 
 .header-area .main-nav .nav li:last-child a ,
 .background-header .main-nav .nav li:last-child a,
-.header-area .main-nav .nav li:nth-child(6) a ,
-.background-header .main-nav .nav li:nth-child(6) a {
+.header-area .main-nav .nav li:nth-child(7) a ,
+.background-header .main-nav .nav li:nth-child(7) a {
   padding: 0px 20px !important;
   font-weight: 400;
 }
 
 .header-area .main-nav .nav li:last-child a:hover ,
 .background-header .main-nav .nav li:last-child a:hover,
-.header-area .main-nav .nav li:nth-child(6) a:hover ,
-.background-header .main-nav .nav li:nth-child(6) a:hover {
+.header-area .main-nav .nav li:nth-child(7) a:hover ,
+.background-header .main-nav .nav li:nth-child(7) a:hover {
   color: #fff !important;
 }
 
@@ -657,8 +657,8 @@ header
   .background-header .main-nav .nav li:last-child {
     color: #069;
   }
-  .header-area .main-nav .nav li:nth-child(6),
-  .background-header .main-nav .nav li:nth-child(6) {
+  .header-area .main-nav .nav li:nth-child(7),
+  .background-header .main-nav .nav li:nth-child(7) {
     padding-right: 0px;
   }
   .background-header .nav li a.active:after {
@@ -2093,6 +2093,9 @@ responsive
     padding-top: 0px;
     text-align: center;
   }
+  .h4-footer{
+    visibility: hidden;
+  }
   .footer-widget ul {
     display: block;
     width: 100%;
@@ -2226,4 +2229,9 @@ responsive
   max-width: 500px; /* Maximum width (optional) */
   display: none; /* Initially hidden */
   margin: 0 auto; /* Center alignment */
+}
+.logo-img {
+  height: 65px;
+  width: auto; /* Maintain aspect ratio */
+  max-width: 100%; /* Ensure it doesn't overflow */
 }
