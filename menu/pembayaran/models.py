@@ -52,8 +52,8 @@ class Diskon(models.Model):
     def clean(self):
         if ' ' in self.diskon_code:
             raise ValidationError('diskon code tidak boleh spasi.')
-        if self.persentase_diskon > 99:
-            raise ValidationError(f'diskon tidak boleh melebihi 99 persen')
+        if self.persentase_diskon > 99 or self.persentase_diskon < 1:
+            raise ValidationError(f'diskon tidak boleh melebihi 99 persen atau kurang dari 0 persen')
 
 class Transaksi(models.Model):
     id_transaksi        = models.UUIDField(unique=True, primary_key=True)

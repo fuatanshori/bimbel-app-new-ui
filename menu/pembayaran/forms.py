@@ -19,8 +19,10 @@ class DiskonForm(forms.ModelForm):
         self.fields['diskon_code'].widget.attrs['class'] = 'form-control'
         self.fields['is_publish'].widget.attrs['class'] = 'form-check-input'
         self.fields['persentase_diskon'].widget.attrs['class'] = 'form-control'
-        self.fields['kedaluwarsa'].widget.attrs['class'] = 'form-control'
     
     class Meta:
         model = Diskon
         exclude=["tarif"]
+        widgets = {
+            'kedaluwarsa': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }

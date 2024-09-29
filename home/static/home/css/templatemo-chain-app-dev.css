@@ -2093,6 +2093,9 @@ responsive
     padding-top: 0px;
     text-align: center;
   }
+  .h4-footer{
+    visibility: hidden;
+  }
   .footer-widget ul {
     display: block;
     width: 100%;

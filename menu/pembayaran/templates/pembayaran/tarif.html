@@ -29,7 +29,8 @@
             </div>
         {% endif %}
         <div class="card-header">
-            <h4 class="mb-4">Tarif Pembayaran</h4>
+            <a href="{% url "menu:menu" %}" class="btn btn-dark mb-4 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
+            <h4 class="mb-3">Tarif Pembayaran</h4>
             <button class="btn btn-primary" 
             data-bs-toggle="modal"
             data-bs-target="#modalAddTarif">add tarif</button>
@@ -98,7 +99,7 @@
                        >edit</button>
                        <a href="{% url "menu:delete-tarif" id_tarif=tarif_obj.pk %}" class="btn btn-danger">delete</a>
                       </td>
-                      <td><a href="" class="btn btn-primary">Lihat diskon</a></td>
+                      <td><a href="{% url "menu:diskon" id_tarif=tarif_obj.pk %}" class="btn btn-primary">Lihat diskon</a></td>
                     </tr>
                     <div class="modal fade" id="modalEditTarif{{tarif_obj.pk}}" tabindex="-1" aria-hidden="true">
                       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -118,13 +119,13 @@
                             <div class="row">
                               <div class="col mb-3">
                                 <label for="id_subject" class="form-label">Subject</label>
-                                <input id="id_subject" value="{{tarif_obj.subject}}" class="form-control" name="subject">
+                                <input id="id_subject" value="{{tarif_obj.subject}}" class="form-control" name="subject" reqired>
                               </div>
                             </div>
                             <div class="row g-2">
                               <div class="col mb-0">
                                 <label for="id_harga" class="form-label">Harga</label>
-                                <input id="id_harga" value="{{tarif_obj.harga}}" class="form-control" name="harga">
+                                <input id="id_harga" value="{{tarif_obj.harga}}" class="form-control" name="harga" reqired>
                               </div>
                             </div>
                           </div>
@@ -141,6 +142,9 @@
                     {% endfor %}
                   </tbody>
                 </table>
+
+                {% include "includes/menu/pagination.html" with queryset=tarif_objs custom_range=custom_range %}
+
               </div>
         </div>
       </div>

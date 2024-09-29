@@ -30,6 +30,10 @@ urlpatterns += [
     path("tarif/delete/<id_tarif>/",views_pembayaran.delete_tarif,name="delete-tarif"),
     path("tarif/add/",views_pembayaran.add_tarif,name="add-tarif"),
     path("tarif/edit/<id_tarif>/",views_pembayaran.edit_tarif,name="edit-tarif"),
+    path("diskon/<id_tarif>/",views_pembayaran.diskon,name="diskon"),
+    path("diskon/add/<id_tarif>/",views_pembayaran.add_diskon,name="add-diskon"),
+    path("diskon/delete/<id_tarif>/<id_diskon>/",views_pembayaran.delete_diskon,name="delete-diskon"),
+    path("diskon/edit/<id_tarif>/<id_diskon>/",views_pembayaran.edit_diskon,name="edit-diskon"),
 ]
 
 # modul

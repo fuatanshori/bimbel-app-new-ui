@@ -26,7 +26,7 @@ import pytz
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.utils import timezone
 from .forms import TarifForm,DiskonForm
-
+from menu.utils.pagination import pagination_queryset
 
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
@@ -626,10 +626,12 @@ def pembayaran_admin_list(request):
 @admin_required
 def tarif(request):
     tarif_form = TarifForm()
-    tarif_objs = Tarif.objects.all()
+    amount_perpage=5
+    custom_range,tarif_objs = pagination_queryset(request,Tarif.objects.all(),amount_perpage)
     context={
-    "tarif_objs":tarif_objs,
-    "tarif_form":tarif_form,   
+    "tarif_form":tarif_form, 
+    "custom_range":custom_range,
+    "tarif_objs":tarif_objs
     }
     return render(request,"pembayaran/tarif.html",context)
 
@@ -661,7 +663,7 @@ def add_tarif(request):
                     error_messages.append(f"{field}: {error}")    
         messages.error(request, " | ".join(error_messages))
         return redirect("menu:tarif")
-    return redirect("menu:tarif")
+    raise Http404
     
     
 @login_required(login_url='user:masuk')
@@ -680,15 +682,72 @@ def edit_tarif(request, id_tarif):
                     error_messages.append(f"{field}: {error}")
             messages.error(request, " | ".join(error_messages))
         return redirect("menu:tarif")
-    return redirect("menu:tarif")
+    raise Http404
+
 
 @login_required(login_url='user:masuk')
 @admin_required
 def diskon(request,id_tarif):
     diskon_form = DiskonForm()
-    diskon_objs=get_list_or_404(Diskon,tarif__pk=id_tarif)
+    amount_perpage=4
+    try:
+        custom_range,diskon_objs = pagination_queryset(request,Diskon.objects.filter(tarif__pk=id_tarif),amount_perpage)
+    except Diskon.DoesNotExist:
+        diskon_objs = None
+    
     context={
         "diskon_objs":diskon_objs,
         "diskon_form":diskon_form,
+        "id_tarif":id_tarif,
+        "custom_range":custom_range,
     }
     return render(request,"pembayaran/diskon.html",context)
+
+@login_required(login_url='user:masuk')
+@admin_required
+def add_diskon(request, id_tarif):
+    tarif_obj = get_object_or_404(Tarif, pk=id_tarif)
+    if request.method == "POST":
+        diskon_form = DiskonForm(request.POST)
+        
+        if diskon_form.is_valid():
+            # Gunakan .save(commit=False) agar bisa menambahkan tarif sebelum menyimpan
+            diskon_obj = diskon_form.save(commit=False)
+            diskon_obj.tarif = tarif_obj  # Menambahkan objek tarif yang terkait
+            diskon_obj.save()  # Simpan objek diskon
+
+            messages.success(request, "Selamat, Diskon berhasil ditambahkan")
+            return redirect("menu:diskon", id_tarif=id_tarif)
+        else:
+            error_messages = []
+            for _, errors in diskon_form.errors.items():
+                for error in errors:
+                    error_messages.append(f"{error}")
+            messages.error(request, " | ".join(error_messages))
+            return redirect("menu:diskon", id_tarif=id_tarif)
+
+@login_required(login_url='user:masuk')
+@admin_required
+def delete_diskon(request,id_tarif,id_diskon):
+    diskon_obj = get_object_or_404(Diskon,pk=id_diskon)
+    diskon_obj.delete()
+    messages.success(request,"berhasil di hapus")
+    return redirect("menu:diskon", id_tarif=id_tarif)
+
+@login_required(login_url='user:masuk')
+@admin_required
+def edit_diskon(request,id_tarif,id_diskon):
+    if request.method == "POST":
+        diskon_obj = get_object_or_404(Diskon, pk=id_diskon)
+        diskon_form = DiskonForm(request.POST, instance=diskon_obj)
+        if diskon_form.is_valid():
+            diskon_form.save()
+            messages.success(request, "Diskon berhasil diedit.")
+        else:
+            error_messages = []
+            for field, errors in diskon_form.errors.items():
+                for error in errors:
+                    error_messages.append(f"{field}: {error}")
+            messages.error(request, " | ".join(error_messages))
+        return redirect("menu:diskon",id_tarif=id_tarif)
+    raise Http404
