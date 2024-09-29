@@ -1,4 +1,3 @@
-console.log("hello")
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload_form');
     const inputFile = document.getElementById("id_modul");
