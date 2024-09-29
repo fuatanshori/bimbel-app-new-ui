@@ -18,6 +18,15 @@
             </div>
             {% endfor %}
         {% endif %}
+        {% if tarif_form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field, errors in tarif_form.errors.items %}
+                        <li>{{ field }}: {{ errors|striptags }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         <div class="card-header">
           <a href="{% url "menu:tarif" %}" class="btn btn-dark mb-4 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
             <h4 class="mb-3">Diskon Pembayaran</h4>
@@ -97,7 +106,7 @@
                   <tbody>
                     {% for diskon_obj in diskon_objs %}
                     <tr>
-                      <td><i class=""></i>{{diskon_obj.diskon_name}}</td>
+                      <td>{{diskon_obj.diskon_name}}</td>
                       <td>{{diskon_obj.diskon_code}}</td>
                       <td><input class="form-check-input" type="checkbox" id="disabledCheck2" disabled="" {% if diskon_obj.is_publish == True %}checked=""{% endif %}></td>
                       <td>{{diskon_obj.persentase_diskon}}</td>

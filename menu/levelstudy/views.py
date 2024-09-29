@@ -4,14 +4,17 @@ from core.utils.decorator import admin_pemateri_required
 from django.contrib import messages
 from .models import LevelStudy
 from .forms import LevelStudyForm
+from menu.utils.pagination import pagination_queryset
 # Create your views here.
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def levelstudy(request):
-    levelstudy_objs = LevelStudy.objects.all()
+    amount_perpage=5
+    custom_range,levelstudy_objs = pagination_queryset(request,LevelStudy.objects.all(),amount_perpage)
     context = {
-        "levelstudy_objs":levelstudy_objs
+        "levelstudy_objs":levelstudy_objs,
+        "custom_range":custom_range,
     }
     return render(request,"levelstudy/levelstudy.html",context)
 

@@ -18,7 +18,6 @@
             </div>
             {% endfor %}
         {% endif %}
-        {{tarif_form.error}}
         {% if tarif_form.errors %}
             <div class="alert alert-danger">
                 <ul>
@@ -29,7 +28,7 @@
             </div>
         {% endif %}
         <div class="card-header">
-            <a href="{% url "menu:menu" %}" class="btn btn-dark mb-4 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
+            <a href="{% url "menu:pembayaran-menu" %}" class="btn btn-dark mb-4 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
             <h4 class="mb-3">Tarif Pembayaran</h4>
             <button class="btn btn-primary" 
             data-bs-toggle="modal"
@@ -88,7 +87,7 @@
                   <tbody>
                     {% for tarif_obj in tarif_objs %}
                     <tr>
-                      <td><i class=""></i>{{tarif_obj.subject}}</td>
+                      <td>{{tarif_obj.subject}}</td>
                       <td>{{tarif_obj.harga}}</td>
                       <td>
                        <button
