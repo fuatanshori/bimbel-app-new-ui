@@ -7,8 +7,11 @@
     <div class="row justify-content-center">
       <div class="card">
         <h5 class="card-header">Transaksi User</h5>
-        <div class="d-flex flex-column gap-2 col-lg-4">
-          <a href="{% url 'menu:laporan-transaksi' %}" class="btn btn-primary col-lg-6">Cetak Laporan <i class="bx bxs-report"></i></a>
+        <div class="d-flex flex-column gap-2 col-lg-6">
+          <div class="d-flex flex-row gap-2 ">
+            <a href="{% url 'menu:laporan-excel' %}" class="btn btn-primary col-lg-6">Cetak Excel <i class="bx bxs-report"></i></a>
+            <a href="{% url 'menu:laporan-csv' %}" class="btn btn-dark col-lg-6">Cetak Csv <i class="bx bxs-report"></i></a>
+          </div>
           <form method="get" class="d-flex align-items-center gap-2">
               <input style="border-radius: 4px;" type="text" name="cari_transaksi" value="{{ request.GET.cari_transaksi }}" class="form-control text-black" placeholder="cari pembayaran">
               <button type="submit" class="btn btn-primary px-4">go</button>

@@ -69,7 +69,7 @@ class Transaksi(models.Model):
     user                = models.OneToOneField(Users, on_delete=models.CASCADE)
     tarif               = models.ForeignKey(Tarif,on_delete=models.SET_NULL,null=True,blank=True)
     harga               = models.PositiveBigIntegerField(null=True,blank=True)
-    transaksi_status    = models.CharField(max_length=15, choices=PAYMENT_STATUS)
+    transaksi_status    = models.CharField(max_length=15, choices=PAYMENT_STATUS,db_index=True)
     va_number           = models.CharField(max_length=18, null=True, blank=True)
     layanan_pembayaran  = models.CharField(max_length=10, null=True, blank=True)
     transaction_time    = models.DateTimeField(null=True, blank=True)

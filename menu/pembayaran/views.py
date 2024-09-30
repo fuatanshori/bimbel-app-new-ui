@@ -3,7 +3,6 @@ import babel.dates
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.shortcuts import render, redirect,HttpResponse,get_object_or_404,get_list_or_404
-import requests
 from .models import Tarif, Transaksi,Diskon
 from config import midtrans
 import uuid
@@ -27,9 +26,9 @@ from core.utils.decorator import admin_pemateri_required,admin_required
 from django.utils import timezone
 from .forms import TarifForm,DiskonForm
 from menu.utils.pagination import pagination_queryset
-from menu.utils.encode_url import encode_id,decode_id
+from menu.utils.encode_url import decode_id
 from django.urls import reverse
-
+import csv
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
@@ -222,6 +221,11 @@ def buat_pesanan(request):
 @login_required(login_url="user:masuk")
 def invoice_gopay(request,id_transaksi):
     try:
+        transaksi_obj = Transaksi.objects.get(
+            id_transaksi=id_transaksi, user=request.user)
+    except Transaksi.DoesNotExist:
+        return redirect("menu:pembayaran")
+    try:
         transaksi_obj = Transaksi.objects.get(user=request.user,transaksi_status="settlement")
         if transaksi_obj:
             context = {
@@ -247,11 +251,7 @@ def invoice_gopay(request,id_transaksi):
 
     if resp.get('transaction_status') == "cancel":
         return redirect("menu:pembayaran")
-    try:
-        transaksi_obj = Transaksi.objects.get(
-            id_transaksi=id_transaksi, user=request.user)
-    except Transaksi.DoesNotExist:
-        return redirect("menu:pembayaran")
+    
     if resp.get('transaction_status') == "settlement":
         transaksi_obj.transaksi_status = resp.get(
             'transaction_status')
@@ -282,6 +282,11 @@ def invoice_gopay(request,id_transaksi):
 @login_required(login_url='user:masuk')
 def invoice(request, id_transaksi):
     try:
+        transaksi_obj = Transaksi.objects.get(
+            id_transaksi=id_transaksi, user=request.user)
+    except Transaksi.DoesNotExist:
+        return redirect("menu:pembayaran")
+    try:
         transaksi_obj = Transaksi.objects.get(user=request.user,transaksi_status="settlement")
         if transaksi_obj:
             context = {
@@ -296,46 +301,36 @@ def invoice(request, id_transaksi):
             return render(request, 'pembayaran/invoice.html', context)
     except Transaksi.DoesNotExist:
         pass
-       
-    try:
-        
-        resp = MIDTRANS_CORE.transactions.status(id_transaksi)
-        resp_harga = resp.get("gross_amount")
-        resp_harga = str(resp_harga).split(".")
-        resp_harga = int(resp_harga[0])
+    resp = MIDTRANS_CORE.transactions.status(id_transaksi)
+    resp_harga = resp.get("gross_amount")
+    resp_harga = str(resp_harga).split(".")
+    resp_harga = int(resp_harga[0])
+    if resp.get('transaction_status') == "cancel":
+        return redirect("menu:pembayaran")
+    if resp.get('transaction_status') == "settlement":
+        transaksi_obj.transaksi_status = resp.get(
+            'transaction_status')
+        transaksi_obj.save()
 
-        if resp.get('transaction_status') == "cancel":
-            return redirect("menu:pembayaran")
-        try:
-            transaksi_obj = Transaksi.objects.get(
-                id_transaksi=id_transaksi, user=request.user)
-        except Transaksi.DoesNotExist:
-            return redirect("menu:pembayaran")
-        if resp.get('transaction_status') == "settlement":
-            transaksi_obj.transaksi_status = resp.get(
-                'transaction_status')
-            transaksi_obj.save()
+    elif resp.get('transaction_status') == "expire":
+        transaksi_obj.transaksi_status = resp.get(
+            'transaction_status')
+        transaksi_obj.save()
+    else:
+        transaksi_obj.transaksi_status = resp.get(
+            'transaction_status')
+        transaksi_obj.save()
+    context = {
+        'vn': resp.get('va_numbers')[0]['va_number'],
+        'harga':resp_harga,
+        'bank': resp.get('va_numbers')[0]['bank'],
+        'id_transaksi': str(resp.get('transaction_id')),
+        'status_transaksi': PAYMENT_STATUS[resp.get('transaction_status')],
+        'expiry_time': resp.get('expiry_time'),
 
-        elif resp.get('transaction_status') == "expire":
-            transaksi_obj.transaksi_status = resp.get(
-                'transaction_status')
-            transaksi_obj.save()
-        else:
-            transaksi_obj.transaksi_status = resp.get(
-                'transaction_status')
-            transaksi_obj.save()
-        context = {
-            'vn': resp.get('va_numbers')[0]['va_number'],
-            'harga':resp_harga,
-            'bank': resp.get('va_numbers')[0]['bank'],
-            'id_transaksi': str(resp.get('transaction_id')),
-            'status_transaksi': PAYMENT_STATUS[resp.get('transaction_status')],
-            'expiry_time': resp.get('expiry_time'),
+    }
+    return render(request, 'pembayaran/invoice.html', context)
 
-        }
-        return render(request, 'pembayaran/invoice.html', context)
-    except requests.exceptions.ConnectionError:
-        return render(request, 'koneksi_buruk.html')
 
 @login_required(login_url='user:masuk')
 def batalkan_pesanan(request, id_transaksi):
@@ -457,43 +452,6 @@ def notifikasi_midtrans_handler(request):
 
     return JsonResponse({}, status=200)
 
-@login_required(login_url='user:masuk')
-@admin_pemateri_required
-def laporan_excel(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    date = datetime.datetime.now(pytz.timezone('Asia/Makassar')).strftime("%H:%M:%S_%m/%b/%Y")
-    response['Content-Disposition'] = f'attachment; filename="laporan_rekap_transaksi_{date}.xls"'
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Rekap Transaksi')
-
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-
-    ws.write_merge(0, 0, 0, 6, 'Laporan Rekap Transaksi/Pembayaran', font_style)
-    
-    columns = ['id_transaksi', 'email', 'nama', 'tarif', 'va number', 'layanan_pembayaran', 'status transaksi']
-
-    row_num = 1
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
-
-    font_style = xlwt.XFStyle()
-
-    rows = Transaksi.objects.all().values_list('id_transaksi', 'user__email', 'user__full_name', 'harga', "va_number", 'layanan_pembayaran', 'transaksi_status')
-    
-    for row in rows:
-        row_num += 1
-        converted_row = list(row)
-        
-        converted_row[0] = str(row[0])
-        
-        converted_row[-1] = midtrans.PAYMENT_STATUS[row[-1]]
-        
-        for col_num in range(len(converted_row)):
-            ws.write(row_num, col_num, converted_row[col_num], font_style)
-    
-    wb.save(response)
-    return response
 
 @login_required(login_url='user:masuk')
 def laporan_invoice(request):
@@ -768,3 +726,80 @@ def edit_diskon(request,id_tarif,id_diskon):
             page = request.GET.get('page') 
             return redirect(f"{reverse('menu:diskon', kwargs={'id_tarif': id_tarif})}?page={page}")
     raise Http404
+
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def export_transaksi_csv(request):
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="transaksi_report.csv"'
+
+    # Create a CSV writer object
+    writer = csv.writer(response)
+
+    # Write the header row
+    writer.writerow([
+        'ID Transaksi', 'User', 'Tarif', 'Harga', 'Transaksi Status',
+        'VA Number', 'Layanan Pembayaran', 'Transaction Time',
+        'QRCode Link', 'Deep Link Redirect', 'Expiry Time', 'Updated At'
+    ])
+
+    # Fetch data from the Transaksi model
+    transaksi_list = Transaksi.objects.all()
+
+    # Write data rows
+    for transaksi in transaksi_list:
+        writer.writerow([
+            transaksi.id_transaksi,
+            transaksi.user.full_name,  # Adjust this if you want a different user field
+            transaksi.tarif,  # Assuming the Tarif model has a __str__ method
+            transaksi.harga,
+            transaksi.transaksi_status,
+            transaksi.va_number,
+            transaksi.layanan_pembayaran,
+            transaksi.transaction_time,
+            transaksi.qrcode_link,
+            transaksi.deep_link_redirect,
+            transaksi.expiry_time,
+            transaksi.updated_at,
+        ])
+
+    return response
+
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def laporan_excel(request):
+    response = HttpResponse(content_type='application/ms-excel')
+    date = datetime.datetime.now(pytz.timezone('Asia/Makassar')).strftime("%H:%M:%S_%m/%b/%Y")
+    response['Content-Disposition'] = f'attachment; filename="laporan_rekap_transaksi_{date}.xls"'
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Rekap Transaksi')
+
+    font_style = xlwt.XFStyle()
+    font_style.font.bold = True
+
+    ws.write_merge(0, 0, 0, 6, 'Laporan Rekap Transaksi/Pembayaran', font_style)
+    
+    columns = ['id_transaksi', 'email', 'nama', 'tarif', 'va number', 'layanan_pembayaran', 'status transaksi']
+
+    row_num = 1
+    for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], font_style)
+
+    font_style = xlwt.XFStyle()
+
+    rows = Transaksi.objects.all().values_list('id_transaksi', 'user__email', 'user__full_name', 'harga', "va_number", 'layanan_pembayaran', 'transaksi_status')
+    
+    for row in rows:
+        row_num += 1
+        converted_row = list(row)
+        
+        converted_row[0] = str(row[0])
+        
+        converted_row[-1] = midtrans.PAYMENT_STATUS[row[-1]]
+        
+        for col_num in range(len(converted_row)):
+            ws.write(row_num, col_num, converted_row[col_num], font_style)
+    
+    wb.save(response)
+    return response

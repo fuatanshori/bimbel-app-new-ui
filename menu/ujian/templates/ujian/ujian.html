@@ -10,6 +10,8 @@
         {% for soal_ujian_obj in soal_ujian_objs  %}
         <div class="container mt-4">
             <!-- Bagian card -->
+            <form method='post' action="{% url "menu:ujian" id_mapel=id_mapel %}">
+              {% csrf_token %}
             <div class="row justify-content-center">
               <div class="col-lg-8">
                 <div class="card h-100 overflow-hidden shadow-sm">
@@ -30,8 +32,7 @@
               <div class="col-lg-8">
                 <div class="p-3 bg-light rounded shadow-sm">
                   <!-- Pilihan Jawaban -->
-      <form method='post' action="{% url "menu:ujian" id_mapel=id_mapel %}">
-                  {% csrf_token %}
+      
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
                     id="gridRadios1" value="jawaban1" required>

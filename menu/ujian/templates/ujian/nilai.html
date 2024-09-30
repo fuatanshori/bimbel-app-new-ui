@@ -1,12 +1,17 @@
 {% extends "menu_base.html" %}
 
+{% block title %}menu{% endblock title %}
 {% block content %}
-<div class="col-sm-8">
-    <div class="card-body">
-        <h2 class="card-title text-black">Nilai Ujian</h2>
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
+<div class="container-xxl flex-grow-1 container-p-y ">
+    <div class="row justify-content-center">
+      <div class="card py-4">
+        <div class="card-header">
+          <div><h4 class="mb-3">Nilai Ujian</h4></div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive text-nowrap">
+                <table class="table table-borderless">
+                  <thead>
                     <tr>
                         <th>Nama</th>
                         <th>Mata Pelajaran</th>
@@ -16,27 +21,29 @@
                         <th>=========</th>
 
                     </tr>
-                </thead>
-                <tbody>
+                  </thead>
+                  <tbody>
                     <tr>
                         <td>{{request.user.full_name}}</td>
                         <td>{{mapel}}</td>
                         <td>{{nilai}}</td>
                         <td>{{predikat}}</td>
-                        <td><label class="badge badge-{% if status == "lulus" %}success{% else %}danger{% endif %}">{{status}}</label></td>
+                        <td><label class="badge bg-{% if status == "lulus" %}success{% else %}danger{% endif %}">{{status}}</label></td>
                         <td>
                         {% if sertifikat_obj %}
-                            <a href="{{sertifikat_obj.sertifikat.url}}"class="badge badge-primary text-decoration-none text-white">Sertifikat</a>
+                            <a href="{{sertifikat_obj.sertifikat.url}}"class="badge bg-primary text-decoration-none text-white">Sertifikat</a>
                         {% else %}
-                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="badge badge text-decoration-none text-white" style="background-color:#8929e3;">
+                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="btn btn-sm btn-danger">
                                 Lakukan Ujian Ulang
                             </a>
                         {% endif %}
                         </td>
                     </tr>
-                </tbody>
-            </table>
+                  </tbody>
+                </table>
+              </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 {% endblock content %}
