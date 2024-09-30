@@ -10,7 +10,7 @@ from django.db.models import ProtectedError
 from django.core.exceptions import ValidationError
 from menu.levelstudy.models import LevelStudy
 from menu.utils.pagination import pagination_queryset
-from menu.utils.encode_url import decode_id,encode_id
+from menu.utils.encode_url import decode_id
 # Create your views here.
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
@@ -95,17 +95,14 @@ def tambah_mapel(request, id_levelstudy):
 def edit_mapel(request, id_levelstudy, id_mapel):
     pk_levelstudy = decode_id(id_levelstudy)
     pk_mapel = decode_id(id_mapel)
-    
-    print(pk_levelstudy,pk_mapel,"====================")
     mapel_obj = get_object_or_404(MataPelajaran, pk=pk_mapel, level_study__pk=pk_levelstudy)
     print(mapel_obj)
     if request.method == "POST":
         mapel_forms = MapelForm(request.POST, instance=mapel_obj)
         if mapel_forms.is_valid():
             try:
-                # Manually trigger validation to catch unique_together constraint
                 mapel_obj = mapel_forms.save(commit=False)
-                mapel_obj.full_clean()  # This will raise a ValidationError if unique_together is violated
+                mapel_obj.full_clean()
                 mapel_obj.save()
                 messages.success(request, f"Selamat mata pelajaran {mapel_obj.nama_mapel} berhasil di-edit")
                 return redirect("menu:mapel", id_levelstudy=id_levelstudy)

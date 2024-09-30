@@ -1,6 +1,6 @@
-{% extends "base_menu.html" %}
+{% extends "menu_base.html" %}
 
-{% block content_menu %}
+{% block content %}
 <div class="col-sm-8">
     <div class="card-body">
         <h2 class="card-title text-black">Nilai Ujian</h2>
@@ -28,7 +28,7 @@
                         {% if sertifikat_obj %}
                             <a href="{{sertifikat_obj.sertifikat.url}}"class="badge badge-primary text-decoration-none text-white">Sertifikat</a>
                         {% else %}
-                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran.pk id_nilai=nilai_obj.pk %}" class="badge badge text-decoration-none text-white" style="background-color:#8929e3;">
+                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="badge badge text-decoration-none text-white" style="background-color:#8929e3;">
                                 Lakukan Ujian Ulang
                             </a>
                         {% endif %}
@@ -39,4 +39,4 @@
         </div>
     </div>
 </div>
-{% endblock content_menu %}
+{% endblock content %}

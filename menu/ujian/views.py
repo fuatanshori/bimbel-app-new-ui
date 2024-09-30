@@ -13,14 +13,11 @@ from django.conf import settings
 import datetime
 import uuid
 from menu.levelstudy.models import LevelStudy
-from core.utils.decorator import admin_pemateri_required
+from core.utils.decorator import admin_pemateri_required,transaksi_settlement_required
 from menu.utils.encode_url import decode_id
 from menu.utils.pagination import pagination_queryset
 from django.contrib import messages
 
-
-
-# Create your views here.
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
@@ -28,27 +25,19 @@ PAYMENT_STATUS = midtrans.PAYMENT_STATUS
 
 
 @login_required(login_url='user:masuk')
+@transaksi_settlement_required
 def levelstudy_ujian(request):
     levelstudy_objs = LevelStudy.objects.all()
-    try:
-        Transaksi.objects.get(user=request.user, transaksi_status="settlement")
-    except Transaksi.DoesNotExist:
-        if request.user.role not in ["pemateri","admin"]:
-            return redirect("menu:pembayaran")
     context = {
         'levelstudy_objs': levelstudy_objs,
     }
     return render(request, 'ujian/levelstudy_ujian.html', context)
 
 @login_required(login_url='user:masuk')
+@transaksi_settlement_required
 def ujian_mapel(request,id_levelstudy):
     pk = decode_id(id_levelstudy)
     mapel_objs = MataPelajaran.objects.filter(level_study__pk=pk)
-    try:
-        Transaksi.objects.get(user=request.user, transaksi_status="settlement")
-    except Transaksi.DoesNotExist:
-        if request.user.role not in ["pemateri","admin"]:
-            return redirect("menu:pembayaran")
     context = {
         'mapel_objs': mapel_objs,
         
@@ -59,11 +48,6 @@ def ujian_mapel(request,id_levelstudy):
 @admin_pemateri_required
 def daftar_ujian_admin_pemateri(request, id_mapel):
     pk = decode_id(id_mapel)
-    try:
-        Transaksi.objects.get(user=request.user, transaksi_status="settlement")
-    except Transaksi.DoesNotExist:
-        if request.user.role not in ["pemateri","admin"]:
-            return redirect("menu:pembayaran")
     try:
         custom_range,soal_ujian_objs = pagination_queryset(request,SoalUjian.objects.filter(mata_pelajaran__pk=pk),5)
         mapel_objs = MataPelajaran.objects.get(pk=pk)
@@ -159,24 +143,14 @@ def detail_ujian(request, id_mapel, id_soal_ujian):
     }
     return render(request, 'ujian/detail_ujian.html',context)
 
-
+@login_required(login_url='user:masuk')
+@transaksi_settlement_required
 def ujian(request,id_mapel):
     pk = decode_id(id_mapel)
     try:
-        status_transaksi=[]
-        transaksi_obj = Transaksi.objects.get(
-            user=request.user, transaksi_status="settlement")
-        status_transaksi.append(PAYMENT_STATUS[transaksi_obj.transaksi_status])
-    except Transaksi.DoesNotExist:
-        if request.user.role == "admin" or request.user.role == "pemateri":
-            status_transaksi = (None,)
-        else:
-            return redirect("menu:pembayaran")
-        
-    try:
         mapel_obj = MataPelajaran.objects.get(pk=pk)
         nilai = Nilai.objects.get(user=request.user,mata_pelajaran=mapel_obj)
-        return redirect("menu:nilai-setelah-ujian",id_mapel=id_mapel,id_nilai=nilai.pk)
+        return redirect("menu:nilai-setelah-ujian",id_mapel=id_mapel,id_nilai=nilai.get_id_safe())
     except Nilai.DoesNotExist:
         pass
     except MataPelajaran.DoesNotExist:
@@ -230,7 +204,7 @@ def ujian(request,id_mapel):
                 sertifikat = f"sertifikat/{no_cert}.png"
             )
             cert_obj.save()
-        return redirect("menu:nilai-setelah-ujian",id_mapel=id_mapel,id_nilai=nilai_obj.pk)
+        return redirect("menu:nilai-setelah-ujian",id_mapel=id_mapel,id_nilai=nilai_obj.get_id_safe())
 
     soal_ujian_objs_lists = list(SoalUjian.objects.filter(mata_pelajaran__pk=pk))
     if len(soal_ujian_objs_lists)==0:
@@ -242,25 +216,19 @@ def ujian(request,id_mapel):
         'soal_ujian_objs':soal_ujian_objs_lists,
         'total_soal':SoalUjian.objects.filter(mata_pelajaran__pk=pk).count(),
         'mata_pelajaran': mapel_obj.nama_mapel,
-        'status_transaksi': status_transaksi[0],
     }
     return render(request,'ujian/ujian.html',context)
 
+@login_required(login_url='user:masuk')
+@transaksi_settlement_required
 def nilai_setelah_ujian(request,id_mapel,id_nilai):
+    pk_mapel = decode_id(id_mapel)
+    pk_nilai = decode_id(id_nilai)
+   
+    mapel_obj = MataPelajaran.objects.get(pk=pk_mapel)
     try:
-        status_transaksi=[]
-        transaksi_obj = Transaksi.objects.get(
-            user=request.user, transaksi_status="settlement")
-        status_transaksi.append(PAYMENT_STATUS[transaksi_obj.transaksi_status])
-    except Transaksi.DoesNotExist:
-        if request.user.role == "admin" or request.user.role == "pemateri":
-            status_transaksi = (None,)
-        else:
-            return redirect("menu:pembayaran")
-    mapel_obj = MataPelajaran.objects.get(pk=id_mapel)
-    try:
-        nilai_obj = Nilai.objects.get(pk=id_nilai,user=request.user)
-    except:
+        nilai_obj = Nilai.objects.get(pk=pk_nilai,user=request.user)
+    except Nilai.DoesNotExist:
         return redirect("menu:ujian",id_mapel=id_mapel)
     try:
         sertifikat_obj = Sertifikat.objects.get(nilai=nilai_obj)
@@ -272,7 +240,6 @@ def nilai_setelah_ujian(request,id_mapel,id_nilai):
             "predikat":nilai_obj.predikat,
             "status":nilai_obj.status,
             'mapel':mapel_obj.nama_mapel,
-            'status_transaksi': status_transaksi[0],
             'sertifikat_obj':sertifikat_obj
         }
     return render(request,'ujian/nilai.html',context)

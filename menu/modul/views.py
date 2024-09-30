@@ -4,13 +4,12 @@ from django.http import JsonResponse
 from .models import MataPelajaran
 from .models import Modul
 from menu.levelstudy.models import LevelStudy
-from menu.pembayaran.models import Transaksi
 from config import midtrans
 from django.contrib.auth.decorators import login_required
 import os
 from django.contrib import messages
 from .forms import ModulForm
-from core.utils.decorator import admin_pemateri_required
+from core.utils.decorator import admin_pemateri_required,transaksi_settlement_required
 from menu.utils.encode_url import decode_id
 from menu.utils.pagination import pagination_queryset
 
@@ -21,14 +20,9 @@ PAYMENT_STATUS = midtrans.PAYMENT_STATUS
 
 
 @login_required(login_url='user:masuk')
+@transaksi_settlement_required
 def modul_levelstudy(request):
     levelstudy_objs = LevelStudy.objects.all()
-    try:
-        Transaksi.objects.get(user=request.user, transaksi_status="settlement")
-    except Transaksi.DoesNotExist:
-        if request.user.role not in ["pemateri","admin"]:
-            return redirect("menu:pembayaran")
-    
     context = {
         'levelstudy_objs': levelstudy_objs,
     }
@@ -36,15 +30,10 @@ def modul_levelstudy(request):
 
 
 @login_required(login_url='user:masuk')
+@transaksi_settlement_required
 def modul_mapel(request,id_levelstudy):
     pk =decode_id(id_levelstudy)
     mapel_objs = MataPelajaran.objects.filter(level_study__pk=pk)
-    try:
-        Transaksi.objects.get(user=request.user, transaksi_status="settlement")
-    except Transaksi.DoesNotExist:
-        if request.user.role not in ["pemateri","admin"]:
-            return redirect("menu:pembayaran")
-    
     context = {
         'mapel_objs': mapel_objs,
         "id_levelstudy":id_levelstudy
@@ -53,12 +42,8 @@ def modul_mapel(request,id_levelstudy):
 
 
 @login_required(login_url='user:masuk')
+@transaksi_settlement_required
 def daftar_modul(request,id_levelstudy, id_mapel):
-    try:
-        Transaksi.objects.get(user=request.user, transaksi_status="settlement")
-    except Transaksi.DoesNotExist:
-        if request.user.role not in ["pemateri","admin"]:
-            return redirect("menu:pembayaran")
     pk = decode_id(id_mapel)
     custom_range,modul_objs = pagination_queryset(request,Modul.objects.filter(mata_pelajaran__pk=pk),5)
     context = {
@@ -69,6 +54,22 @@ def daftar_modul(request,id_levelstudy, id_mapel):
     }
     return render(request, 'modul/daftar_modul.html', context)
 
+@login_required(login_url="user:masuk")
+@transaksi_settlement_required
+def detailmodul(request,id_levelstudy,id_mapel,id_modul):
+    pk_mapel=decode_id(id_mapel)
+    pk_modul=decode_id(id_modul)
+
+    try:
+        modul_obj = Modul.objects.get(pk=pk_modul,mata_pelajaran__pk=pk_mapel)
+    except Modul.DoesNotExist:
+        raise Http404
+    context = {
+        "modul_obj":modul_obj,
+        "id_mapel":id_mapel,
+        "id_levelstudy":id_levelstudy,
+    }
+    return render(request,'modul/detail_modul.html',context)
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
@@ -162,23 +163,3 @@ def edit_modul(request, id_mapel, id_modul):
         "id_modul": id_modul
     }
     return render(request, 'modul/edit_modul.html', context)
-
-@login_required(login_url="user:masuk")
-def detailmodul(request,id_levelstudy,id_mapel,id_modul):
-    pk_mapel=decode_id(id_mapel)
-    pk_modul=decode_id(id_modul)
-    try:
-        Transaksi.objects.get(user=request.user, transaksi_status="settlement")
-    except Transaksi.DoesNotExist:
-        if request.user.role not in ["pemateri","admin"]:
-            return redirect("menu:pembayaran")
-    try:
-        modul_obj = Modul.objects.get(pk=pk_modul,mata_pelajaran__pk=pk_mapel)
-    except Modul.DoesNotExist:
-        raise Http404
-    context = {
-        "modul_obj":modul_obj,
-        "id_mapel":id_mapel,
-        "id_levelstudy":id_levelstudy,
-    }
-    return render(request,'modul/detail_modul.html',context)
