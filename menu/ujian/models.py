@@ -2,6 +2,7 @@ from django.db import models
 from menu.mapel.models import MataPelajaran
 from menu.nilai.models import Nilai
 from django.core.validators import FileExtensionValidator 
+from menu.utils.encode_url import encode_id
 # Create your models here.
 
 
@@ -21,13 +22,17 @@ class SoalUjian(models.Model):
     jawaban_4 = models.CharField(max_length=200)
     pilih_jawaban_benar = models.CharField(choices=choices,max_length=200)
     mata_pelajaran = models.ForeignKey(MataPelajaran,on_delete=models.CASCADE)   
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
     def __str__(self):
         return self.soal
     class Meta:
         verbose_name_plural = "Soal Ujian"
+        ordering = ["-created_at"]
     
-
+    def get_id_safe(self):
+        return encode_id(self.pk)
 
 
 class Sertifikat(models.Model):

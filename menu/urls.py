@@ -44,7 +44,6 @@ urlpatterns += [
     path('modul/delete-modul/<id_levelstudy>/<id_mapel>/<id_modul>/',views_modul.hapusModul, name='hapus-modul'),
     path('modul/tambah/<id_levelstudy>/<id_mapel>/', views_modul.tambah_modul, name='tambah-modul'),
     path('modul/edit/<id_mapel>/<id_modul>/', views_modul.edit_modul, name='edit-modul'),
-    
     path('modul/detail/<id_levelstudy>/<id_mapel>/<id_modul>/', views_modul.detailmodul, name='detail-modul'),
 ]
 
@@ -57,7 +56,8 @@ urlpatterns+=[
     path('ujian/delete-ujian/<id_mapel>/<id_soal_ujian>/',views_ujian.hapusSoalUjian, name='hapus-soal-ujian'),
     path('ujian/tambah/<id_mapel>/', views_ujian.tambah_ujian, name='tambah-ujian'),
     path('ujian/edit/<id_mapel>/<id_soal_ujian>/', views_ujian.edit_ujian, name='edit-ujian'),
-
+    path('ujian/detail/<id_mapel>/<id_soal_ujian>/', views_ujian.detail_ujian, name='detail-ujian'),
+    
     path('ujian/<id_mapel>/', views_ujian.ujian, name='ujian'),
     path('ujian/nilai/<id_mapel>/<id_nilai>/', views_ujian.nilai_setelah_ujian, name='nilai-setelah-ujian'),
 ]

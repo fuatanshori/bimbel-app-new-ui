@@ -42,6 +42,7 @@
                 Akses pdf
               </button>
             </li>
+            {% if modul_obj.vidio %}
             <li class="nav-item">
               <button
                 type="button"
@@ -55,6 +56,7 @@
                 Akses Vidio
               </button>
             </li>
+            {% endif %}
           </ul>
           <div class="tab-content">
             <div class="tab-pane fade show active" id="detailmodul" role="tabpanel">
@@ -68,7 +70,7 @@
               <object data="{{ modul_obj.modul.url }}" type="application/pdf" width="100%" height="600px">
               </object>
             </div>
-            
+            {% if modul_obj.vidio %}
             <div class="tab-pane fade" id="moduleVidio" role="tabpanel">
               <p>Jika Browser anda Tidak mendukung <a href="{{ modul_obj.vidio.url }}">lihat Vidio</a> untuk melihatnya.</p>
               <div id="trailer" class="section d-flex justify-content-center">
@@ -79,6 +81,7 @@
                 </div>
               </div>
             </div>
+            {% endif %}
           </div>
         </div>
       </div>

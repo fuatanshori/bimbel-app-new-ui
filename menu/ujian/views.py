@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import render, redirect, HttpResponse,get_object_or_404
 from .models import MataPelajaran
 from menu.pembayaran.models import Transaksi
 from config import midtrans
@@ -14,6 +14,10 @@ import datetime
 import uuid
 from menu.levelstudy.models import LevelStudy
 from core.utils.decorator import admin_pemateri_required
+from menu.utils.encode_url import decode_id
+from menu.utils.pagination import pagination_queryset
+from django.contrib import messages
+
 
 
 # Create your views here.
@@ -38,7 +42,8 @@ def levelstudy_ujian(request):
 
 @login_required(login_url='user:masuk')
 def ujian_mapel(request,id_levelstudy):
-    mapel_objs = MataPelajaran.objects.filter(level_study__pk=id_levelstudy)
+    pk = decode_id(id_levelstudy)
+    mapel_objs = MataPelajaran.objects.filter(level_study__pk=pk)
     try:
         Transaksi.objects.get(user=request.user, transaksi_status="settlement")
     except Transaksi.DoesNotExist:
@@ -53,14 +58,15 @@ def ujian_mapel(request,id_levelstudy):
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def daftar_ujian_admin_pemateri(request, id_mapel):
+    pk = decode_id(id_mapel)
     try:
         Transaksi.objects.get(user=request.user, transaksi_status="settlement")
     except Transaksi.DoesNotExist:
         if request.user.role not in ["pemateri","admin"]:
             return redirect("menu:pembayaran")
     try:
-        soal_ujian_objs = SoalUjian.objects.filter(mata_pelajaran__pk=id_mapel)
-        mapel_objs = MataPelajaran.objects.get(pk=id_mapel)
+        custom_range,soal_ujian_objs = pagination_queryset(request,SoalUjian.objects.filter(mata_pelajaran__pk=pk),5)
+        mapel_objs = MataPelajaran.objects.get(pk=pk)
     except SoalUjian.DoesNotExist:
         return HttpResponse("404 soal tidak ditemukan")
     except MataPelajaran.DoesNotExist:
@@ -69,7 +75,8 @@ def daftar_ujian_admin_pemateri(request, id_mapel):
     context = {
         'id_mapel':id_mapel,
         'soal_ujian_objs': soal_ujian_objs,
-        'mapel':mapel_objs
+        'mapel':mapel_objs,
+        "custom_range":custom_range,
     }
     return render(request, 'ujian/daftar_ujian_admin.html', context)
 
@@ -77,18 +84,21 @@ def daftar_ujian_admin_pemateri(request, id_mapel):
 @admin_pemateri_required
 def hapusSoalUjian(request,id_mapel, id_soal_ujian):
     try:
-        soal_ujian_obj = SoalUjian.objects.get(pk=id_soal_ujian)
+        pk = decode_id(id_soal_ujian)
+        soal_ujian_obj = get_object_or_404(SoalUjian,pk=pk)
     except SoalUjian.DoesNotExist:
         return redirect("menu:daftar-ujian-admin-pemateri",id_mapel=id_mapel)
    
     soal_ujian_obj.delete()
-    return redirect('menu:daftar-ujian-admin-pemateri', id_mapel=soal_ujian_obj.mata_pelajaran.pk)
+    messages.success(request,"berhasil dihapus")
+    return redirect('menu:daftar-ujian-admin-pemateri', id_mapel=id_mapel)
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def tambah_ujian(request,id_mapel):
     if request.method == "POST":
-        mapel_obj = MataPelajaran.objects.get(pk=id_mapel)
+        pk = decode_id(id_mapel)
+        mapel_obj = MataPelajaran.objects.get(pk=pk)
         soal_ujian_forms = SoalUjianForm(request.POST,request.FILES)
         if soal_ujian_forms.is_valid():
             gambar_soal = soal_ujian_forms.cleaned_data['gambar_soal']
@@ -117,10 +127,12 @@ def tambah_ujian(request,id_mapel):
     }
     return render(request, 'ujian/tambah_ujian.html',context)
 
+
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def edit_ujian(request, id_mapel, id_soal_ujian):
-    soal_ujian_obj = SoalUjian.objects.get(pk=id_soal_ujian)
+    pk = decode_id(id_soal_ujian)
+    soal_ujian_obj = SoalUjian.objects.get(pk=pk)
     if request.method == "POST":
         soal_ujian_forms = SoalUjianForm(request.POST , request.FILES ,instance=soal_ujian_obj)
         if soal_ujian_forms.is_valid():
@@ -136,7 +148,20 @@ def edit_ujian(request, id_mapel, id_soal_ujian):
     return render(request, 'ujian/edit_ujian.html',context)
 
 
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def detail_ujian(request, id_mapel, id_soal_ujian):
+    pk = decode_id(id_soal_ujian)
+    soal_ujian_obj = get_object_or_404(SoalUjian,pk=pk)
+    context={
+        "id_mapel": id_mapel,
+        "soal_ujian_obj":soal_ujian_obj
+    }
+    return render(request, 'ujian/detail_ujian.html',context)
+
+
 def ujian(request,id_mapel):
+    pk = decode_id(id_mapel)
     try:
         status_transaksi=[]
         transaksi_obj = Transaksi.objects.get(
@@ -149,7 +174,7 @@ def ujian(request,id_mapel):
             return redirect("menu:pembayaran")
         
     try:
-        mapel_obj = MataPelajaran.objects.get(pk=id_mapel)
+        mapel_obj = MataPelajaran.objects.get(pk=pk)
         nilai = Nilai.objects.get(user=request.user,mata_pelajaran=mapel_obj)
         return redirect("menu:nilai-setelah-ujian",id_mapel=id_mapel,id_nilai=nilai.pk)
     except Nilai.DoesNotExist:
@@ -158,7 +183,7 @@ def ujian(request,id_mapel):
         return HttpResponse("Mata pelajaran tidak ditemukan")
 
     if request.method == "POST":
-        soal_ujian_objs = SoalUjian.objects.filter(mata_pelajaran__pk=id_mapel)
+        soal_ujian_objs = SoalUjian.objects.filter(mata_pelajaran__pk=pk)
         salah = 0
         benar = 0
         for soal_ujian_obj in soal_ujian_objs:
@@ -207,7 +232,7 @@ def ujian(request,id_mapel):
             cert_obj.save()
         return redirect("menu:nilai-setelah-ujian",id_mapel=id_mapel,id_nilai=nilai_obj.pk)
 
-    soal_ujian_objs_lists = list(SoalUjian.objects.filter(mata_pelajaran__pk=id_mapel))
+    soal_ujian_objs_lists = list(SoalUjian.objects.filter(mata_pelajaran__pk=pk))
     if len(soal_ujian_objs_lists)==0:
         return HttpResponse("soal ujian belum dibuat")
     random.shuffle((soal_ujian_objs_lists))
@@ -215,7 +240,7 @@ def ujian(request,id_mapel):
     context = {
         'id_mapel':id_mapel,
         'soal_ujian_objs':soal_ujian_objs_lists,
-        'total_soal':SoalUjian.objects.filter(mata_pelajaran__pk=id_mapel).count(),
+        'total_soal':SoalUjian.objects.filter(mata_pelajaran__pk=pk).count(),
         'mata_pelajaran': mapel_obj.nama_mapel,
         'status_transaksi': status_transaksi[0],
     }

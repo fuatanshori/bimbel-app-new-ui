@@ -1,64 +1,82 @@
-{% extends "base_menu.html" %}
+{% extends "menu_base.html" %}
 
-{% block content_menu %}
-<div class="col-md-12 grid-margin">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex flex-row flex-wrap justify-content-center">
-          <h2 class="card-title mb-4 ">Ujian {{mata_pelajaran}} {{total_soal}} Soal</h2>
+{% block title %}menu{% endblock title %}
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y ">
+    <div class="row justify-content-center">
+        <div>
+          <h2 class="text-center">Ujian {{mata_pelajaran}} {{total_soal}} Soal</h2>
         </div>
-        <div class="row">
-          <div class="col-md-12 d-flex flex-column gap-3">
-            <form method='post' action='{% url "menu:ujian" id_mapel=id_mapel %}'>
-              {% csrf_token %}
-              {% for soal_ujian_obj in soal_ujian_objs %}
-              <section>
-                {% if soal_ujian_obj.gambar_soal %}
-                <div class="form-group">
-                  <img style="max-width: 200px;" src="{{soal_ujian_obj.gambar_soal.url}}" alt="">
-                </div>
-                {% endif %}
-                <div class="form-group">
-                  {{ forloop.counter }}.) <label for="question">{{soal_ujian_obj.soal}}</label>
-                </div>
-                <div class="form-check">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
-                      id="gridRadios1" value="jawaban1">
-                    <label class="form-check-label" for="gridRadios1">
-                      {{soal_ujian_obj.jawaban_1}}
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
-                      id="gridRadios2" value="jawaban2">
-                    <label class="form-check-label" for="gridRadios2">
-                      {{soal_ujian_obj.jawaban_2}}
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
-                      id="gridRadios1" value="jawaban3">
-                    <label class="form-check-label" for="gridRadios1">
-                      {{soal_ujian_obj.jawaban_3}}
-                    </label>
-                  </div>
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
-                      id="gridRadios2" value="jawaban4">
-                    <label class="form-check-label" for="gridRadios2">
-                      {{soal_ujian_obj.jawaban_4}}
-                    </label>
+        {% for soal_ujian_obj in soal_ujian_objs  %}
+        <div class="container mt-4">
+            <!-- Bagian card -->
+            <div class="row justify-content-center">
+              <div class="col-lg-8">
+                <div class="card h-100 overflow-hidden shadow-sm">
+                  <div class="card-body">
+                    {% if soal_ujian_obj.gambar_soal %}
+                    <img class="img-fluid" src="{{soal_ujian_obj.gambar_soal.url}}" alt="Card image cap" style="max-height: 250px; object-fit: cover; width: 100%; border-radius: 8px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal{{soal_ujian_obj.pk}}">
+                    {% endif %}
+                    <p class="card-text mt-3 text-start fw-bolder">
+                      {{ forloop.counter }}. {{soal_ujian_obj.soal}}
+                    </p>
                   </div>
                 </div>
-              </section>
-              <br>
-              {% endfor %}
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+              </div>
+            </div>
+          
+            <!-- Bagian teks jawaban yang berada di bawah card -->
+            <div class="row justify-content-center mt-2 mb-5">
+              <div class="col-lg-8">
+                <div class="p-3 bg-light rounded shadow-sm">
+                  <!-- Pilihan Jawaban -->
+      <form method='post' action="{% url "menu:ujian" id_mapel=id_mapel %}">
+                  {% csrf_token %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                    id="gridRadios1" value="jawaban1" required>
+                    <label class="form-check-label" for="gridRadios1">{{soal_ujian_obj.jawaban_1}}</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios2" value="jawaban2" required>
+                    <label class="form-check-label" for="gridRadios2">{{soal_ujian_obj.jawaban_2}}</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                    id="gridRadios3" value="jawaban3" required>
+                    <label class="form-check-label" for="gridRadios3">{{soal_ujian_obj.jawaban_3}}</label>
+                  </div>
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios4" value="jawaban4" required>
+                    <label class="form-check-label" for="gridRadios4">{{soal_ujian_obj.jawaban_4}}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+          
+          {% if soal_ujian_obj.gambar_soal %}
+            <!-- Modal untuk Preview Gambar -->
+            <div class="modal fade" id="imageModal{{soal_ujian_obj.pk}}" tabindex="-1" aria-labelledby="imageModal{{soal_ujian_obj.pk}}Label" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered" style="max-width: 80%;">
+
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="imageModal{{soal_ujian_obj.pk}}Label">Preview Gambar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-center">
+                    <img class="img-fluid" src="{{soal_ujian_obj.gambar_soal.url}}" alt="Preview Image" style="max-width: 100%; height: auto;">
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+        <button type="submit" class="btn btn-primary col-3 my-4">Submit</button>
+      </form>
     </div>
   </div>
-{% endblock content_menu %}
+{% endblock content %}
