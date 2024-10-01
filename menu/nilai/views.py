@@ -161,7 +161,7 @@ def generate_certificate(request,id_sertifikat):
 
     domain = get_current_site(request).domain
     endpoint = reverse("menu:generate-certificate",args=[id_sertifikat])
-    qr_data = f"https://{domain}{endpoint}"
+    qr_data = f"http://{domain}{endpoint}"
     qr_code_image = qrcode.make(qr_data)
 
     qr_buffer = BytesIO()
