@@ -1,6 +1,5 @@
 from django.db import models
 from menu.mapel.models import MataPelajaran
-from menu.nilai.models import Nilai
 from django.core.validators import FileExtensionValidator 
 from menu.utils.encode_url import encode_id
 import uuid
@@ -36,13 +35,3 @@ class SoalUjian(models.Model):
         return encode_id(self.pk)
 
 
-class Sertifikat(models.Model):
-    no_cert     = models.UUIDField(primary_key=True,unique=True,db_index=True,default=uuid.uuid4)
-    nilai        = models.OneToOneField(Nilai,on_delete=models.CASCADE)
-    created_at = models.DateField(auto_now_add=True)
-
-    class Meta:
-        verbose_name_plural = "Sertifikat"
-        
-    def get_id_safe(self):
-        return encode_id(self.pk)

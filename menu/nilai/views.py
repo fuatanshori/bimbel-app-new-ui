@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import Http404
-from menu.ujian.models import Nilai
+from menu.nilai.models import Nilai
 from menu.mapel.models import MataPelajaran
 from django.contrib.auth.decorators import login_required
 from core.utils.decorator import transaksi_settlement_required
@@ -16,7 +16,7 @@ from django.conf import settings
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from user.models import Profile
-from menu.ujian.models import Sertifikat
+from menu.nilai.models import Sertifikat
 from menu.utils.encode_url import decode_id
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
@@ -78,6 +78,7 @@ def daftar_nilai_permapel(request,id_mapel):
         "nilai_objs": nilai_objs,
         "mapel_objs":mapel_objs,
         "nama_mapel":nama_mapel,
+        "id_mapel":id_mapel
     }
     return render(request, 'nilai/nilai.html', context)
 
@@ -85,7 +86,6 @@ def daftar_nilai_permapel(request,id_mapel):
 def generate_certificate(request,id_sertifikat):
     
     sertifikat_obj = get_object_or_404(Sertifikat,pk=decode_id(id_sertifikat))
-    profile_obj = get_object_or_404(Profile,user=sertifikat_obj.nilai.user)
     
     BASE_DIR = settings.BASE_DIR
     image_path = BASE_DIR / 'cert_generator/sertifikat_template.png'
@@ -106,13 +106,13 @@ def generate_certificate(request,id_sertifikat):
     pdfmetrics.registerFont(TTFont('LeagueSpartan-Medium', font_path2))
     pdfmetrics.registerFont(TTFont('LeagueSpartan-Regular', font_path3))
 
-    nama = profile_obj.nama_lengkap
-    id_cert = sertifikat_obj.pk
-    tingkat_studi = sertifikat_obj.nilai.mata_pelajaran.level_study.level_study
-    mata_pelajaran = sertifikat_obj.nilai.mata_pelajaran.nama_mapel
-    predikat = sertifikat_obj.nilai.predikat
-    nilai = sertifikat_obj.nilai.nilai
-    tanggal_lahir = profile_obj.tanggal_lahir
+    nama = str(sertifikat_obj.nama).upper()
+    id_cert = str(sertifikat_obj.pk).upper()
+    tingkat_studi = sertifikat_obj.tingkat_studi
+    mata_pelajaran = sertifikat_obj.mata_pelajaran
+    predikat = sertifikat_obj.predikat
+    nilai = sertifikat_obj.nilai
+    tanggal_lahir = sertifikat_obj.tanggal_lahir
     tanggal_dibuat = sertifikat_obj.created_at
 
     positions = {
@@ -183,3 +183,4 @@ def generate_certificate(request,id_sertifikat):
     response['Content-Disposition'] = 'inline; filenama="certificate_with_qr.pdf"'
 
     return response
+

@@ -2,7 +2,7 @@ from django.db import models
 from user.models import Users
 from menu.mapel.models import MataPelajaran
 from menu.utils.encode_url import encode_id
-
+import uuid
 
 # Create your models here.
 class Nilai(models.Model):
@@ -11,12 +11,14 @@ class Nilai(models.Model):
         "tidak lulus":"tidak lulus"
 
     }
-    id_nilai = models.BigAutoField(primary_key=True,unique=True,db_index=True)
-    user = models.ForeignKey(Users,on_delete=models.CASCADE,db_index=True)
-    mata_pelajaran = models.ForeignKey(MataPelajaran,on_delete=models.PROTECT,db_index=True)
-    nilai = models.IntegerField()
-    predikat = models.CharField(max_length=2)
-    status = models.CharField(max_length=12,choices=choices)
+    id_nilai            = models.BigAutoField(primary_key=True,unique=True,db_index=True)
+    user                = models.ForeignKey(Users,on_delete=models.CASCADE,db_index=True)
+    mata_pelajaran_obj  = models.ForeignKey(MataPelajaran,on_delete=models.SET_NULL,db_index=True,null=True)
+    mata_pelajaran      = models.CharField(max_length=100,null=True)
+    level_study         = models.CharField(max_length=100,null=True)
+    nilai               = models.IntegerField()
+    predikat            = models.CharField(max_length=2)
+    status              = models.CharField(max_length=12,choices=choices)
 
     def __str__(self) -> str:
         return f"{self.mata_pelajaran} = {self.nilai}"
@@ -26,3 +28,20 @@ class Nilai(models.Model):
     
     class Meta:
         verbose_name_plural = "Nilai"
+        
+class Sertifikat(models.Model):
+    no_cert         = models.UUIDField(primary_key=True,unique=True,db_index=True,default=uuid.uuid4)
+    nama            = models.CharField(max_length=100)
+    tingkat_studi   = models.CharField(max_length=100)
+    mata_pelajaran  = models.CharField(max_length=100)
+    predikat        = models.CharField(max_length=2)
+    nilai           = models.CharField(max_length=100)
+    tanggal_lahir   = models.DateField()
+    nilai_obj       = models.OneToOneField(Nilai,on_delete=models.SET_NULL,null=True)
+    created_at      = models.DateField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Sertifikat"
+        
+    def get_id_safe(self):
+        return encode_id(self.pk)

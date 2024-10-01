@@ -1,23 +1,18 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect, HttpResponse,get_object_or_404
 from .models import MataPelajaran
-from menu.pembayaran.models import Transaksi
 from config import midtrans
 from django.contrib.auth.decorators import login_required
-import os
 from .forms import SoalUjianForm
-from .models import SoalUjian,Nilai,Sertifikat
+from .models import SoalUjian
+from menu.nilai.models import Nilai,Sertifikat
 import random
-
-from django.conf import settings
-import datetime
-import uuid
 from menu.levelstudy.models import LevelStudy
 from core.utils.decorator import admin_pemateri_required,transaksi_settlement_required
 from menu.utils.encode_url import decode_id
 from menu.utils.pagination import pagination_queryset
 from django.contrib import messages
-
+from user.models import Profile
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
@@ -185,15 +180,24 @@ def ujian(request,id_mapel):
         status = "tidak lulus" if nilai <=60 else "lulus"
         nilai_obj = Nilai.objects.create(
             user = request.user,
-            mata_pelajaran = mapel_obj,
+            mata_pelajaran_obj = mapel_obj,
             nilai = nilai,
             predikat=predikat,
             status = status,
+            mata_pelajaran= mapel_obj.nama_mapel,
+            level_study = mapel_obj.level_study.level_study
         )
         nilai_obj.save()
         if status == "lulus":
+            profile_obj = Profile.objects.get(user=request.user)
             cert_obj = Sertifikat.objects.create(
-                nilai=nilai_obj
+                nama = profile_obj.nama_lengkap,
+                tingkat_studi = mapel_obj.level_study.level_study,
+                mata_pelajaran =mapel_obj.nama_mapel,
+                predikat=nilai_obj.predikat,
+                nilai=nilai_obj.nilai,
+                tanggal_lahir=profile_obj.tanggal_lahir,
+                nilai_obj=nilai_obj,
             )
             cert_obj.save()
 
@@ -215,16 +219,13 @@ def ujian(request,id_mapel):
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def nilai_setelah_ujian(request,id_mapel,id_nilai):
-    pk_mapel = decode_id(id_mapel)
     pk_nilai = decode_id(id_nilai)
-   
-    mapel_obj = MataPelajaran.objects.get(pk=pk_mapel)
     try:
         nilai_obj = Nilai.objects.get(pk=pk_nilai,user=request.user)
     except Nilai.DoesNotExist:
         return redirect("menu:ujian",id_mapel=id_mapel)
     try:
-        sertifikat_obj = Sertifikat.objects.get(nilai=nilai_obj)
+        sertifikat_obj = Sertifikat.objects.get(nilai_obj=nilai_obj)
     except Sertifikat.DoesNotExist:
         sertifikat_obj= None
     context = {
@@ -232,7 +233,8 @@ def nilai_setelah_ujian(request,id_mapel,id_nilai):
             "nilai":nilai_obj.nilai,
             "predikat":nilai_obj.predikat,
             "status":nilai_obj.status,
-            'mapel':mapel_obj.nama_mapel,
-            'sertifikat_obj':sertifikat_obj
+            'mapel':nilai_obj.mata_pelajaran,
+            'sertifikat_obj':sertifikat_obj,
+            'id_mapel':id_mapel,
         }
     return render(request,'ujian/nilai.html',context)
