@@ -203,10 +203,9 @@ LOCALE_PATHS = [BASE_DIR/'locale']
 STATIC_URL = '/static/'
 STATIC_ROOT = 'nginx/staticfiles'
 CKEDITOR_BASEPATH = STATIC_ROOT
-if DEBUG:
-    STATICFILES_DIRS = [
-        BASE_DIR/'static',    
-    ]
+STATICFILES_DIRS = [
+    BASE_DIR/'static',    
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR/'media'
