@@ -11,10 +11,9 @@ load_dotenv(".env")
 
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-SECRET_SALT = os.getenv("SECRET_SALT")
 
-# DEBUG = str(os.getenv("STATUS_DEBUG")).lower()=="true"
-DEBUG = True
+DEBUG = str(os.getenv("STATUS_DEBUG")).lower()=="true"
+# DEBUG = True
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
@@ -281,7 +280,8 @@ LOGGING = {
     },
 }
 
-# handler404 = 'core.views.custom_404_handler'
+handler404 = 'core.views.custom_404_handler'
+handler500 = 'core.views.custom_500_handler'
 
 LOGIN_URL='/users/masuk/'
 

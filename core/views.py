@@ -129,4 +129,13 @@ def profile_foto(request, image_file):
     return response
 
 def custom_404_handler(request):
-    return render(request,"404.html",status=404)
+    context = {}
+    return render(request,"404.html",context,status=404)
+
+def custom_500_handler(request):
+    context = {}
+    return render(request,"500.html",context,status=500)
+
+def trigger_error(request):
+    # Coba munculkan error secara sengaja
+    raise ValueError("Ini adalah error yang sengaja dibuat untuk debugging!")
