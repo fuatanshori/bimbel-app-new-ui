@@ -135,7 +135,3 @@ def custom_404_handler(request):
 def custom_500_handler(request):
     context = {}
     return render(request,"500.html",context,status=500)
-
-def trigger_error(request):
-    # Coba munculkan error secara sengaja
-    raise ValueError("Ini adalah error yang sengaja dibuat untuk debugging!")

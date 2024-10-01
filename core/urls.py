@@ -17,7 +17,7 @@ urlpatterns = [
     path('media/sertifikat/<str:image_file>', views.sertifikat_media_protect),
     path('media/pdf/<str:pdf_file>', views.pdf_protect_membership),
     path('media/vidio/<str:vidio_file>', views.vidio_protect_membership),
-    path('error/',views.trigger_error)
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
