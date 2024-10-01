@@ -84,7 +84,7 @@
           <div data-i18n="Analytics">Ujian</div>
         </a>
       </li>
-      <li id="nilai" class="menu-item {% if request.path|slice:'0:13' == "/menu/nilai/"%}active{% endif %}" style="
+      <li id="nilai" class="menu-item {% if request.path|slice:'0:13' == "/menu/nilai/" or request.path|slice:"0:21" == "/menu/nilai-permapel/" %}active{% endif %}" style="
          {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
         {% elif request.user.role == 'pelajar' %}
@@ -96,7 +96,7 @@
                 display:none;
             {% endif %}
         {% endif %}">
-        <a href="" class="menu-link">
+        <a href="{% url "menu:daftar-nilai" %}" class="menu-link">
           <i class="menu-icon tf-icons bx bx-trophy"></i>
           <div data-i18n="Analytics">Nilai</div>
         </a>

@@ -66,14 +66,14 @@ def daftar_nilai_permapel(request,id_mapel):
     pk = decode_id(id_mapel)
     try:
         if request.user.role in ['pemateri',"admin"]:
-            nilai_objs = Nilai.objects.filter(mata_pelajaran__pk=pk).select_related('sertifikat')
+            nilai_objs = Nilai.objects.filter(mata_pelajaran_obj__pk=pk).select_related('sertifikat')
         else:
-            nilai_objs = Nilai.objects.filter(user=request.user,mata_pelajaran__pk=pk).select_related('sertifikat')
+            nilai_objs = Nilai.objects.filter(user=request.user,mata_pelajaran_obj__pk=pk).select_related('sertifikat')
 
     except Nilai.DoesNotExist:
         pass
     mapel_objs = MataPelajaran.objects.all()
-    nama_mapel = MataPelajaran.objects.get(pk=pk).nama_mapel
+    nama_mapel = get_object_or_404(MataPelajaran,pk=pk).nama_mapel
     context = {
         "nilai_objs": nilai_objs,
         "mapel_objs":mapel_objs,

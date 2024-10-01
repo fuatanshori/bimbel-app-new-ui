@@ -1,74 +1,70 @@
-{% extends "base_menu.html" %}
+{% extends "menu_base.html" %}
 
-{% block content_menu %}
-<div class="col-md-12">
-    <div class="card-body">
-        {% if request.user.role == "pelajar" %}
-          <h4 class="card-title text-black">Nilai</h4>
-        {% elif request.user.role == "pemateri" or request.user.role == "admin" %}
-          <h4 class="card-title text-black">Nilai Pelajar</h4>
-        {% endif %}
-        <div class="col-lg col-sm col-md col-6 flex-grow-0">
-            <div class="category-wrap dropdown d-inline-block float-right">
-                <button type="button" class="btn btn-dark dropdown-toggle py-2" data-toggle="dropdown"> 
+{% block title %}menu{% endblock title %}
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y ">
+    <div class="row justify-content-center">
+      <div class="card py-4">
+        <div class="card-header">
+          <div><h4 class="mb-3">Nilai Ujian</h4></div>
+          <div class="col-lg col-sm col-md col-6 flex-grow-0">
+            <div class="category-wrap dropdown d-inline-block float-start">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
                     {% if request.path == '/menu/' or request.path|slice:'0:21' == "/menu/nilai-permapel/" %}
-                    <i class="mdi mdi-format-list-bulleted"></i> {{nama_mapel}}
+                        <i class="mdi mdi-format-list-bulleted"></i> {{nama_mapel}}
                     {% else %}
-                    <i class="mdi mdi-format-list-bulleted"></i> Semua Mata Pelajaran
+                        <i class="mdi mdi-format-list-bulleted"></i> Semua Mata Pelajaran
                     {% endif %}
                 </button>
-                <div class="dropdown-menu">
+                <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item" href="{% url "menu:daftar-nilai" %}">Semua Mata Pelajaran</a>
                     {% for mapel_obj in mapel_objs %}
-                    <a class="dropdown-item" href="{% url "menu:daftar-nilai-permapel" id_mapel=mapel_obj.pk %}">{{mapel_obj.nama_mapel}}</a>
+                        <a class="dropdown-item" href="{% url "menu:daftar-nilai-permapel" id_mapel=mapel_obj.get_id_safe %}">{{mapel_obj.nama_mapel}}</a>
                     {% endfor %}
                 </div>
-            </div>  <!-- category-wrap.// -->
-        </div> <!-- col.// -->
-        <div class="table-responsive">
-            <table class="table">
-                <thead class="thead-dark">
+            </div> <!-- category-wrap.// -->
+          </div> <!-- col.// -->
+        </div>
+        
+            <div class="table-responsive text-nowrap">
+                <table class="table table-borderless">
+                  <thead>
                     <tr>
-                        {% if request.user.role == "pemateri" or request.user.role == "admin" %}
-                          <th>Nama User</th>
-                        {% endif %}
+                        <th>Nama</th>
+                        <th>Tingkat Studi</th>
                         <th>Mata Pelajaran</th>
                         <th>Nilai</th>
                         <th>Predikat</th>
                         <th>Status</th>
                         <th>Aksi</th>
+
                     </tr>
-                </thead>
-                <tbody>
+                  </thead>
+                  <tbody>
                     {% for nilai_obj in nilai_objs %}
-                    <tr>
-                        {% if request.user.role == "pemateri" or request.user.role == "admin" %}
-                          <td>{{nilai_obj.user.full_name}}</td>
+                    <tr>  
+                        <td>{{request.user.full_name}}</td>
+                        <td>{{nilai_obj.level_study}}</td>
+                        <td>{{nilai_obj.mata_pelajaran}}</td>
+                        <td>{{nilai_obj.nilai}}</td>
+                        <td>{{nilai_obj.predikat}}</td>
+                        <td><label class="badge bg-{% if nilai_obj.status == "lulus" %}success{% else %}danger{% endif %}">{{nilai_obj.status}}</label></td>
+                        <td>
+                        {% if nilai_obj.sertifikat %}
+                            <a href="{% url "menu:generate-certificate" id_sertifikat=nilai_obj.sertifikat.get_id_safe %}"class="badge bg-primary text-decoration-none text-white">Sertifikat</a>
+                        {% else %}
+                            <a href="" class="btn btn-sm btn-danger">
+                                Lakukan Ujian Ulang
+                            </a>
                         {% endif %}
-                        <td>{{ nilai_obj.mata_pelajaran }}</td>
-                        <td>{{ nilai_obj.nilai }}</td>
-                        <td>{{ nilai_obj.predikat }}</td>
-                        <td>
-                            <label class="badge badge-{% if nilai_obj.status == "lulus" %}success{% else %}danger{% endif %}">
-                                {{ nilai_obj.status }}
-                            </label>
-                        </td>
-                        <td>
-                            {% if nilai_obj.sertifikat %}
-                            <a href="{{ nilai_obj.sertifikat.sertifikat.url }}" class="badge badge-primary text-decoration-none text-white">
-                                Lihat Sertifikat
-                            </a>
-                            {% else %}
-                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran.pk id_nilai=nilai_obj.pk %}" class="badge badge text-decoration-none text-white" style="background-color:#8929e3;">
-                              Lakukan Ujian Ulang
-                            </a>
-                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
-                </tbody>
-            </table>
+                  </tbody>
+                </table>
+              </div>
         </div>
+      </div>
     </div>
-</div>
-{% endblock content_menu %}
+  </div>
+{% endblock content %}

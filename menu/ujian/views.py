@@ -236,5 +236,6 @@ def nilai_setelah_ujian(request,id_mapel,id_nilai):
             'mapel':nilai_obj.mata_pelajaran,
             'sertifikat_obj':sertifikat_obj,
             'id_mapel':id_mapel,
+            "tingkat_study":nilai_obj.level_study
         }
     return render(request,'ujian/nilai.html',context)
