@@ -15,7 +15,7 @@
         <!-- Account -->
         {% if messages %}
           {% for message in messages %}
-          <div id="message" class="container" data-duration="4000">
+          <div id="message" class="container" data-duration="8000">
               <div{% if message.tags %} class="text-center alert alert-{{ message.tags }}"{% endif %}>
                   {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
                   <i class="fa-sharp fa-solid fa-triangle-exclamation"></i>

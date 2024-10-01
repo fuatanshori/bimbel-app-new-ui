@@ -27,46 +27,31 @@ from django.core.cache import cache
 def daftar(request):
     # jika request adalah post
     if request.method == 'POST':
-        conn = internetConnection()
-        if not conn:
-            return render(request, "koneksi_buruk.html")
-
         full_name = request.POST['full_name']
         email = request.POST['email']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
-
-        # untuk cek apakah ada karakter tidak, karakter bervalue = "","  " akan ditolak.
-        # atau lalu cek ada spasi di awal dan di akhir kalimat value seperti = "  fuat anshori  " akan ditolak.
-        # hanya kalimat atau kata dengan nilai seperti "fuat anshori" atau "fuat" di terima
-
         if not full_name.strip() or len(full_name) != len(full_name.strip()):
             messages.error(request, _("Full name is invalid"))
             return render(request, 'user/daftar.html', status=HTTPStatus.BAD_REQUEST)
 
-        # untuk menghilangkan spasi 2x atau lebih berlebih seperti = "fuat   anshori"
         cleaned_full_name = str(full_name).split()
         cleaned_full_name = ' '.join(cleaned_full_name)
-        # hanya nama dengan 1 kali spasi yang diterima
         if len(full_name) != len(cleaned_full_name):
             messages.error(request, _("The full name has too many spaces"))
             return render(request, 'user/daftar.html', status=HTTPStatus.BAD_REQUEST)
 
-        # untuk validasi email
         try:
             validate_email(email)
         except ValidationError:
             messages.error(request, _('Invalid email address'))
             return render(request, 'user/daftar.html', status=HTTPStatus.BAD_REQUEST)
 
-        # validasi jika password1 dan password2 sama akan diterima
         if password1 != password2:
             messages.error(request, _('Different Passwords'))
             return render(request, 'user/daftar.html', status=HTTPStatus.BAD_REQUEST)
 
-        # untuk apakah password hanya berisi spasi saja seperti "" atau "  "
-        # atau gak di isi
-        # password value " password ","password   " atau lain sebagainya akan tetap di acc a
+        
         if str(password1).isspace() or len(password1) < 1 and str(password2).isspace() or len(password2) < 1:
             messages.error(request, _(
                 "Password cannot contain spaces or be empty"))
@@ -132,8 +117,6 @@ def aktifasi(request, uidb64, token):
 
 
 def masuk(request):
-    # jika user telah ter autentikasi
-
     if request.user.is_authenticated:
         return redirect("home:home")  # response 302
 
@@ -297,7 +280,9 @@ def add_profile(request):
     try:
         profile_obj = Profile.objects.get(user=request.user)
         if not any([profile_obj.foto, profile_obj.jenis_kelamin, profile_obj.tempat_tinggal, profile_obj.nomor_telepon, profile_obj.tanggal_lahir]):
-            messages.info(request, "Saat ini anda tidak diizinkan untuk mengakses beberapa halaman, anda harus melengkapi profil.")
+            if not request.session.get('profile_message_displayed', False):
+                messages.info(request, "Saat ini anda tidak diizinkan untuk mengakses beberapa halaman, anda harus melengkapi profil.")
+                request.session['profile_message_displayed'] = True
     except Profile.DoesNotExist:
         profile_obj = None
 

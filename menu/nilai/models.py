@@ -11,10 +11,10 @@ class Nilai(models.Model):
         "tidak lulus":"tidak lulus"
 
     }
-    id_nilai = models.BigAutoField(primary_key=True,unique=True)
-    user = models.ForeignKey(Users,on_delete=models.CASCADE)
-    mata_pelajaran = models.ForeignKey(MataPelajaran,on_delete=models.PROTECT)
-    nilai = models.CharField(max_length=20)
+    id_nilai = models.BigAutoField(primary_key=True,unique=True,db_index=True)
+    user = models.ForeignKey(Users,on_delete=models.CASCADE,db_index=True)
+    mata_pelajaran = models.ForeignKey(MataPelajaran,on_delete=models.PROTECT,db_index=True)
+    nilai = models.IntegerField()
     predikat = models.CharField(max_length=2)
     status = models.CharField(max_length=12,choices=choices)
 

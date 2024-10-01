@@ -1,7 +1,7 @@
 from django.core import signing
 
 def encode_id(id):
-    return signing.dumps(id)
+    return signing.dumps(str(id))
 
 def decode_id(encoded_id):
     try:

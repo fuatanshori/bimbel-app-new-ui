@@ -67,7 +67,8 @@ urlpatterns+=[
 urlpatterns+=[
     path("nilai/", views_nilai.daftar_nilai, name='daftar-nilai'),
     path("nilai-permapel/<id_mapel>/", views_nilai.daftar_nilai_permapel, name='daftar-nilai-permapel'),
-    path("nilai/ujian_ulang/<id_mapel>/<id_nilai>/",views_nilai.lakukan_ujian_ulang,name='ujian-ulang')
+    path("nilai/ujian_ulang/<id_mapel>/<id_nilai>/",views_nilai.lakukan_ujian_ulang,name='ujian-ulang'),
+    path("sertifikat/<id_sertifikat>/",views_nilai.generate_certificate,name='generate-certificate')
 ]
 
 # mapel

@@ -8,7 +8,7 @@ import os
 from .forms import SoalUjianForm
 from .models import SoalUjian,Nilai,Sertifikat
 import random
-from cert_generator.certificates import cert
+
 from django.conf import settings
 import datetime
 import uuid
@@ -191,19 +191,12 @@ def ujian(request,id_mapel):
             status = status,
         )
         nilai_obj.save()
-        
         if status == "lulus":
-            date=datetime.datetime.now().strftime("%d/%m/%Y")
-            media_root = os.path.join(settings.MEDIA_ROOT)
-            no_cert = cert(media_root=str(media_root),nama=str(request.user.full_name),
-                            mata_pelajaran=str(mapel_obj.nama_mapel),date=date,no_cert=str(uuid.uuid4()),
-                            request=request)
             cert_obj = Sertifikat.objects.create(
-                no_cert=no_cert,
-                nilai = nilai_obj,
-                sertifikat = f"sertifikat/{no_cert}.png"
+                nilai=nilai_obj
             )
             cert_obj.save()
+
         return redirect("menu:nilai-setelah-ujian",id_mapel=id_mapel,id_nilai=nilai_obj.get_id_safe())
 
     soal_ujian_objs_lists = list(SoalUjian.objects.filter(mata_pelajaran__pk=pk))

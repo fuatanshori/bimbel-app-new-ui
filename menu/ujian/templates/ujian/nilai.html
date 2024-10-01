@@ -31,7 +31,7 @@
                         <td><label class="badge bg-{% if status == "lulus" %}success{% else %}danger{% endif %}">{{status}}</label></td>
                         <td>
                         {% if sertifikat_obj %}
-                            <a href="{{sertifikat_obj.sertifikat.url}}"class="badge bg-primary text-decoration-none text-white">Sertifikat</a>
+                            <a href="{% url "menu:generate-certificate" id_sertifikat=sertifikat_obj.get_id_safe %}"class="badge bg-primary text-decoration-none text-white">Sertifikat</a>
                         {% else %}
                             <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="btn btn-sm btn-danger">
                                 Lakukan Ujian Ulang

@@ -3,7 +3,6 @@
 {% block content_menu %}
 <div class="col-md-12">
     <div class="card-body">
-        
         {% if request.user.role == "pelajar" %}
           <h4 class="card-title text-black">Nilai</h4>
         {% elif request.user.role == "pemateri" or request.user.role == "admin" %}
