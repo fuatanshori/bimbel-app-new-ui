@@ -12,9 +12,13 @@
             <!-- ***** Menu Start ***** -->
             <ul class="nav">
               <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
+              {% if diskon_objs %}
               <li class="scroll-to-section"><a href="#promo">Promo</a></li>
+              {% endif %}
               <li class="scroll-to-section"><a href="#about">About</a></li>
+              {% if tarif_obj %}
               <li class="scroll-to-section"><a href="#pricing">Pricing</a></li>
+              {% endif %}
               {% if request.user.is_authenticated %}
               <li class="scroll-to-section"><a href="{% url "menu:menu" %}">menu</a></li>
               {% if request.user.role == "admin" %}
