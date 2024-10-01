@@ -37,6 +37,7 @@ class Sertifikat(models.Model):
     predikat        = models.CharField(max_length=2)
     nilai           = models.CharField(max_length=100)
     tanggal_lahir   = models.DateField()
+    user            = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True)
     nilai_obj       = models.OneToOneField(Nilai,on_delete=models.SET_NULL,null=True)
     created_at      = models.DateField(auto_now_add=True)
 

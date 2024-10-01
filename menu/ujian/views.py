@@ -191,6 +191,7 @@ def ujian(request,id_mapel):
         if status == "lulus":
             profile_obj = Profile.objects.get(user=request.user)
             cert_obj = Sertifikat.objects.create(
+                user = request.user,
                 nama = profile_obj.nama_lengkap,
                 tingkat_studi = mapel_obj.level_study.level_study,
                 mata_pelajaran =mapel_obj.nama_mapel,
