@@ -29,7 +29,7 @@
         <div class="card-header">
           <div><h4 class="mb-3">Ujian</h4></div>
           <div>
-            <a href="" class="btn btn-dark text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
+            <a href="{% url "menu:mapel-ujian" id_levelstudy=id_levelstudy %}" class="btn btn-dark text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
             {% if request.user.role == 'admin' or request.user.role == 'pemateri' %}
             <a href="{% url "menu:tambah-ujian" id_mapel=id_mapel %}" class="text-white btn btn-primary">Tambah Ujian</a>
             {% endif %}

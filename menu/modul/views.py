@@ -136,7 +136,7 @@ def tambah_modul(request,id_levelstudy,id_mapel):
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
-def edit_modul(request, id_mapel, id_modul):
+def edit_modul(request,id_levelstudy, id_mapel, id_modul):
     pk_modul = decode_id(id_modul)
     if request.user.role not in ["pemateri", "admin"]:
         return redirect("menu:daftar-modul", id_mapel=id_mapel)
@@ -148,7 +148,8 @@ def edit_modul(request, id_mapel, id_modul):
             messages.success(request,f"selamat modul {modul_obj.nama_modul} berhasil di edit")
             return JsonResponse({
                 "message": "data uploaded",
-                "id_mapel": id_mapel
+                "id_mapel": id_mapel,
+                "id_levelstudy": id_levelstudy,
             })
         else:
             return JsonResponse({
@@ -160,6 +161,7 @@ def edit_modul(request, id_mapel, id_modul):
     context = {
         "modul_forms": modul_forms,
         "id_mapel": id_mapel,
-        "id_modul": id_modul
+        "id_modul": id_modul,
+        "id_levelstudy": id_levelstudy,
     }
     return render(request, 'modul/edit_modul.html', context)

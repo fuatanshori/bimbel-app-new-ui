@@ -35,7 +35,7 @@ class Sertifikat(models.Model):
     tingkat_studi   = models.CharField(max_length=100)
     mata_pelajaran  = models.CharField(max_length=100)
     predikat        = models.CharField(max_length=2)
-    nilai           = models.CharField(max_length=100)
+    nilai           = models.IntegerField()
     tanggal_lahir   = models.DateField()
     user            = models.ForeignKey(Users,on_delete=models.CASCADE,blank=True,null=True)
     nilai_obj       = models.OneToOneField(Nilai,on_delete=models.SET_NULL,null=True)

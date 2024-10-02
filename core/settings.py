@@ -12,8 +12,8 @@ load_dotenv(".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-DEBUG = str(os.getenv("STATUS_DEBUG")).lower()=="true"
-# DEBUG = True
+# DEBUG = str(os.getenv("STATUS_DEBUG")).lower()=="true"
+DEBUG = True
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
@@ -284,11 +284,6 @@ handler500 = 'core.views.custom_500_handler'
 
 LOGIN_URL='/users/masuk/'
 
-# CKEditor Settings
-CKEDITOR_BASEPATH = '/static/django_ckeditor_5/src/ckeditor.js/'
-CKEDITOR_UPLOAD_PATH = 'media/'
-CKEDITOR_IMAGE_BACKEND = "pillow"
-
 customColorPalette = [
         {
             'color': 'hsl(4, 90%, 58%)',
@@ -333,22 +328,10 @@ CKEDITOR_5_CONFIGS = {
             'blockQuote',
         ],
         'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
-        'code','subscript', 'superscript', 'highlight', '|', 'codeBlock', 'sourceEditing', 'insertImage',
-                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'imageUpload', '|',
-                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+        'code','subscript', 'superscript', 'codeBlock', 'sourceEditing',
+                    'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',  'removeFormat',
                     'insertTable',],
-        'image': {
-            'toolbar': ['imageTextAlternative', '|', 'imageStyle:alignLeft',
-                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
-            'styles': [
-                'full',
-                'side',
-                'alignLeft',
-                'alignRight',
-                'alignCenter',
-            ]
-
-        },
         'table': {
             'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
             'tableProperties', 'tableCellProperties' ],

@@ -45,7 +45,7 @@ def daftar_ujian_admin_pemateri(request, id_mapel):
     pk = decode_id(id_mapel)
     try:
         custom_range,soal_ujian_objs = pagination_queryset(request,SoalUjian.objects.filter(mata_pelajaran__pk=pk),5)
-        mapel_objs = MataPelajaran.objects.get(pk=pk)
+        mapel_obj = MataPelajaran.objects.get(pk=pk)
     except SoalUjian.DoesNotExist:
         return HttpResponse("404 soal tidak ditemukan")
     except MataPelajaran.DoesNotExist:
@@ -54,7 +54,8 @@ def daftar_ujian_admin_pemateri(request, id_mapel):
     context = {
         'id_mapel':id_mapel,
         'soal_ujian_objs': soal_ujian_objs,
-        'mapel':mapel_objs,
+        'mapel':mapel_obj,
+        "id_levelstudy":mapel_obj.level_study.get_id_safe,
         "custom_range":custom_range,
     }
     return render(request, 'ujian/daftar_ujian_admin.html', context)
