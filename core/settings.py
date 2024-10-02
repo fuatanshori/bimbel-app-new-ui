@@ -12,8 +12,8 @@ load_dotenv(".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-# DEBUG = str(os.getenv("STATUS_DEBUG")).lower()=="true"
-DEBUG = True
+DEBUG = str(os.getenv("STATUS_DEBUG")).lower()=="true"
+# DEBUG = True
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
