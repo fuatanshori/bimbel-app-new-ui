@@ -84,7 +84,6 @@ def daftar_nilai_permapel(request,id_mapel):
 
 
 def generate_certificate(request,id_sertifikat):
-    
     sertifikat_obj = get_object_or_404(Sertifikat,pk=decode_id(id_sertifikat))
     
     BASE_DIR = settings.BASE_DIR
@@ -184,3 +183,107 @@ def generate_certificate(request,id_sertifikat):
 
     return response
 
+
+def search_certificate(request):
+    id_sertifikat = request.GET.get('id_sertifikat')
+    try:
+        sertifikat_obj = Sertifikat.objects.get(pk__iexact=id_sertifikat)
+    except Sertifikat.DoesNotExist:
+        raise Http404
+    
+    BASE_DIR = settings.BASE_DIR
+    image_path = BASE_DIR / 'cert_generator/sertifikat_template.png'
+
+    certificate_image = Image.open(image_path)
+    image_width, image_height = certificate_image.size
+
+    buffer = BytesIO()
+
+    pdf = canvas.Canvas(buffer, pagesize=(image_width, image_height))
+
+    pdf.drawImage(image_path, 0, 0, width=image_width, height=image_height)
+
+    font_path1 = BASE_DIR / 'cert_generator/font/LeagueSpartan-Bold.ttf'
+    font_path2 = BASE_DIR / 'cert_generator/font/LeagueSpartan-Medium.ttf'
+    font_path3 = BASE_DIR / 'cert_generator/font/LeagueSpartan-Regular.ttf'
+    pdfmetrics.registerFont(TTFont('LeagueSpartan-Bold', font_path1))
+    pdfmetrics.registerFont(TTFont('LeagueSpartan-Medium', font_path2))
+    pdfmetrics.registerFont(TTFont('LeagueSpartan-Regular', font_path3))
+
+    nama = str(sertifikat_obj.nama).upper()
+    id_cert = str(sertifikat_obj.pk).upper()
+    tingkat_studi = sertifikat_obj.tingkat_studi
+    mata_pelajaran = sertifikat_obj.mata_pelajaran
+    predikat = sertifikat_obj.predikat
+    nilai = sertifikat_obj.nilai
+    tanggal_lahir = sertifikat_obj.tanggal_lahir
+    tanggal_dibuat = sertifikat_obj.created_at
+
+    positions = {
+        "nama": (image_width / 2, 620),
+        "id_sertifikat": (550, 770),
+        "tingkat_studi": (550, 830),
+        "mata_pelajaran": (550, 890),
+        "predikat": (550, 950),
+        "nilai": (550, 1010),
+        "tanggal_lahir": (550, 1070),
+        "tanggal_dibuat": (550, 1130),
+    }
+
+    pdf.setFont("LeagueSpartan-Bold", 100)
+
+    nama_width = pdf.stringWidth(nama, "LeagueSpartan-Bold", 100)
+    nama_x_position = (image_width - nama_width) / 2 
+
+    pdf.drawString(nama_x_position, image_height - positions['nama'][1], nama)
+
+    pdf.setFont("LeagueSpartan-Regular", 32)
+
+    pdf.drawString(positions['id_sertifikat'][0], image_height - positions['id_sertifikat'][1], "ID SERTIFIKAT")
+    pdf.drawString(positions['tingkat_studi'][0], image_height - positions['tingkat_studi'][1], "TINGKAT STUDI")
+    pdf.drawString(positions['mata_pelajaran'][0], image_height - positions['mata_pelajaran'][1], "MATA PELAJARAN")
+    pdf.drawString(positions['predikat'][0], image_height - positions['predikat'][1], "PREDIKAT")
+    pdf.drawString(positions['nilai'][0], image_height - positions['nilai'][1], "NILAI")
+    pdf.drawString(positions['tanggal_lahir'][0], image_height - positions['tanggal_lahir'][1], "TANGGAL LAHIR")
+    pdf.drawString(positions['tanggal_dibuat'][0], image_height - positions['tanggal_dibuat'][1], "TANGGAL DIBUAT")
+
+    pdf.drawString(860, image_height - positions['id_sertifikat'][1], ":")
+    pdf.drawString(860, image_height - positions['tingkat_studi'][1], ":")
+    pdf.drawString(860, image_height - positions['mata_pelajaran'][1], ":")
+    pdf.drawString(860, image_height - positions['predikat'][1], ":")
+    pdf.drawString(860, image_height - positions['nilai'][1], ":")
+    pdf.drawString(860, image_height - positions['tanggal_lahir'][1], ":")
+    pdf.drawString(860, image_height - positions['tanggal_dibuat'][1], ":")
+ 
+    pdf.drawString(880, image_height - positions['id_sertifikat'][1], f"{id_cert}")
+    pdf.drawString(880, image_height - positions['tingkat_studi'][1], f"{tingkat_studi}")
+    pdf.drawString(880, image_height - positions['mata_pelajaran'][1], f"{mata_pelajaran}")
+    pdf.drawString(880, image_height - positions['predikat'][1], f"{predikat}")
+    pdf.drawString(880, image_height - positions['nilai'][1], f"{nilai}")
+    pdf.drawString(880, image_height - positions['tanggal_lahir'][1], f"{tanggal_lahir}")
+    pdf.drawString(880, image_height - positions['tanggal_dibuat'][1], f"{tanggal_dibuat}")
+
+    domain = get_current_site(request).domain
+    endpoint = reverse("menu:generate-certificate",args=[id_sertifikat])
+    qr_data = f"http://{domain}{endpoint}"
+    qr_code_image = qrcode.make(qr_data)
+
+    qr_buffer = BytesIO()
+    qr_code_image.save(qr_buffer, format='PNG')
+    qr_buffer.seek(0)
+
+    qr_image = ImageReader(qr_buffer)
+
+    qr_code_position = (50, 50)
+    qr_code_size = 150 
+
+    pdf.drawImage(qr_image, qr_code_position[0], qr_code_position[1], qr_code_size, qr_code_size)
+     
+    pdf.save()
+
+    buffer.seek(0)
+
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filenama="certificate_with_qr.pdf"'
+
+    return response

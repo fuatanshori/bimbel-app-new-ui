@@ -34,8 +34,8 @@
     </div>
   </div>
 
-  {% if diskon_objs %}
   <div id="promo" class="services section">
+    {% if diskon_objs %}
     <div class="container">
       <div class="row">
         <div class="col-lg-8 offset-lg-2">
@@ -67,8 +67,8 @@
           </div>
           {% endfor %}
       </div>
+      {% endif %}
   </div>
-  {% endif %}
   
   </div>
 
@@ -93,8 +93,8 @@
   </div>
 
 
-  {% if tarif_obj %}
   <div id="pricing" class="pricing-tables">
+    {% if tarif_obj %}
     <div class="container">
       <div class="row justify-content-center">
         <div class="">
@@ -124,6 +124,6 @@
         </div>
       </div>
     </div>
+    {% endif %}
   </div> 
-  {% endif %}
 {% endblock content %}
