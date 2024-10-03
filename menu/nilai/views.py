@@ -189,7 +189,7 @@ def search_certificate(request):
     try:
         sertifikat_obj = Sertifikat.objects.get(pk__iexact=id_sertifikat)
     except Sertifikat.DoesNotExist:
-        raise Http404
+        raise Http404()
     
     BASE_DIR = settings.BASE_DIR
     image_path = BASE_DIR / 'cert_generator/sertifikat_template.png'

@@ -1,0 +1,24 @@
+{% extends "error_base.html" %}
+{% load static %}
+{% block title %}csrf failed{% endblock title %}
+{% block content %}
+<div class="container-xxl container-p-y">
+  <div class="misc-wrapper">
+    <h2 class="mb-2 mx-2">Csrf Gagal</h2>
+    {% if reason != "" %}
+    <p class="mb-4 mx-2">{{ reason }}</p>
+    {% else %}
+    <p class="mb-4 mx-2">Sepertinya anda menggunakan csrf yang tidak valid.</p>
+    {% endif %}
+    <a href="{% url "home:home" %}" class="btn btn-primary">Kembali ke home</a>
+    <div class="mt-4">
+      <img
+        src="{% static "assets/img/illustrations/403.png" %}"
+        alt="girl-doing-yoga-light"
+        width="500"
+        class="img-fluid"
+      />
+    </div>
+  </div>
+</div>
+{% endblock content %}

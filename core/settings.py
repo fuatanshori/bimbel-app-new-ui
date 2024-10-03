@@ -281,6 +281,7 @@ LOGGING = {
 
 handler404 = 'core.views.custom_404_handler'
 handler500 = 'core.views.custom_500_handler'
+CSRF_FAILURE_VIEW ="core.views.csrf_failure"
 
 LOGIN_URL='/users/masuk/'
 

@@ -135,3 +135,11 @@ def custom_404_handler(request):
 def custom_500_handler(request):
     context = {}
     return render(request,"500.html",context,status=500)
+
+def csrf_failure(request, reason=""):
+    return render(
+        request,
+        "403_csrf.html",
+        {"reason": reason},
+        status=403,
+    )

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http.response import Http404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import Users,Profile
@@ -11,7 +12,6 @@ from django.utils.translation import gettext as _
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
-from core.utils.internet_connection import internetConnection
 from .utils.kirim_email import kirim_email_activate, kirim_email_reset_password
 from .token import account_activation_token
 from django.utils import timezone
@@ -169,9 +169,8 @@ def masuk(request):
 def keluar(request):
     if request.user.is_authenticated:
         logout(request)
-        # status code 302
         return redirect("user:masuk")
-    return render(request, '403.html', status=HTTPStatus.FORBIDDEN)
+    raise Http404()
 
 
 def lupaPassword(request):
