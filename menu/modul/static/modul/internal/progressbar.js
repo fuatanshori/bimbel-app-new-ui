@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload_form');
     const inputFile = document.getElementById("id_modul");
-    const inputVidio = document.getElementById("id_vidio");
     const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
@@ -13,22 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         const formData = new FormData(uploadForm);
         const file = inputFile.files[0];
-        const vidio = inputVidio.files[0];
-        
-        // Validasi ekstensi file
-        if (vidio && !vidio.name.endsWith('.mp4')) {
-            feedbackMessage.textContent = 'Error: Vido harus memiliki ekstensi .mp4';
-            feedbackMessage.classList.add('alert', 'alert-danger');
-            return; // Hentikan eksekusi jika validasi gagal
-        }
 
-        if (file && !file.name.endsWith('.pdf')) {
-            feedbackMessage.textContent = 'Error: Modul harus memiliki ekstensi .pdf';
-            feedbackMessage.classList.add('alert', 'alert-danger');
-            return; // Hentikan eksekusi jika validasi gagal
-        }
-
-        if (file != null || vidio != null) {
+        if (file != null) {
             progressModal.show();
             feedbackMessage.textContent = ''; // Clear previous messages
             feedbackMessage.classList.remove('text-success', 'text-danger', 'text-warning');
@@ -64,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     feedbackMessage.textContent = errorMessage;
                     feedbackMessage.classList.add('alert', 'alert-danger');
                 } else {
-                    progressModal.hide();
+                  progressModal.hide();
                     feedbackMessage.textContent = 'Error: ' + response.message;
                     feedbackMessage.classList.add('alert', 'alert-danger');
                 }
