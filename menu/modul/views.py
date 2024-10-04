@@ -124,6 +124,7 @@ def tambah_modul(request,id_levelstudy,id_mapel):
             })
         else:
             return JsonResponse({
+                "data":"cant upload",
                 "message":modul_forms.errors.as_text()
             })
     modul_forms = ModulForm(request.POST or None,request.FILES or None)
@@ -153,6 +154,7 @@ def edit_modul(request,id_levelstudy, id_mapel, id_modul):
             })
         else:
             return JsonResponse({
+                "data":"cant upload",
                 "message": modul_forms.errors.as_text()
             })
     else:
