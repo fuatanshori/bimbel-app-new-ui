@@ -9,6 +9,7 @@ services:
     image: fuatanshori12/bimbel-app
     env_file:
       - .env
+    restart: always
     volumes:
       - .:/app
       - /etc/letsencrypt:/etc/letsencrypt
@@ -37,6 +38,7 @@ services:
   redis_container:
     container_name: redis_container
     image: redis
+    restart: always
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -82,6 +84,7 @@ services:
       context: .
       dockerfile: Dockerfile
     command: celery -A core worker --loglevel=info
+    restart: always
     env_file:
       - .env
     volumes:
@@ -132,6 +135,7 @@ services:
     container_name: cadvisor
     image: gcr.io/cadvisor/cadvisor
     privileged: true
+    restart: always
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
@@ -151,6 +155,7 @@ services:
   prometheus:
     container_name: prometheus
     image: prom/prometheus
+    restart: always
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
@@ -164,6 +169,7 @@ services:
   grafana:
     container_name: grafana
     image: grafana/grafana
+    restart: always
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
