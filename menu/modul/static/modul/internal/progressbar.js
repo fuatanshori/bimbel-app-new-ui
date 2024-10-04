@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload_form');
     const inputFile = document.getElementById("id_modul");
+    const inputVideo = document.getElementById("id_vidio");
     const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
@@ -12,11 +13,19 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
         const formData = new FormData(uploadForm);
         const file = inputFile.files[0];
+        const video = inputVideo.files[0];
 
-        if (file != null) {
+        // Clear previous messages and reset classes
+        feedbackMessage.textContent = '';
+        feedbackMessage.className = '';
+
+        // Check file extensions before uploading
+        if (!checkFileType(file, ['pdf'], 'PDF') || !checkFileType(video, ['mp4'], 'MP4')) {
+            return; // Stop the function here if file types are invalid
+        }
+
+        if (file || video) {
             progressModal.show();
-            feedbackMessage.textContent = ''; // Clear previous messages
-            feedbackMessage.classList.remove('text-success', 'text-danger', 'text-warning');
         }
 
         xhr = new XMLHttpRequest();
@@ -27,43 +36,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 const percentProgress = (e.loaded / e.total) * 100;
                 progressBar.style.width = `${percentProgress}%`;
                 progressBar.setAttribute('aria-valuenow', percentProgress);
-                progressText.textContent = `${Math.round(percentProgress)}%`; // Update percentage text
+                progressText.textContent = `${Math.round(percentProgress)}%`;
             }
         });
 
         xhr.onload = function() {
+            progressModal.hide(); // Always hide the modal when the request is complete
+
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
                 
                 if (response.message === "data uploaded") {
                     window.location.href = `/menu/modul/daftar-modul/${response.id_levelstudy}/${response.id_mapel}/`;
-                } else if (response.message === "cant upload") {
-                    let errorMessage = 'Error: ';
-                    if (response.errors) {
-                        // Tampilkan pesan kesalahan dari form
-                        errorMessage += 'Form errors: ' + JSON.stringify(response.errors);
-                    } else {
-                        errorMessage += response.message;
-                    }
-                    progressModal.hide();
-                    feedbackMessage.textContent = errorMessage;
-                    feedbackMessage.classList.add('alert', 'alert-danger');
                 } else {
-                  progressModal.hide();
-                    feedbackMessage.textContent = 'Error: ' + response.message;
-                    feedbackMessage.classList.add('alert', 'alert-danger');
+                    handleError(response);
                 }
             } else {
-                progressModal.hide(); // Close the modal on error status
-                feedbackMessage.textContent = 'Error: Upload failed.';
-                feedbackMessage.classList.add('text-danger');
+                handleError({ message: 'Upload failed.' });
             }
         };
 
         xhr.onerror = function() {
-            progressModal.hide(); // Close the modal on network error
-            feedbackMessage.textContent = 'Network error: Upload failed.';
-            feedbackMessage.classList.add('text-danger');
+            progressModal.hide();
+            handleError({ message: 'Network error: Upload failed.' });
         };
 
         xhr.send(formData);
@@ -71,10 +66,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     cancelButton.addEventListener('click', function() {
         if (xhr) {
-            xhr.abort(); // Abort the request
+            xhr.abort();
         }
-        progressModal.hide(); // Hide the modal
+        progressModal.hide();
         feedbackMessage.textContent = 'Upload canceled.';
-        feedbackMessage.classList.add('alert', 'alert-warning');
+        feedbackMessage.className = 'alert alert-warning';
     });
+
+    function handleError(response) {
+        let errorMessage = 'Error: ';
+        if (response.errors) {
+            errorMessage += 'Form errors: ' + JSON.stringify(response.errors);
+        } else {
+            errorMessage += response.message;
+        }
+        feedbackMessage.textContent = errorMessage;
+        feedbackMessage.className = 'alert alert-danger';
+    }
+
+    function checkFileType(file, allowedExtensions, fileType) {
+        if (file) {
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!allowedExtensions.includes(fileExtension)) {
+                feedbackMessage.textContent = `Error: Invalid file type for ${fileType}. Please upload a ${allowedExtensions.join(' or ')} file.`;
+                feedbackMessage.className = 'alert alert-danger';
+                return false;
+            }
+        }
+        return true;
+    }
 });
