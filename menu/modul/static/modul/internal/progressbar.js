@@ -1,11 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload_form');
     const inputFile = document.getElementById("id_modul");
-    // Mengatur modal agar tidak bisa ditutup dengan klik di luar atau dengan tombol esc
-    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'), {
-        backdrop: 'static',
-        keyboard: false
-    });
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal')); // Inisialisasi modal tanpa opsi di sini
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
     const cancelButton = document.getElementById('cancelButton');
@@ -19,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (file != null) {
             progressModal.show();
-            feedbackMessage.textContent = ''; // Hapus pesan feedback sebelumnya
+            feedbackMessage.textContent = ''; // Clear previous messages
             feedbackMessage.classList.remove('alert', 'alert-success', 'alert-danger', 'alert-warning');
         }
 
@@ -31,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const percentProgress = (e.loaded / e.total) * 100;
                 progressBar.style.width = `${percentProgress}%`;
                 progressBar.setAttribute('aria-valuenow', percentProgress);
-                progressText.textContent = `${Math.round(percentProgress)}%`; // Update teks persentase
+                progressText.textContent = `${Math.round(percentProgress)}%`; // Update percentage text
             }
         });
 
@@ -41,34 +37,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (response.message === "data uploaded") {
                     window.location.href = `/menu/modul/daftar-modul/${response.id_levelstudy}/${response.id_mapel}/`;
-                } else if (response.message === "cant upload") {
-                    let errorMessage = 'Error: ';
-                    if (response.errors) {
-                        // Menampilkan pesan kesalahan form secara lebih rapi
-                        errorMessage += 'Form errors:\n';
-                        for (const field in response.errors) {
-                            errorMessage += `${field}: ${response.errors[field].join(', ')}\n`;
-                        }
-                    } else {
-                        errorMessage += response.message;
-                    }
-                    progressModal.hide();
-                    feedbackMessage.textContent = errorMessage;
-                    feedbackMessage.classList.add('alert', 'alert-danger');
                 } else {
                     progressModal.hide();
                     feedbackMessage.textContent = 'Error: ' + response.message;
                     feedbackMessage.classList.add('alert', 'alert-danger');
                 }
             } else {
-                progressModal.hide(); // Tutup modal jika ada error
+                progressModal.hide(); // Close the modal on error status
                 feedbackMessage.textContent = 'Error: Upload failed.';
                 feedbackMessage.classList.add('alert', 'alert-danger');
             }
         };
 
         xhr.onerror = function() {
-            progressModal.hide(); // Tutup modal jika ada kesalahan jaringan
+            progressModal.hide(); // Close the modal on network error
             feedbackMessage.textContent = 'Network error: Upload failed.';
             feedbackMessage.classList.add('alert', 'alert-danger');
         };
@@ -78,9 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     cancelButton.addEventListener('click', function() {
         if (xhr) {
-            xhr.abort(); // Membatalkan permintaan
+            xhr.abort(); // Abort the request
         }
-        progressModal.hide(); // Sembunyikan modal
+        progressModal.hide(); // Hide the modal
         feedbackMessage.textContent = 'Upload canceled.';
         feedbackMessage.classList.add('alert', 'alert-warning');
     });
