@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload_form');
     const inputFile = document.getElementById("id_modul");
-    const progressModal = new bootstrap.Modal(document.getElementById('progressModal')); 
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
     const cancelButton = document.getElementById('cancelButton');
@@ -40,9 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         xhr.onload = function() {
+            const response = JSON.parse(xhr.responseText); // Pindahkan parse di sini
+            progressModal.hide(); // Pastikan modal ditutup di sini
+
             if (xhr.status >= 200 && xhr.status < 300) {
-                const response = JSON.parse(xhr.responseText);
-                
                 if (response.message === "data uploaded") {
                     feedbackMessage.textContent = 'Modul berhasil ditambahkan.'; // Feedback on success
                     feedbackMessage.classList.add('alert', 'alert-success');
@@ -55,13 +56,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 feedbackMessage.textContent = 'Error: Upload failed.';
                 feedbackMessage.classList.add('alert', 'alert-danger');
             }
-            progressModal.hide(); // Close the modal here for both success and error
         };
 
         xhr.onerror = function() {
+            progressModal.hide(); // Close the modal on network error
             feedbackMessage.textContent = 'Network error: Upload failed.';
             feedbackMessage.classList.add('alert', 'alert-danger');
-            progressModal.hide(); // Close the modal on network error
         };
 
         xhr.send(formData);
