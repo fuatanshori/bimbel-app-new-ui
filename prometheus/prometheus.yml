@@ -2,9 +2,9 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'django_app_bimbel'
+  - job_name: 'django_app_bimbel_wsgi'
     static_configs:
-      - targets: ['192.168.1.100:8000']
+      - targets: ['192.168.1.100:8001']
 
   - job_name: 'cadvisor'
     static_configs:

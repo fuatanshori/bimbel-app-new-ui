@@ -1,18 +1,55 @@
 version: '3.8'
 
 services:
-  django_app_bimbel:
-    container_name: django_app_bimbel
+  # WSGI Server
+  django_app_bimbel_wsgi:
+    container_name: django_app_bimbel_wsgi
     build:
       context: .
       dockerfile: Dockerfile
     image: fuatanshori12/bimbel-app
     env_file:
       - .env
+    restart: always
     volumes:
       - .:/app
       - /etc/letsencrypt:/etc/letsencrypt
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && uvicorn core.asgi:application --host 0.0.0.0 --port 8000 --ssl-keyfile /etc/letsencrypt/live/bimbelbanua.my.id/privkey.pem --ssl-certfile /etc/letsencrypt/live/bimbelbanua.my.id/fullchain.pem --timeout-keep-alive 600"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8001 core.wsgi:application"
+    depends_on:
+      redis_container:
+        condition: service_healthy
+      mysql_container:
+        condition: service_healthy
+      celery_worker:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      bimbel-net:
+        ipv4_address: 192.168.1.101
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 8G
+
+  # ASGI Server for Django
+  django_app_bimbel_asgi:
+    container_name: django_app_bimbel_asgi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fuatanshori12/bimbel-app
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - .:/app
+      - /etc/letsencrypt:/etc/letsencrypt
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -e ssl:443:privateKey=/etc/letsencrypt/live/bimbelbanua.my.id/privkey.pem:certKey=/etc/letsencrypt/live/bimbelbanua.my.id/fullchain.pem -b 0.0.0.0 -p 8000 --application-close-timeout 600 core.asgi:application"
     depends_on:
       redis_container:
         condition: service_healthy
@@ -31,8 +68,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0'  # Limit to 2 CPUs
-          memory: 8G   # Limit to 8 GB
+          cpus: '2.0'
+          memory: 8G
 
   redis_container:
     container_name: redis_container
@@ -194,7 +231,9 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/www/certbot:/var/www/certbot
     depends_on:
-      django_app_bimbel:
+      django_app_bimbel_wsgi:
+        condition: service_started
+      django_app_bimbel_asgi:
         condition: service_started
       phpmyadmin:
         condition: service_started

@@ -1,2 +1,5 @@
 media/*
 nginx
+static
+.git
+.venv
