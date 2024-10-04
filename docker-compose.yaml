@@ -21,7 +21,7 @@ services:
       mysql_container:
         condition: service_healthy
       django_app_bimbel_asgi:
-        condition: django_app_bimbel_asgi
+        condition: service_started
       celery_worker:
         condition: service_started
     healthcheck:
