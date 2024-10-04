@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload_form');
     const inputFileModul = document.getElementById("id_modul");
-    const inputFileVidio = document.getElementById("id_vidio"); // Ganti ini sesuai dengan id field untuk video
+    const inputFileVidio = document.getElementById("id_vidio");
     const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
@@ -9,47 +9,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const feedbackMessage = document.getElementById('feedbackMessage');
     let xhr;
 
-    uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const formData = new FormData(uploadForm);
+    // Function untuk validasi ukuran file
+    function validateFiles() {
         const fileModul = inputFileModul.files[0];
-        const fileVidio = inputFileVidio ? inputFileVidio.files[0] : null; // Jika ada file video
-
-        // Debugging: Log ukuran file ke console
-        if (fileModul) {
-            console.log("Ukuran file modul: " + fileModul.size / (1024 * 1024) + " MB");
-        }
-        if (fileVidio) {
-            console.log("Ukuran file video: " + fileVidio.size / (1024 * 1024) + " MB");
-        }
+        const fileVidio = inputFileVidio ? inputFileVidio.files[0] : null;
 
         // Cek ukuran file modul (maks 20MB)
         if (fileModul && fileModul.size > 20 * 1024 * 1024) {
             feedbackMessage.textContent = 'Error: File modul tidak boleh lebih dari 20MB.';
             feedbackMessage.classList.add('alert', 'alert-danger');
-            progressModal.hide();
-            return; // Stop the process if the file is too large
+            return false; // Tidak valid
         }
 
         // Cek ukuran file vidio (maks 200MB)
         if (fileVidio && fileVidio.size > 200 * 1024 * 1024) {
             feedbackMessage.textContent = 'Error: Video tidak boleh lebih dari 200MB.';
             feedbackMessage.classList.add('alert', 'alert-danger');
-            progressModal.hide();
-            return; // Stop the process if the file is too large
+            return false; // Tidak valid
         }
 
-        // Jika semua ukuran file valid, lanjutkan dengan upload
-        if (fileModul || fileVidio) {
-            progressModal.show();
-            feedbackMessage.textContent = ''; // Hapus pesan sebelumnya
-            feedbackMessage.classList.remove('text-success', 'text-danger', 'text-warning');
-        }
+        return true; // Valid
+    }
 
+    // Function untuk melakukan upload file jika valid
+    function uploadFiles() {
+        const formData = new FormData(uploadForm);
         xhr = new XMLHttpRequest();
         xhr.open('POST', uploadForm.action, true);
 
+        // Tampilkan modal progress
+        progressModal.show();
+        feedbackMessage.textContent = ''; // Hapus pesan sebelumnya
+        feedbackMessage.classList.remove('alert-danger', 'alert-warning', 'alert-success');
+
+        // Update progress bar
         xhr.upload.addEventListener('progress', function(e) {
             if (e.lengthComputable) {
                 const percentProgress = (e.loaded / e.total) * 100;
@@ -59,21 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
+        // Handle response dari server
         xhr.onload = function() {
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
-
                 if (response.message === "data uploaded") {
                     window.location.href = `/menu/modul/daftar-modul/${response.id_levelstudy}/${response.id_mapel}/`;
                 } else if (response.data === "cant upload") {
-                    let errorMessage = 'Error: ';
-                    if (response.errors) {
-                        errorMessage += 'Form errors: ' + JSON.stringify(response.errors);
-                    } else {
-                        errorMessage += response.message;
-                    }
                     progressModal.hide();
-                    feedbackMessage.textContent = errorMessage;
+                    feedbackMessage.textContent = 'Error: ' + (response.errors ? JSON.stringify(response.errors) : response.message);
                     feedbackMessage.classList.add('alert', 'alert-danger');
                 } else {
                     progressModal.hide();
@@ -93,12 +80,24 @@ document.addEventListener('DOMContentLoaded', function() {
             feedbackMessage.classList.add('text-danger');
         };
 
-        xhr.send(formData);
+        xhr.send(formData); // Kirim form jika validasi sukses
+    }
+
+    // Event listener pada form submit
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault(); // Stop submit form default behavior
+
+        // Lakukan validasi
+        if (validateFiles()) {
+            // Jika validasi berhasil, lakukan upload
+            uploadFiles();
+        }
     });
 
+    // Event listener untuk membatalkan upload
     cancelButton.addEventListener('click', function() {
         if (xhr) {
-            xhr.abort();
+            xhr.abort(); // Batalkan request jika ada
         }
         progressModal.hide();
         feedbackMessage.textContent = 'Upload canceled.';
