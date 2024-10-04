@@ -13,18 +13,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(uploadForm);
         const file = inputFile.files[0];
 
-        // Validasi file: pastikan hanya PDF yang diizinkan
         if (file != null) {
-            const fileType = file.type;
-            if (fileType !== 'application/pdf') {
-                feedbackMessage.textContent = 'Error: Hanya file PDF yang diizinkan.';
-                feedbackMessage.classList.add('alert', 'alert-danger');
-                return; // Hentikan eksekusi jika file bukan PDF
-            }
-
             progressModal.show();
             feedbackMessage.textContent = ''; // Clear previous messages
-            feedbackMessage.classList.remove('alert', 'alert-success', 'alert-danger', 'alert-warning');
+            feedbackMessage.classList.remove('text-success', 'text-danger', 'text-warning');
         }
 
         xhr = new XMLHttpRequest();
@@ -40,28 +32,38 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         xhr.onload = function() {
-            const response = JSON.parse(xhr.responseText); // Pindahkan parse di sini
-            progressModal.hide(); // Pastikan modal ditutup di sini
-
             if (xhr.status >= 200 && xhr.status < 300) {
+                const response = JSON.parse(xhr.responseText);
+                
                 if (response.message === "data uploaded") {
-                    feedbackMessage.textContent = 'Modul berhasil ditambahkan.'; // Feedback on success
-                    feedbackMessage.classList.add('alert', 'alert-success');
                     window.location.href = `/menu/modul/daftar-modul/${response.id_levelstudy}/${response.id_mapel}/`;
+                } else if (response.message === "cant upload") {
+                    let errorMessage = 'Error: ';
+                    if (response.errors) {
+                        // Tampilkan pesan kesalahan dari form
+                        errorMessage += 'Form errors: ' + JSON.stringify(response.errors);
+                    } else {
+                        errorMessage += response.message;
+                    }
+                    progressModal.hide();
+                    feedbackMessage.textContent = errorMessage;
+                    feedbackMessage.classList.add('alert', 'alert-danger');
                 } else {
+                  progressModal.hide();
                     feedbackMessage.textContent = 'Error: ' + response.message;
                     feedbackMessage.classList.add('alert', 'alert-danger');
                 }
             } else {
+                progressModal.hide(); // Close the modal on error status
                 feedbackMessage.textContent = 'Error: Upload failed.';
-                feedbackMessage.classList.add('alert', 'alert-danger');
+                feedbackMessage.classList.add('text-danger');
             }
         };
 
         xhr.onerror = function() {
             progressModal.hide(); // Close the modal on network error
             feedbackMessage.textContent = 'Network error: Upload failed.';
-            feedbackMessage.classList.add('alert', 'alert-danger');
+            feedbackMessage.classList.add('text-danger');
         };
 
         xhr.send(formData);
