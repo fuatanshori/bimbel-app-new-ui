@@ -1,28 +1,74 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('upload_form');
-    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'), {
+        backdrop: 'static',
+        keyboard: false
+    });
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
     const cancelButton = document.getElementById('cancelButton');
-    const closeButton = document.getElementById('closeButton');
+    const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
     let xhr = null;
+
+    // Function to format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Function to validate file size
+    function validateFileSize(formData) {
+        const modulFile = formData.get('modul');
+        const videoFile = formData.get('vidio');
+        let totalSize = 0;
+        let errorMessage = '';
+
+        if (modulFile && modulFile.size) {
+            totalSize += modulFile.size;
+            if (modulFile.size > MAX_FILE_SIZE) {
+                errorMessage += `Modul file size (${formatFileSize(modulFile.size)}) exceeds 50MB limit.\n`;
+            }
+        }
+
+        if (videoFile && videoFile.size) {
+            totalSize += videoFile.size;
+            if (videoFile.size > MAX_FILE_SIZE) {
+                errorMessage += `Video file size (${formatFileSize(videoFile.size)}) exceeds 50MB limit.\n`;
+            }
+        }
+
+        return {
+            isValid: errorMessage === '',
+            errorMessage: errorMessage.trim()
+        };
+    }
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        // Create FormData
+        const formData = new FormData(form);
+
+        // Validate file size before proceeding
+        const validation = validateFileSize(formData);
+        if (!validation.isValid) {
+            showError(validation.errorMessage);
+            return;
+        }
+        
         // Show progress modal
         progressModal.show();
-        closeButton.style.display = 'none';
         cancelButton.style.display = 'block';
         
         // Reset progress
         progressBar.style.width = '0%';
         progressBar.setAttribute('aria-valuenow', 0);
         progressText.textContent = '0%';
+        progressBar.classList.remove('bg-danger', 'bg-success');
 
-        // Create FormData
-        const formData = new FormData(form);
-        
         // Create and configure XHR
         xhr = new XMLHttpRequest();
         
@@ -44,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     progressBar.classList.add('bg-success');
                     progressText.textContent = 'Upload Complete!';
                     cancelButton.style.display = 'none';
-                    closeButton.style.display = 'block';
                     
                     // Redirect after successful upload
                     setTimeout(() => {
@@ -69,6 +114,20 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.send(formData);
     });
 
+    // Add file input change listeners for instant validation
+    const fileInputs = form.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > MAX_FILE_SIZE) {
+                    showError(`File "${file.name}" (${formatFileSize(file.size)}) exceeds 50MB limit`);
+                    e.target.value = ''; // Clear the file input
+                }
+            }
+        });
+    });
+
     // Cancel button handler
     cancelButton.addEventListener('click', function() {
         if (xhr) {
@@ -76,28 +135,36 @@ document.addEventListener('DOMContentLoaded', function() {
             progressBar.classList.add('bg-danger');
             progressText.textContent = 'Upload Cancelled';
             cancelButton.style.display = 'none';
-            closeButton.style.display = 'block';
+            
+            // Automatically hide modal and reset form after cancellation
+            setTimeout(() => {
+                progressModal.hide();
+                resetProgress();
+            }, 1500);
         }
     });
 
-    // Close button handler
-    closeButton.addEventListener('click', function() {
-        progressModal.hide();
-        // Reset progress bar
+    function showError(message) {
+        // If modal is shown, hide it
+        if (progressModal._isShown) {
+            progressModal.hide();
+        }
+
+        // Show feedback message
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        feedbackMessage.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+        
+        // Scroll to error message
+        feedbackMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        resetProgress();
+    }
+
+    function resetProgress() {
         progressBar.style.width = '0%';
         progressBar.setAttribute('aria-valuenow', 0);
         progressText.textContent = '0%';
         progressBar.classList.remove('bg-danger', 'bg-success');
-    });
-
-    function showError(message) {
-        progressBar.classList.add('bg-danger');
-        progressText.textContent = 'Error: ' + message;
-        cancelButton.style.display = 'none';
-        closeButton.style.display = 'block';
-        
-        // Show feedback message
-        const feedbackMessage = document.getElementById('feedbackMessage');
-        feedbackMessage.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+        cancelButton.style.display = 'block';
     }
 });
