@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const inputVideo = document.getElementById("id_vidio");
     const progressModalElement = document.getElementById('progressModal');
     const progressModal = new bootstrap.Modal(progressModalElement, {
-        backdrop: 'static',  // This prevents the modal from closing when clicking outside
-        keyboard: false  // This prevents the modal from closing when pressing ESC key
+        backdrop: 'static',
+        keyboard: false
     });
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
@@ -16,24 +16,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     uploadForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        const formData = new FormData(uploadForm);
-        const file = inputFile.files[0];
-        const video = inputVideo.files[0];
-
+        
         // Clear previous messages and reset classes
         feedbackMessage.textContent = '';
         feedbackMessage.className = '';
 
-        // Check file extensions before uploading
-        if (!checkFileType(file, ['pdf'], 'PDF') || !checkFileType(video, ['mp4'], 'MP4')) {
+        // Check file extensions before proceeding
+        const file = inputFile.files[0];
+        const video = inputVideo.files[0];
+
+        if (!checkFileType(file, ['pdf'], 'PDF', 'Modul') || !checkFileType(video, ['mp4'], 'MP4', 'Video')) {
             return; // Stop the function here if file types are invalid
         }
 
-        if (file || video) {
-            progressModal.show();
-            isUploading = true;
-            lockModal();
-        }
+        // If file types are valid, proceed with upload
+        const formData = new FormData(uploadForm);
+
+        progressModal.show();
+        isUploading = true;
+        lockModal();
 
         xhr = new XMLHttpRequest();
         xhr.open('POST', uploadForm.action, true);
@@ -50,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.onload = function() {
             isUploading = false;
             unlockModal();
-            progressModal.hide(); // Hide the modal when the request is complete
+            progressModal.hide();
 
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
@@ -97,11 +98,11 @@ document.addEventListener('DOMContentLoaded', function() {
         feedbackMessage.className = 'alert alert-danger';
     }
 
-    function checkFileType(file, allowedExtensions, fileType) {
+    function checkFileType(file, allowedExtensions, fileType, fieldName) {
         if (file) {
             const fileExtension = file.name.split('.').pop().toLowerCase();
             if (!allowedExtensions.includes(fileExtension)) {
-                feedbackMessage.textContent = `Error: Invalid file type for ${fileType}. Please upload a ${allowedExtensions.join(' or ')} file.`;
+                feedbackMessage.textContent = `Error: Invalid file type for ${fieldName}. Please upload a ${allowedExtensions.join(' or ')} file.`;
                 feedbackMessage.className = 'alert alert-danger';
                 return false;
             }
