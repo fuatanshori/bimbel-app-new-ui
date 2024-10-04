@@ -14,16 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const fileModul = inputFileModul.files[0];
         const fileVidio = inputFileVidio ? inputFileVidio.files[0] : null;
 
-        // Cek ukuran file modul (maks 20MB)
-        if (fileModul && fileModul.size > 20 * 1024 * 1024) {
-            feedbackMessage.textContent = 'Error: File modul tidak boleh lebih dari 20MB.';
+        // Cek ukuran file modul (maks 100MB)
+        if (fileModul && fileModul.size > 100 * 1024 * 1024) {
+            feedbackMessage.textContent = 'Error: File modul tidak boleh lebih dari 100MB.';
             feedbackMessage.classList.add('alert', 'alert-danger');
             return false; // Tidak valid
         }
 
         // Cek ukuran file vidio (maks 200MB)
-        if (fileVidio && fileVidio.size > 200 * 1024 * 1024) {
-            feedbackMessage.textContent = 'Error: Video tidak boleh lebih dari 200MB.';
+        if (fileVidio && fileVidio.size > 1500 * 1024 * 1024) {
+            feedbackMessage.textContent = 'Error: Video tidak boleh lebih dari 1.5GB.';
             feedbackMessage.classList.add('alert', 'alert-danger');
             return false; // Tidak valid
         }
