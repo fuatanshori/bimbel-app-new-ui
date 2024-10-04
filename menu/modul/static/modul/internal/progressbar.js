@@ -23,8 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const isFileValid = checkFileType(file, ['pdf'], 'PDF');
         const isVideoValid = checkFileType(video, ['mp4'], 'MP4');
 
-        if (!isFileValid || !isVideoValid) {
+        if (!isFileValid) {
             return; // Stop the function here if file types are invalid
+        }
+        if (!isVideoValid){
+            return;
         }
 
         // Show progress modal if files are valid
