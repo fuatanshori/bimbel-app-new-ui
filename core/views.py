@@ -60,21 +60,36 @@ def vidio_protect_membership(request, vidio_file):
 
     try:
         transaksi_obj = Transaksi.objects.get(user=request.user, transaksi_status="settlement")
-        
-        # Jika transaksi valid
-        response = StreamingHttpResponse(open(video_path, 'rb'), content_type='video/mp4')
-        response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
-        response['Accept-Ranges'] = 'bytes'
-        return response
+
+        with open(video_path, 'rb') as video_file:
+            response = HttpResponse(video_file, content_type='video/mp4')
+            response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+            response['Accept-Ranges'] = 'bytes'
+            
+            # Mendukung permintaan range
+            range_header = request.META.get('HTTP_RANGE', None)
+            if range_header:
+                # Parse the range header
+                range_value = range_header.split('=')[1]
+                start, end = map(int, range_value.split('-'))
+                video_file.seek(start)
+                length = end - start + 1
+                response = HttpResponse(video_file.read(length), status=206)
+                response['Content-Range'] = f'bytes {start}-{end}/{os.path.getsize(video_path)}'
+                response['Content-Length'] = length
+            else:
+                response['Content-Length'] = os.path.getsize(video_path)
+                
+            return response
 
     except Transaksi.DoesNotExist:
         # Cek role pengguna
         if request.user.role in ["admin", "pemateri"]:
-            # Pengguna memiliki akses sebagai admin/pemateri
-            response = StreamingHttpResponse(open(video_path, 'rb'), content_type='video/mp4')
-            response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
-            response['Accept-Ranges'] = 'bytes'
-            return response
+            with open(video_path, 'rb') as video_file:
+                response = HttpResponse(video_file, content_type='video/mp4')
+                response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+                response['Accept-Ranges'] = 'bytes'
+                return response
         else:
             # Pengguna tidak memiliki akses, redirect ke halaman pembayaran
             return redirect("menu:pembayaran")
