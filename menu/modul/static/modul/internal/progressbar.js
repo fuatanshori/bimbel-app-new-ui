@@ -1,68 +1,41 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const uploadForm = document.getElementById('upload_form');
     const inputFile = document.getElementById("id_modul");
     const inputVideo = document.getElementById("id_vidio");
-    const progressModalElement = document.getElementById('progressModal');
-    const progressModal = new bootstrap.Modal(progressModalElement, {
-        backdrop: 'static',
-        keyboard: false
-    });
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
     const cancelButton = document.getElementById('cancelButton');
     const feedbackMessage = document.getElementById('feedbackMessage');
     let xhr;
-    let isUploading = false;
 
-    uploadForm.addEventListener('submit', function(e) {
+    uploadForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        
+        const formData = new FormData(uploadForm);
+        const file = inputFile.files[0];
+        const video = inputVideo.files[0];
+
         // Clear previous messages and reset classes
         feedbackMessage.textContent = '';
         feedbackMessage.className = '';
 
-        // Validate files before proceeding
-        if (!validateFiles()) {
-            return; // Stop if validation fails
+        // Check file extensions before uploading
+        const isFileValid = checkFileType(file, ['pdf'], 'PDF');
+        const isVideoValid = checkFileType(video, ['mp4'], 'MP4');
+
+        if (!isFileValid || !isVideoValid) {
+            return; // Stop the function here if file types are invalid
         }
 
-        // If validation passes, proceed with upload
-        startUpload();
-    });
-
-    function validateFiles() {
-        const file = inputFile.files[0];
-        const video = inputVideo.files[0];
-
-        if (!checkFileType(file, ['pdf'], 'PDF', 'Modul')) return false;
-        if (!checkFileType(video, ['mp4'], 'MP4', 'Video')) return false;
-
-        return true;
-    }
-
-    function checkFileType(file, allowedExtensions, fileType, fieldName) {
-        if (file) {
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            if (!allowedExtensions.includes(fileExtension)) {
-                feedbackMessage.textContent = `Error: Invalid file type for ${fieldName}. Please upload a ${allowedExtensions.join(' or ')} file.`;
-                feedbackMessage.className = 'alert alert-danger';
-                return false;
-            }
+        // Show progress modal if files are valid
+        if (file || video) {
+            progressModal.show();
         }
-        return true;
-    }
-
-    function startUpload() {
-        const formData = new FormData(uploadForm);
-
-        progressModal.show();
-        isUploading = true;
-        lockModal();
 
         xhr = new XMLHttpRequest();
         xhr.open('POST', uploadForm.action, true);
 
-        xhr.upload.addEventListener('progress', function(e) {
+        xhr.upload.addEventListener('progress', function (e) {
             if (e.lengthComputable) {
                 const percentProgress = (e.loaded / e.total) * 100;
                 progressBar.style.width = `${percentProgress}%`;
@@ -71,10 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        xhr.onload = function() {
-            isUploading = false;
-            unlockModal();
-            progressModal.hide();
+        xhr.onload = function () {
+            progressModal.hide(); // Always hide the modal when the request is complete
 
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
@@ -89,25 +60,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
 
-        xhr.onerror = function() {
-            isUploading = false;
-            unlockModal();
+        xhr.onerror = function () {
             progressModal.hide();
             handleError({ message: 'Network error: Upload failed.' });
         };
 
         xhr.send(formData);
-    }
+    });
 
-    cancelButton.addEventListener('click', function() {
-        if (xhr && isUploading) {
+    cancelButton.addEventListener('click', function () {
+        if (xhr) {
             xhr.abort();
-            isUploading = false;
-            unlockModal();
-            progressModal.hide();
-            feedbackMessage.textContent = 'Upload canceled.';
-            feedbackMessage.className = 'alert alert-warning';
         }
+        progressModal.hide();
+        feedbackMessage.textContent = 'Upload canceled.';
+        feedbackMessage.className = 'alert alert-warning';
     });
 
     function handleError(response) {
@@ -121,18 +88,19 @@ document.addEventListener('DOMContentLoaded', function() {
         feedbackMessage.className = 'alert alert-danger';
     }
 
-    function lockModal() {
-        progressModalElement.removeEventListener('hide.bs.modal', preventModalClose);
-        progressModalElement.addEventListener('hide.bs.modal', preventModalClose);
-    }
-
-    function unlockModal() {
-        progressModalElement.removeEventListener('hide.bs.modal', preventModalClose);
-    }
-
-    function preventModalClose(event) {
-        if (isUploading) {
-            event.preventDefault();
+    function checkFileType(file, allowedExtensions, fileType) {
+        if (file) {
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!allowedExtensions.includes(fileExtension)) {
+                feedbackMessage.textContent = `Error: Invalid file type for ${fileType}. Please upload a ${allowedExtensions.join(' or ')} file.`;
+                feedbackMessage.className = 'alert alert-danger';
+                return false;
+            }
+        } else {
+            feedbackMessage.textContent = `Error: No file selected for ${fileType}.`;
+            feedbackMessage.className = 'alert alert-danger';
+            return false; // Return false if no file is selected
         }
+        return true;
     }
 });
