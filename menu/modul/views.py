@@ -124,7 +124,8 @@ def tambah_modul(request,id_levelstudy,id_mapel):
             })
         else:
             return JsonResponse({
-                "message": "File modul atau video tidak valid. Pastikan format file sudah sesuai.",
+                "message": "cant upload",
+                "errors": modul_forms.errors.get_json_data(),  # Menggunakan get_json_data untuk format yang lebih mudah dipahami di JS
             })
     modul_forms = ModulForm(request.POST or None,request.FILES or None)
     context={
