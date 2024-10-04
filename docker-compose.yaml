@@ -14,7 +14,7 @@ services:
     volumes:
       - .:/app
       - /etc/letsencrypt:/etc/letsencrypt
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && gunicorn --bind 0.0.0.0:8001 core.wsgi:application"
+    command: bash -c "gunicorn --bind 0.0.0.0:8001 core.wsgi:application"
     depends_on:
       redis_container:
         condition: service_healthy
