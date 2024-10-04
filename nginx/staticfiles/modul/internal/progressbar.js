@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const fileModul = inputFileModul.files[0];
         const fileVidio = inputFileVidio ? inputFileVidio.files[0] : null; // Jika ada file video
 
+        // Debugging: Log ukuran file ke console
+        if (fileModul) {
+            console.log("Ukuran file modul: " + fileModul.size / (1024 * 1024) + " MB");
+        }
+        if (fileVidio) {
+            console.log("Ukuran file video: " + fileVidio.size / (1024 * 1024) + " MB");
+        }
+
         // Cek ukuran file modul (maks 20MB)
         if (fileModul && fileModul.size > 20 * 1024 * 1024) {
             feedbackMessage.textContent = 'Error: File modul tidak boleh lebih dari 20MB.';
