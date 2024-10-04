@@ -2,12 +2,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload_form');
     const inputFile = document.getElementById("id_modul");
     const inputVideo = document.getElementById("id_vidio");
-    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+    const progressModalElement = document.getElementById('progressModal');
+    const progressModal = new bootstrap.Modal(progressModalElement, {
+        backdrop: 'static',  // This prevents the modal from closing when clicking outside
+        keyboard: false  // This prevents the modal from closing when pressing ESC key
+    });
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
     const cancelButton = document.getElementById('cancelButton');
     const feedbackMessage = document.getElementById('feedbackMessage');
     let xhr;
+    let isUploading = false;
 
     uploadForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -26,6 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (file || video) {
             progressModal.show();
+            isUploading = true;
+            lockModal();
         }
 
         xhr = new XMLHttpRequest();
@@ -41,7 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         xhr.onload = function() {
-            progressModal.hide(); // Always hide the modal when the request is complete
+            isUploading = false;
+            unlockModal();
+            progressModal.hide(); // Hide the modal when the request is complete
 
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
@@ -57,6 +66,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         xhr.onerror = function() {
+            isUploading = false;
+            unlockModal();
             progressModal.hide();
             handleError({ message: 'Network error: Upload failed.' });
         };
@@ -65,12 +76,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     cancelButton.addEventListener('click', function() {
-        if (xhr) {
+        if (xhr && isUploading) {
             xhr.abort();
+            isUploading = false;
+            unlockModal();
+            progressModal.hide();
+            feedbackMessage.textContent = 'Upload canceled.';
+            feedbackMessage.className = 'alert alert-warning';
         }
-        progressModal.hide();
-        feedbackMessage.textContent = 'Upload canceled.';
-        feedbackMessage.className = 'alert alert-warning';
     });
 
     function handleError(response) {
@@ -94,5 +107,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         return true;
+    }
+
+    function lockModal() {
+        progressModalElement.removeEventListener('hide.bs.modal', preventModalClose);
+        progressModalElement.addEventListener('hide.bs.modal', preventModalClose);
+    }
+
+    function unlockModal() {
+        progressModalElement.removeEventListener('hide.bs.modal', preventModalClose);
+    }
+
+    function preventModalClose(event) {
+        if (isUploading) {
+            event.preventDefault();
+        }
     }
 });
