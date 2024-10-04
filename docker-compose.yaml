@@ -13,7 +13,7 @@ services:
     volumes:
       - .:/app
       - /etc/letsencrypt:/etc/letsencrypt
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -e ssl:443:privateKey=/etc/letsencrypt/live/bimbelbanua.my.id/privkey.pem:certKey=/etc/letsencrypt/live/bimbelbanua.my.id/fullchain.pem -b 0.0.0.0 -p 8000 --application-close-timeout 600 core.asgi:application"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && uvicorn core.asgi:application --host 0.0.0.0 --port 443 --ssl-keyfile /etc/letsencrypt/live/bimbelbanua.my.id/privkey.pem --ssl-certfile /etc/letsencrypt/live/bimbelbanua.my.id/fullchain.pem --timeout-keep-alive 600"
     depends_on:
       redis_container:
         condition: service_healthy
