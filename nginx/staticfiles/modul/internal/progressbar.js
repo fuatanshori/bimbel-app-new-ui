@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload_form');
     const inputFile = document.getElementById("id_modul");
-    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+    // Mengatur modal agar tidak bisa ditutup dengan klik di luar atau dengan tombol esc
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'), {
+        backdrop: 'static',
+        keyboard: false
+    });
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.getElementById('progressText');
     const cancelButton = document.getElementById('cancelButton');
@@ -15,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (file != null) {
             progressModal.show();
-            feedbackMessage.textContent = ''; // Clear previous messages
-            feedbackMessage.classList.remove('text-success', 'text-danger', 'text-warning');
+            feedbackMessage.textContent = ''; // Hapus pesan feedback sebelumnya
+            feedbackMessage.classList.remove('alert', 'alert-success', 'alert-danger', 'alert-warning');
         }
 
         xhr = new XMLHttpRequest();
@@ -27,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const percentProgress = (e.loaded / e.total) * 100;
                 progressBar.style.width = `${percentProgress}%`;
                 progressBar.setAttribute('aria-valuenow', percentProgress);
-                progressText.textContent = `${Math.round(percentProgress)}%`; // Update percentage text
+                progressText.textContent = `${Math.round(percentProgress)}%`; // Update teks persentase
             }
         });
 
@@ -40,8 +44,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else if (response.message === "cant upload") {
                     let errorMessage = 'Error: ';
                     if (response.errors) {
-                        // Tampilkan pesan kesalahan dari form
-                        errorMessage += 'Form errors: ' + JSON.stringify(response.errors);
+                        // Menampilkan pesan kesalahan form secara lebih rapi
+                        errorMessage += 'Form errors:\n';
+                        for (const field in response.errors) {
+                            errorMessage += `${field}: ${response.errors[field].join(', ')}\n`;
+                        }
                     } else {
                         errorMessage += response.message;
                     }
@@ -49,21 +56,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     feedbackMessage.textContent = errorMessage;
                     feedbackMessage.classList.add('alert', 'alert-danger');
                 } else {
-                  progressModal.hide();
+                    progressModal.hide();
                     feedbackMessage.textContent = 'Error: ' + response.message;
                     feedbackMessage.classList.add('alert', 'alert-danger');
                 }
             } else {
-                progressModal.hide(); // Close the modal on error status
+                progressModal.hide(); // Tutup modal jika ada error
                 feedbackMessage.textContent = 'Error: Upload failed.';
-                feedbackMessage.classList.add('text-danger');
+                feedbackMessage.classList.add('alert', 'alert-danger');
             }
         };
 
         xhr.onerror = function() {
-            progressModal.hide(); // Close the modal on network error
+            progressModal.hide(); // Tutup modal jika ada kesalahan jaringan
             feedbackMessage.textContent = 'Network error: Upload failed.';
-            feedbackMessage.classList.add('text-danger');
+            feedbackMessage.classList.add('alert', 'alert-danger');
         };
 
         xhr.send(formData);
@@ -71,9 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     cancelButton.addEventListener('click', function() {
         if (xhr) {
-            xhr.abort(); // Abort the request
+            xhr.abort(); // Membatalkan permintaan
         }
-        progressModal.hide(); // Hide the modal
+        progressModal.hide(); // Sembunyikan modal
         feedbackMessage.textContent = 'Upload canceled.';
         feedbackMessage.classList.add('alert', 'alert-warning');
     });
