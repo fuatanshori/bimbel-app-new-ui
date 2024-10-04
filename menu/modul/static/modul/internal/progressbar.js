@@ -21,15 +21,38 @@ document.addEventListener('DOMContentLoaded', function() {
         feedbackMessage.textContent = '';
         feedbackMessage.className = '';
 
-        // Check file extensions before proceeding
+        // Validate files before proceeding
+        if (!validateFiles()) {
+            return; // Stop if validation fails
+        }
+
+        // If validation passes, proceed with upload
+        startUpload();
+    });
+
+    function validateFiles() {
         const file = inputFile.files[0];
         const video = inputVideo.files[0];
 
-        if (!checkFileType(file, ['pdf'], 'PDF', 'Modul') || !checkFileType(video, ['mp4'], 'MP4', 'Video')) {
-            return; // Stop the function here if file types are invalid
-        }
+        if (!checkFileType(file, ['pdf'], 'PDF', 'Modul')) return false;
+        if (!checkFileType(video, ['mp4'], 'MP4', 'Video')) return false;
 
-        // If file types are valid, proceed with upload
+        return true;
+    }
+
+    function checkFileType(file, allowedExtensions, fileType, fieldName) {
+        if (file) {
+            const fileExtension = file.name.split('.').pop().toLowerCase();
+            if (!allowedExtensions.includes(fileExtension)) {
+                feedbackMessage.textContent = `Error: Invalid file type for ${fieldName}. Please upload a ${allowedExtensions.join(' or ')} file.`;
+                feedbackMessage.className = 'alert alert-danger';
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function startUpload() {
         const formData = new FormData(uploadForm);
 
         progressModal.show();
@@ -74,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         xhr.send(formData);
-    });
+    }
 
     cancelButton.addEventListener('click', function() {
         if (xhr && isUploading) {
@@ -96,18 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         feedbackMessage.textContent = errorMessage;
         feedbackMessage.className = 'alert alert-danger';
-    }
-
-    function checkFileType(file, allowedExtensions, fileType, fieldName) {
-        if (file) {
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            if (!allowedExtensions.includes(fileExtension)) {
-                feedbackMessage.textContent = `Error: Invalid file type for ${fieldName}. Please upload a ${allowedExtensions.join(' or ')} file.`;
-                feedbackMessage.className = 'alert alert-danger';
-                return false;
-            }
-        }
-        return true;
     }
 
     function lockModal() {
