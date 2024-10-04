@@ -35,24 +35,18 @@ document.getElementById('uploadForm').addEventListener('submit', function (event
             if (response.message === "data uploaded") {
                 // Redirect ke halaman daftar modul jika upload berhasil
                 window.location.href = `/menu/modul/daftar-modul/${response.id_levelstudy}/${response.id_mapel}/`;
-            } else if (response.message === "cant upload") {
-                // Menampilkan pesan kesalahan dari server (contoh: file ekstensi salah)
+            } else {
+                // Menampilkan pesan kesalahan dari server
                 let errorMessage = 'Error: ';
-                if (response.errors) {
-                    // Tampilkan kesalahan validasi form
-                    errorMessage += 'Form errors: ' + JSON.stringify(response.errors);
-                } else {
+                if (response.message) {
                     errorMessage += response.message;
+                } else {
+                    errorMessage += 'Terjadi kesalahan dalam validasi form.';
                 }
 
                 // Tutup modal dan tampilkan pesan error
                 progressModal.hide();
                 feedbackMessage.textContent = errorMessage;
-                feedbackMessage.classList.add('alert', 'alert-danger');
-            } else {
-                // Untuk case lainnya (general error)
-                progressModal.hide();
-                feedbackMessage.textContent = 'Error: ' + response.message;
                 feedbackMessage.classList.add('alert', 'alert-danger');
             }
         } else {
