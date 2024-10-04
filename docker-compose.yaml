@@ -14,7 +14,7 @@ services:
     volumes:
       - .:/app
       - /etc/letsencrypt:/etc/letsencrypt
-    command: bash -c "gunicorn --bind 0.0.0.0:8001 --timeout 600 --workers 3 core.wsgi:application"
+    command: bash -c "gunicorn --bind 0.0.0.0:8001 --timeout 600 --workers 5 --worker-class gevent core.wsgi:application"
     depends_on:
       redis_container:
         condition: service_healthy
