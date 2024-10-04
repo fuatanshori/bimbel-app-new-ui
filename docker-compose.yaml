@@ -14,7 +14,7 @@ services:
     volumes:
       - .:/app
       - /etc/letsencrypt:/etc/letsencrypt
-    command: bash -c "gunicorn --bind 0.0.0.0:8001 core.wsgi:application"
+    command: bash -c "gunicorn --bind 0.0.0.0:8001 --timeout 600 --workers 3 core.wsgi:application"
     depends_on:
       redis_container:
         condition: service_healthy
@@ -36,7 +36,7 @@ services:
       resources:
         limits:
           cpus: '2.0'
-          memory: 8G
+          memory: 12G
 
   # ASGI Server for Django
   django_app_bimbel_asgi:
@@ -71,7 +71,7 @@ services:
       resources:
         limits:
           cpus: '2.0'
-          memory: 8G
+          memory: 6G
 
   redis_container:
     container_name: redis_container
