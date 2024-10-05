@@ -71,20 +71,20 @@
               </object>
             </div>
             {% if modul_obj.vidio %}
-              <div class="tab-pane fade" id="moduleVidio" role="tabpanel">
-                <p>Jika Browser anda Tidak mendukung <a href="{{ modul_obj.vidio.url }}">lihat Vidio</a> untuk melihatnya.</p>
-                <div id="trailer" class="section d-flex justify-content-center">
-                  <div class="ratio ratio-16x9" style="max-width: 100%;">
-                    <video id="videoPlayer" class="embed-responsive-item" controls>
-                      <source src="{{modul_obj.vidio.url}}" type="video/mp4">
-                    </video>
-                  </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-center">
-                  <button id="rewindBtn" class="btn btn-primary me-2">Rewind 15s</button>
-                  <button id="forwardBtn" class="btn btn-primary">Forward 15s</button>
+            <div class="tab-pane fade" id="moduleVidio" role="tabpanel">
+              <p>Jika Browser anda Tidak mendukung <a href="{{ modul_obj.vidio.url }}">lihat Vidio</a> untuk melihatnya.</p>
+              <div id="trailer" class="section d-flex justify-content-center">
+                <div class="ratio ratio-16x9" style="max-width: 100%;">
+                  <video id="videoPlayer" class="embed-responsive-item" controls>
+                    <source src="{{modul_obj.vidio.url}}" type="video/mp4">
+                  </video>
                 </div>
               </div>
+              <div class="mt-3 d-flex justify-content-center">
+                <button id="rewindBtn" class="btn btn-primary me-2">Rewind 15s</button>
+                <button id="forwardBtn" class="btn btn-primary">Forward 15s</button>
+              </div>
+            </div>
             {% endif %}
           </div>
         </div>
@@ -97,12 +97,33 @@
       const rewindBtn = document.getElementById('rewindBtn');
       const forwardBtn = document.getElementById('forwardBtn');
     
+      function seekVideo(offset) {
+        if (video.readyState === 0) {
+          console.error('Video belum dimuat sepenuhnya');
+          return;
+        }
+        
+        const newTime = video.currentTime + offset;
+        if (newTime < 0) {
+          video.currentTime = 0;
+        } else if (newTime > video.duration) {
+          video.currentTime = video.duration;
+        } else {
+          video.currentTime = newTime;
+        }
+      }
+    
       rewindBtn.addEventListener('click', function() {
-        video.currentTime = Math.max(video.currentTime - 15, 0);
+        seekVideo(-15);
       });
     
       forwardBtn.addEventListener('click', function() {
-        video.currentTime = Math.min(video.currentTime + 15, video.duration);
+        seekVideo(15);
+      });
+    
+      // Tambahkan event listener untuk memastikan video sudah dimuat
+      video.addEventListener('loadedmetadata', function() {
+        console.log('Video metadata loaded. Duration:', video.duration);
       });
     });
     </script>
