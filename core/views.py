@@ -9,10 +9,7 @@ import os
 import io
 from datetime import datetime, timedelta
 import hashlib
-from django.utils.http import http_date
 import os
-import stat
-import mimetypes
 import re
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat pdf. admin/pemateri
@@ -57,55 +54,57 @@ def pdf_protect_membership(request, pdf_file):
 def vidio_protect_membership(request, vidio_file):
     media_path = os.path.join(settings.MEDIA_ROOT, 'vidio')
     video_path = os.path.join(media_path, vidio_file)
-
+    
     try:
+        # Validate that the user has a valid transaction
         transaksi_obj = Transaksi.objects.get(
-            user=request.user, transaksi_status="settlement")
+            user=request.user, transaksi_status="settlement"
+        )
         
-        if not transaksi_obj and request.user.role not in ["admin", "pemateri"]:
-            return redirect("menu:pembayaran")
-
-        if not os.path.exists(video_path):
-            raise Http404("File tidak ditemukan")
-
-        # Get the file's stats
-        statobj = os.stat(video_path)
-        content_type, encoding = mimetypes.guess_type(video_path)
-        content_type = content_type or 'application/octet-stream'
-        
-        # Handle range request
-        if request.META.get('HTTP_RANGE'):
-            range_header = request.META['HTTP_RANGE'].strip()
-            range_match = re.match(r'bytes=(\d+)-(\d*)', range_header)
-            if range_match:
-                first_byte, last_byte = range_match.groups()
-                first_byte = int(first_byte) if first_byte else 0
-                last_byte = int(last_byte) if last_byte else statobj.st_size - 1
-                if last_byte >= statobj.st_size:
-                    last_byte = statobj.st_size - 1
-                length = last_byte - first_byte + 1
-                resp = HttpResponse(status=206)
-                resp.write(open(video_path, 'rb').read()[first_byte:last_byte+1])
-                resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte, statobj.st_size)
-                resp['Content-Length'] = str(length)
-                resp['Content-Type'] = content_type
+        if transaksi_obj:
+            # Check if the video file exists
+            if os.path.exists(video_path):
+                # Handle range requests for skipping
+                range_header = request.META.get('HTTP_RANGE', None)
+                
+                if not range_header:
+                    # If no range is specified, serve the entire file
+                    response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+                    response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+                    return response
+                
+                # Parse the range header
+                range_match = re.match(r'bytes=(\d+)-(\d*)', range_header)
+                if not range_match:
+                    return HttpResponse(status=400)  # Bad Request
+                
+                # Extract start and end byte positions from the range
+                start, end = range_match.groups()
+                start = int(start)
+                end = int(end) if end else os.path.getsize(video_path) - 1  # Set end to end of file if not specified
+                
+                # Validate the requested range
+                if start > end or end >= os.path.getsize(video_path):
+                    return HttpResponse(status=416)  # Range Not Satisfiable
+                
+                # Set the response headers for partial content
+                response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+                response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+                response['Content-Range'] = f'bytes {start}-{end}/{os.path.getsize(video_path)}'
+                response['Content-Length'] = end - start + 1
+                response.status_code = 206  # Partial Content
+                
+                # Move the file pointer to the start position
+                response.file.seek(start)
+                
+                return response
             else:
-                return HttpResponse(status=416)
+                raise Http404("File tidak ditemukan")
         else:
-            # Normal response
-            resp = HttpResponse(open(video_path, 'rb').read())
-            resp['Content-Type'] = content_type
-            resp['Content-Length'] = statobj.st_size
-        
-        resp['Accept-Ranges'] = 'bytes'
-        resp['Content-Disposition'] = f'inline; filename="{vidio_file}"'
-        resp['Last-Modified'] = http_date(statobj.st_mtime)
-        return resp
-
-    except Transaksi.DoesNotExist:
-        if request.user.role == "pelajar":
             return redirect("menu:pembayaran")
-        raise Http404("Akses ditolak")
+    
+    except Transaksi.DoesNotExist:
+        return redirect("menu:pembayaran")
 
 
 @login_required(login_url="user:masuk")
