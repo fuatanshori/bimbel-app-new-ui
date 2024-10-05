@@ -4,104 +4,78 @@
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row">
-      <div class="col-xl-12">
-        <h6 class="text-muted">Detail modul</h6>
-        <div class="nav-align-top mb-4">
-          <ul class="nav nav-pills mb-3" role="tablist">
-            <li class="nav-item">
-              <a
-                href="{% url "menu:daftar-modul" id_levelstudy=id_levelstudy id_mapel=id_mapel %}" 
-                class="btn btn-icon btn-dark" style="margin-right:6px;"
-              >
-              <i class="tf-icon bx bx-chevron-left"></i>
-              </a>
-            </li>
-            <li class="nav-item ">
-              <button
-                type="button"
-                class="nav-link active"
-                role="tab"
-                data-bs-toggle="tab"
-                data-bs-target="#detailmodul"
-                aria-controls="detailmodul"
-                aria-selected="true"
-              >
-                Detail Modul
-              </button>
-            </li>
-            <li class="nav-item">
-              <button
-                type="button"
-                class="nav-link"
-                role="tab"
-                data-bs-toggle="tab"
-                data-bs-target="#modulePdf"
-                aria-controls="modulePdf"
-                aria-selected="false"
-              >
-                Akses pdf
-              </button>
-            </li>
-            {% if modul_obj.vidio %}
-            <li class="nav-item">
-              <button
-                type="button"
-                class="nav-link"
-                role="tab"
-                data-bs-toggle="tab"
-                data-bs-target="#moduleVidio"
-                aria-controls="moduleVidio"
-                aria-selected="false"
-              >
-                Akses Vidio
-              </button>
-            </li>
-            {% endif %}
-          </ul>
-          <div class="tab-content">
-            <div class="tab-pane fade show active" id="detailmodul" role="tabpanel">
-              <h1 class="card-title ">{{ modul_obj.nama_modul }}</h1>
-              <p class="card-text" style="text-align:justify;">
-                {{ modul_obj.description|safe }}
-              </p>
-            </div>
-            <div class="tab-pane fade" id="modulePdf" role="tabpanel">
-              <p>Jika Browser Anda tidak mendukung PDF inline. Silakan <a href="{{ modul_obj.modul.url }}">lihat PDF</a> untuk melihatnya.</p>
-              <object data="{{ modul_obj.modul.url }}" type="application/pdf" width="100%" height="600px">
-              </object>
-            </div>
-            {% if modul_obj.vidio %}
-            <div class="tab-pane fade" id="moduleVidio" role="tabpanel">
-              <p>Jika Browser anda Tidak mendukung <a href="{{ modul_obj.vidio.url }}">lihat Vidio</a> untuk melihatnya.</p>
-              <div id="trailer" class="section d-flex justify-content-center">
-                <div class="ratio ratio-16x9" style="max-width: 100%;">
-                  <video id="my-video" class="video-js" controls preload="auto" width="640" height="264">
-                    <source src="{{ modul_obj.vidio.url }}" type="video/mp4" />
-                    Your browser does not support the video tag.
-                </video>
+        <div class="col-xl-12">
+            <h6 class="text-muted">Detail modul</h6>
+            <div class="nav-align-top mb-4">
+                <ul class="nav nav-pills mb-3" role="tablist">
+                    <li class="nav-item">
+                        <a href="{% url 'menu:daftar-modul' id_levelstudy=id_levelstudy id_mapel=id_mapel %}" class="btn btn-icon btn-dark" style="margin-right:6px;">
+                            <i class="tf-icon bx bx-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item ">
+                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#detailmodul" aria-controls="detailmodul" aria-selected="true">
+                            Detail Modul
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#modulePdf" aria-controls="modulePdf" aria-selected="false">
+                            Akses pdf
+                        </button>
+                    </li>
+                    {% if modul_obj.vidio %}
+                    <li class="nav-item">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#moduleVidio" aria-controls="moduleVidio" aria-selected="false">
+                            Akses Vidio
+                        </button>
+                    </li>
+                    {% endif %}
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="detailmodul" role="tabpanel">
+                        <h1 class="card-title ">{{ modul_obj.nama_modul }}</h1>
+                        <p class="card-text" style="text-align:justify;">
+                            {{ modul_obj.description|safe }}
+                        </p>
+                    </div>
+                    <div class="tab-pane fade" id="modulePdf" role="tabpanel">
+                        <p>Jika Browser Anda tidak mendukung PDF inline. Silakan <a href="{{ modul_obj.modul.url }}">lihat PDF</a> untuk melihatnya.</p>
+                        <object data="{{ modul_obj.modul.url }}" type="application/pdf" width="100%" height="600px"></object>
+                    </div>
+                    {% if modul_obj.vidio %}
+                    <div class="tab-pane fade" id="moduleVidio" role="tabpanel">
+                        <p>Jika Browser anda Tidak mendukung <a href="{{ modul_obj.vidio.url }}">lihat Vidio</a> untuk melihatnya.</p>
+                        <div id="trailer" class="section d-flex justify-content-center">
+                            <div class="ratio ratio-16x9" style="max-width: 100%;">
+                                <video id="videoPlayer" class="embed-responsive-item" controls>
+                                    <source src="{{ modul_obj.vidio.url }}" type="video/mp4">
+                                </video>
+                            </div>
+                            <div class="d-flex justify-content-center mt-3">
+                                <button id="rewindButton" class="btn btn-primary me-2">Rewind 15 detik</button>
+                                <button id="skipButton" class="btn btn-primary">Skip 15 detik</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
-            </div>
-            {% endif %}
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+</div>
+
+<!-- Tambahkan link dan skrip Video.js -->
+<link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
 <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
-<script >
-  const player = new Plyr('#player');
+<script>
+    const video = document.getElementById('videoPlayer');
 
-document.getElementById('rewindButton').onclick = function() {
-    player.currentTime = Math.max(0, player.currentTime - 15); // Rewind 15 seconds
-};
+    document.getElementById('rewindButton').addEventListener('click', function() {
+        video.currentTime = Math.max(0, video.currentTime - 15); // Rewind 15 seconds
+    });
 
-document.getElementById('skipButton').onclick = function() {
-    player.currentTime = Math.min(player.duration, player.currentTime + 15); // Skip 15 seconds
-};
-
+    document.getElementById('skipButton').addEventListener('click', function() {
+        video.currentTime = Math.min(video.duration, video.currentTime + 15); // Skip 15 seconds
+    });
 </script>
-
 {% endblock content %}
-
