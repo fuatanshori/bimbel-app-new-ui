@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.http import Http404
 from django.http import JsonResponse
 from .models import MataPelajaran
@@ -12,7 +12,7 @@ from .forms import ModulForm
 from core.utils.decorator import admin_pemateri_required,transaksi_settlement_required
 from menu.utils.encode_url import decode_id
 from menu.utils.pagination import pagination_queryset
-
+from .models import Chat
 
 # Create your views here.
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
@@ -167,3 +167,16 @@ def edit_modul(request,id_levelstudy, id_mapel, id_modul):
         "id_levelstudy": id_levelstudy,
     }
     return render(request, 'modul/edit_modul.html', context)
+
+@login_required(login_url='user:masuk')
+@transaksi_settlement_required
+def chat(request,id_modul):
+    pk = decode_id(id_modul)
+    modul_obj = get_object_or_404(Modul,pk=pk)
+    chat_objs = Chat.objects.filter(modul=modul_obj)
+    context={
+        "modul_obj":modul_obj,
+        "chat_objs":chat_objs,
+        "id_modul":id_modul,
+    }
+    return render(request,'modul/chat.html',context) 

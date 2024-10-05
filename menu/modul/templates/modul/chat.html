@@ -1,0 +1,41 @@
+{% extends "menu_base.html" %}
+{% load static %}
+{% block title %}chat{% endblock title %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'modul/css/chat.css' %}">
+{% endblock style %}
+
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y ">
+    <div class="row justify-content-center">
+        <div class="card">
+            <div class="card-body d-flex flex-column">
+                <div id="chat-messages" class="mb-3" style="max-height: 600px; overflow-y: auto;"> <!-- Increased height -->
+                    {% for chat_obj in chat_objs %}
+                        <div class="chat-message {% if chat_obj.user == request.user %}sent{% else %}received{% endif %}">
+                            <div class="message-header">
+                                <span class="user-name">{{ chat_obj.user.full_name }}</span>
+                            </div>
+                            <div class="message-content">{{ chat_obj.message }}</div>
+                            <span class="timestamp {% if chat_obj.user == request.user %}text-white{% endif %}">{{ chat_obj.timestamp|date:"F d, Y H:i" }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="input-group">
+                    <input type="text" id="message-input" class="form-control" placeholder="Ketik pesan Anda..." autocomplete="off">
+                    <div class="input-group-append">
+                        <button id="send-button" class="btn btn-primary mx-2" type="button">Kirim</button>
+                    </div>
+                </div>
+                <div id="idModul" data-id={{ id_modul }} ></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block script %}
+<script src="{% static "modul/js/chat.js" %}"></script>
+{% endblock script %}

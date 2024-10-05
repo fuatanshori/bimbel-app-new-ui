@@ -25,3 +25,10 @@ class Modul(models.Model):
     
     def get_id_safe(self):
         return encode_id(self.pk)
+    
+class Chat(models.Model):
+    user = models.ForeignKey(Users,on_delete=models.CASCADE)
+    modul = models.ForeignKey(Modul,on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
