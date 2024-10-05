@@ -46,6 +46,7 @@ urlpatterns += [
     path('modul/tambah/<id_levelstudy>/<id_mapel>/', views_modul.tambah_modul, name='tambah-modul'),
     path('modul/edit/<id_levelstudy>/<id_mapel>/<id_modul>/', views_modul.edit_modul, name='edit-modul'),
     path('modul/detail/<id_levelstudy>/<id_mapel>/<id_modul>/', views_modul.detailmodul, name='detail-modul'),
+    path("modul/chat/<id_modul>/",views_modul.chat,name="modul-chat"),
 ]
 
 
