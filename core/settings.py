@@ -282,8 +282,8 @@ LOGGING = {
 handler404 = 'core.views.custom_404_handler'
 handler500 = 'core.views.custom_500_handler'
 CSRF_FAILURE_VIEW ="core.views.csrf_failure"
-FILE_UPLOAD_MAX_MEMORY_SIZE = 2147483648
-DATA_UPLOAD_MAX_MEMORY_SIZE = 2147483648
+FILE_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 300 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 300 MB
 LOGIN_URL='/users/masuk/'
 
 customColorPalette = [

@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Cek ukuran file vidio (maks 200MB)
-        if (fileVidio && fileVidio.size > 1500 * 1024 * 1024) {
-            feedbackMessage.textContent = 'Error: Video tidak boleh lebih dari 1.5GB.';
+        if (fileVidio && fileVidio.size > 300 * 1024 * 1024) {
+            feedbackMessage.textContent = 'Error: Video tidak boleh lebih dari 300MB.';
             feedbackMessage.classList.add('alert', 'alert-danger');
             return false; // Tidak valid
         }
