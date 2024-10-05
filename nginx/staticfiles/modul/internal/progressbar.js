@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function untuk validasi ukuran file
     function validateFiles() {
         const fileModul = inputFileModul.files[0];
-        const fileVidio = inputFileVidio ? inputFileVidio.files[0] : null;
+        const fileVidio = inputFileVidio.files[0];
 
         // Cek ukuran file modul (maks 100MB)
         if (fileModul && fileModul.size > 100 * 1024 * 1024) {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Cek ukuran file vidio (maks 200MB)
-        if (fileVidio && fileVidio.size > 300 * 1024 * 1024) {
+        if (fileVidio && fileVidio.size > 10 * 1024 * 1024) {
             feedbackMessage.textContent = 'Error: Video tidak boleh lebih dari 300MB.';
             feedbackMessage.classList.add('alert', 'alert-danger');
             return false; // Tidak valid
