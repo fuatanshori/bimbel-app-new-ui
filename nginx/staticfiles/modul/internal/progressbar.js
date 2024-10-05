@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressText = document.getElementById('progressText');
     const cancelButton = document.getElementById('cancelButton');
     const feedbackMessage = document.getElementById('feedbackMessage');
+    const submitButton = document.getElementById('submitButton'); // Assuming you have a submit button
     let xhr;
 
     // Function untuk validasi ukuran file dan tipe file
@@ -55,6 +56,14 @@ document.addEventListener('DOMContentLoaded', function() {
         progressModal.show();
         feedbackMessage.textContent = ''; // Hapus pesan sebelumnya
         feedbackMessage.classList.remove('alert-danger', 'alert-warning', 'alert-success');
+        
+        // Reset progress bar
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', 0);
+        progressText.textContent = '0%';
+
+        // Disable the submit button to prevent multiple uploads
+        submitButton.disabled = true;
 
         // Update progress bar
         xhr.upload.addEventListener('progress', function(e) {
@@ -68,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Handle response dari server
         xhr.onload = function() {
+            submitButton.disabled = false; // Enable the submit button after upload is done
             if (xhr.status >= 200 && xhr.status < 300) {
                 const response = JSON.parse(xhr.responseText);
                 if (response.message === "data uploaded") {
@@ -89,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         xhr.onerror = function() {
+            submitButton.disabled = false; // Enable the submit button on error
             progressModal.hide();
             feedbackMessage.textContent = 'Network error: Upload failed.';
             feedbackMessage.classList.add('text-danger');
@@ -116,5 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
         progressModal.hide();
         feedbackMessage.textContent = 'Upload canceled.';
         feedbackMessage.classList.add('alert', 'alert-warning');
+        submitButton.disabled = false; // Enable the submit button on cancel
     });
 });
