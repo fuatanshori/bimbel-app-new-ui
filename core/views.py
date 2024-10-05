@@ -9,7 +9,7 @@ import os
 import io
 from datetime import datetime, timedelta
 import hashlib
-import re
+
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat pdf. admin/pemateri
 @login_required(login_url="user:masuk")
@@ -58,37 +58,6 @@ def vidio_protect_membership(request,vidio_file):
             user=request.user, transaksi_status="settlement")
         if transaksi_obj:
             if os.path.exists(video_path):
-                # Open the video file for reading
-                file_size = os.path.getsize(video_path)
-                range_header = request.META.get('HTTP_RANGE', None)
-
-                if range_header:
-                    # Handle range requests
-                    range_match = re.search(r'bytes=(\d+)-(\d*)', range_header)
-                    if range_match:
-                        start = int(range_match.group(1))
-                        if range_match.group(2):
-                            end = int(range_match.group(2))
-                        else:
-                            end = file_size - 1
-
-                        if start > end or start < 0 or end >= file_size:
-                            return HttpResponse(status=416)
-
-                        # Read the specified range of the video file
-                        with open(video_path, 'rb') as f:
-                            f.seek(start)
-                            data = f.read(end - start + 1)
-
-                        response = HttpResponse(data, status=206)
-                        response['Content-Type'] = 'video/mp4'
-                        response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
-                        response['Content-Range'] = f'bytes {start}-{end}/{file_size}'
-                        response['Content-Length'] = str(end - start + 1)
-
-                        return response
-
-                # If no range header, serve the whole file
                 response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
                 response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
                 return response
