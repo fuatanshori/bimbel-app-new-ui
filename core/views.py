@@ -9,7 +9,6 @@ import os
 import io
 from datetime import datetime, timedelta
 import hashlib
-import os
 import re
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat pdf. admin/pemateri
@@ -51,18 +50,13 @@ def pdf_protect_membership(request, pdf_file):
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat vidio. admin/pemateri
 @login_required(login_url="user:masuk")
-def vidio_protect_membership(request, vidio_file):
+def vidio_protect_membership(request,vidio_file):
     media_path = os.path.join(settings.MEDIA_ROOT, 'vidio')
-    video_path = os.path.join(media_path, vidio_file)
-    
+    video_path = os.path.join(media_path,vidio_file)
     try:
-        # Validate that the user has a valid transaction
         transaksi_obj = Transaksi.objects.get(
-            user=request.user, transaksi_status="settlement"
-        )
-        
+            user=request.user, transaksi_status="settlement")
         if transaksi_obj:
-            # Check if the video file exists
             if os.path.exists(video_path):
                 # Handle range requests for skipping
                 range_header = request.META.get('HTTP_RANGE', None)
@@ -102,9 +96,17 @@ def vidio_protect_membership(request, vidio_file):
                 raise Http404("File tidak ditemukan")
         else:
             return redirect("menu:pembayaran")
-    
+            
     except Transaksi.DoesNotExist:
-        return redirect("menu:pembayaran")
+        if request.user.role in ["admin", "pemateri"]:
+            if os.path.exists(video_path):
+                response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+                response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+                return response
+            else:
+                raise Http404("File tidak ditemukan")
+        if request.user.role == "pelajar":
+            return redirect("menu:pembayaran")
 
 
 @login_required(login_url="user:masuk")
