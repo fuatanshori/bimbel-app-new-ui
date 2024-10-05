@@ -9,7 +9,11 @@ import os
 import io
 from datetime import datetime, timedelta
 import hashlib
-
+from django.utils.http import http_date
+import os
+import stat
+import mimetypes
+import re
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat pdf. admin/pemateri
 @login_required(login_url="user:masuk")
@@ -50,32 +54,58 @@ def pdf_protect_membership(request, pdf_file):
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat vidio. admin/pemateri
 @login_required(login_url="user:masuk")
-def vidio_protect_membership(request,vidio_file):
+def vidio_protect_membership(request, vidio_file):
     media_path = os.path.join(settings.MEDIA_ROOT, 'vidio')
-    video_path = os.path.join(media_path,vidio_file)
+    video_path = os.path.join(media_path, vidio_file)
+
     try:
         transaksi_obj = Transaksi.objects.get(
             user=request.user, transaksi_status="settlement")
-        if transaksi_obj:
-            if os.path.exists(video_path):
-                response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
-                response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
-                return response
-            else:
-                raise Http404("File tidak ditemukan")
-        else:
+        
+        if not transaksi_obj and request.user.role not in ["admin", "pemateri"]:
             return redirect("menu:pembayaran")
-            
-    except Transaksi.DoesNotExist:
-        if request.user.role in ["admin", "pemateri"]:
-            if os.path.exists(video_path):
-                response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
-                response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
-                return response
+
+        if not os.path.exists(video_path):
+            raise Http404("File tidak ditemukan")
+
+        # Get the file's stats
+        statobj = os.stat(video_path)
+        content_type, encoding = mimetypes.guess_type(video_path)
+        content_type = content_type or 'application/octet-stream'
+        
+        # Handle range request
+        if request.META.get('HTTP_RANGE'):
+            range_header = request.META['HTTP_RANGE'].strip()
+            range_match = re.match(r'bytes=(\d+)-(\d*)', range_header)
+            if range_match:
+                first_byte, last_byte = range_match.groups()
+                first_byte = int(first_byte) if first_byte else 0
+                last_byte = int(last_byte) if last_byte else statobj.st_size - 1
+                if last_byte >= statobj.st_size:
+                    last_byte = statobj.st_size - 1
+                length = last_byte - first_byte + 1
+                resp = HttpResponse(status=206)
+                resp.write(open(video_path, 'rb').read()[first_byte:last_byte+1])
+                resp['Content-Range'] = 'bytes %s-%s/%s' % (first_byte, last_byte, statobj.st_size)
+                resp['Content-Length'] = str(length)
+                resp['Content-Type'] = content_type
             else:
-                raise Http404("File tidak ditemukan")
+                return HttpResponse(status=416)
+        else:
+            # Normal response
+            resp = HttpResponse(open(video_path, 'rb').read())
+            resp['Content-Type'] = content_type
+            resp['Content-Length'] = statobj.st_size
+        
+        resp['Accept-Ranges'] = 'bytes'
+        resp['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+        resp['Last-Modified'] = http_date(statobj.st_mtime)
+        return resp
+
+    except Transaksi.DoesNotExist:
         if request.user.role == "pelajar":
             return redirect("menu:pembayaran")
+        raise Http404("Akses ditolak")
 
 
 @login_required(login_url="user:masuk")
