@@ -9,6 +9,7 @@ import os
 import io
 from datetime import datetime, timedelta
 import hashlib
+from django.http import StreamingHttpResponse
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat pdf. admin/pemateri
 @login_required(login_url="user:masuk")
@@ -57,41 +58,27 @@ def vidio_protect_membership(request, vidio_file):
     if not os.path.exists(video_path):
         raise Http404("File tidak ditemukan")
 
-    # Cek transaksi
     try:
         transaksi_obj = Transaksi.objects.get(user=request.user, transaksi_status="settlement")
         
-        # Dapatkan ukuran file
-        file_size = os.path.getsize(video_path)
-
-        # Cek header Range
-        range_header = request.META.get('HTTP_RANGE', None)
-        if range_header:
-            # Mendapatkan rentang dari header
-            range_value = range_header.split('=')[1]
-            start, end = map(int, range_value.split('-'))
-            length = end - start + 1
-            
-            # Pastikan rentang yang diminta valid
-            if start >= file_size or end >= file_size:
-                raise Http404("File tidak ditemukan")
-
-            # Siapkan response dengan rentang yang diminta
-            response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
-            response['Content-Range'] = f'bytes {start}-{end}/{file_size}'
-            response['Content-Length'] = length
-            response.status_code = 206  # Partial Content
-            response.seek(start)  # Pindahkan ke posisi awal dari rentang
-            return response
-        else:
-            # Jika tidak ada rentang, kirim seluruh file
-            return FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+        # Jika transaksi valid
+        response = StreamingHttpResponse(open(video_path, 'rb'), content_type='video/mp4')
+        response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+        response['Accept-Ranges'] = 'bytes'
+        return response
 
     except Transaksi.DoesNotExist:
+        # Cek role pengguna
         if request.user.role in ["admin", "pemateri"]:
-            return FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+            # Pengguna memiliki akses sebagai admin/pemateri
+            response = StreamingHttpResponse(open(video_path, 'rb'), content_type='video/mp4')
+            response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+            response['Accept-Ranges'] = 'bytes'
+            return response
         else:
+            # Pengguna tidak memiliki akses, redirect ke halaman pembayaran
             return redirect("menu:pembayaran")
+
 
 @login_required(login_url="user:masuk")
 def soal_media_protect(request, image_file):
