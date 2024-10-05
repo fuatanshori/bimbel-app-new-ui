@@ -4,6 +4,7 @@ const messageInput = document.getElementById('message-input');
 const sendButton = document.getElementById('send-button');
 const getModulId = document.getElementById("idModul");
 const idModul = getModulId.getAttribute("data-id");
+console.log("js conncted")
 function connectWebSocket() {
     chatSocket = new WebSocket(
         'wss://' + window.location.host + `/ws/chat/${idModul}/`
