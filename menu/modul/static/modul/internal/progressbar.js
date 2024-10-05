@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const feedbackMessage = document.getElementById('feedbackMessage');
     let xhr;
 
-    // Function untuk validasi ukuran file
+    // Function untuk validasi ukuran file dan tipe file
     function validateFiles() {
         const fileModul = inputFileModul.files[0];
         const fileVidio = inputFileVidio.files[0];
@@ -21,9 +21,23 @@ document.addEventListener('DOMContentLoaded', function() {
             return false; // Tidak valid
         }
 
-        // Cek ukuran file vidio (maks 200MB)
-        if (fileVidio && fileVidio.size > 10 * 1024 * 1024) {
+        // Cek tipe file modul (hanya .pdf)
+        if (fileModul && !fileModul.name.endsWith('.pdf')) {
+            feedbackMessage.textContent = 'Error: File modul harus berformat PDF.';
+            feedbackMessage.classList.add('alert', 'alert-danger');
+            return false; // Tidak valid
+        }
+
+        // Cek ukuran file vidio (maks 300MB)
+        if (fileVidio && fileVidio.size > 300 * 1024 * 1024) {
             feedbackMessage.textContent = 'Error: Video tidak boleh lebih dari 300MB.';
+            feedbackMessage.classList.add('alert', 'alert-danger');
+            return false; // Tidak valid
+        }
+
+        // Cek tipe file vidio (hanya .mp4)
+        if (fileVidio && !fileVidio.name.endsWith('.mp4')) {
+            feedbackMessage.textContent = 'Error: File video harus berformat MP4.';
             feedbackMessage.classList.add('alert', 'alert-danger');
             return false; // Tidak valid
         }
