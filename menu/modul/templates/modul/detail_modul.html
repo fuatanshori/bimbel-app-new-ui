@@ -75,11 +75,16 @@
               <p>Jika Browser anda Tidak mendukung <a href="{{ modul_obj.vidio.url }}">lihat Vidio</a> untuk melihatnya.</p>
               <div id="trailer" class="section d-flex justify-content-center">
                 <div class="ratio ratio-16x9" style="max-width: 100%;">
-                  <video class="embed-responsive-item" controls>
-                    <source src="{{modul_obj.vidio.url}}" type="video/mp4">
-                  </video>
+                    <video id="videoPlayer" class="embed-responsive-item" controls>
+                        <source src="{{ modul_obj.vidio.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-controls">
+                        <button id="rewindButton">Rewind 15 seconds</button>
+                        <button id="skipButton">Skip 15 seconds</button>
+                    </div>
                 </div>
-              </div>
+            </div>
             </div>
             {% endif %}
           </div>
@@ -87,6 +92,16 @@
       </div>
     </div>
   </div>
+<script>
+    const video = document.getElementById('videoPlayer');
 
+    document.getElementById('rewindButton').addEventListener('click', function() {
+        video.currentTime = Math.max(0, video.currentTime - 15); // Rewind 15 seconds
+    });
+
+    document.getElementById('skipButton').addEventListener('click', function() {
+        video.currentTime = Math.min(video.duration, video.currentTime + 15); // Skip 15 seconds
+    });
+</script>
 {% endblock content %}
 
