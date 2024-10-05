@@ -50,58 +50,52 @@ def pdf_protect_membership(request, pdf_file):
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat vidio. admin/pemateri
 @login_required(login_url="user:masuk")
-def vidio_protect_membership(request, vidio_file):
+def vidio_protect_membership(request,vidio_file):
     media_path = os.path.join(settings.MEDIA_ROOT, 'vidio')
-    video_path = os.path.join(media_path, vidio_file)
-
+    video_path = os.path.join(media_path,vidio_file)
     try:
-        # Check if the user has the right to access the video
         transaksi_obj = Transaksi.objects.get(
-            user=request.user, transaksi_status="settlement"
-        )
-        if not transaksi_obj:
-            return redirect("menu:pembayaran")
+            user=request.user, transaksi_status="settlement")
+        if transaksi_obj:
+            if os.path.exists(video_path):
+                # Open the video file for reading
+                file_size = os.path.getsize(video_path)
+                range_header = request.META.get('HTTP_RANGE', None)
 
-        # Check if the video file exists
-        if os.path.exists(video_path):
-            # Open the video file for reading
-            file_size = os.path.getsize(video_path)
-            range_header = request.META.get('HTTP_RANGE', None)
+                if range_header:
+                    # Handle range requests
+                    range_match = re.search(r'bytes=(\d+)-(\d*)', range_header)
+                    if range_match:
+                        start = int(range_match.group(1))
+                        if range_match.group(2):
+                            end = int(range_match.group(2))
+                        else:
+                            end = file_size - 1
 
-            if range_header:
-                # Handle range requests
-                range_match = re.search(r'bytes=(\d+)-(\d*)', range_header)
-                if range_match:
-                    start = int(range_match.group(1))
-                    if range_match.group(2):
-                        end = int(range_match.group(2))
-                    else:
-                        end = file_size - 1
+                        if start > end or start < 0 or end >= file_size:
+                            return HttpResponse(status=416)
 
-                    if start > end or start < 0 or end >= file_size:
-                        return HttpResponse(status=416)
+                        # Read the specified range of the video file
+                        with open(video_path, 'rb') as f:
+                            f.seek(start)
+                            data = f.read(end - start + 1)
 
-                    # Read the specified range of the video file
-                    with open(video_path, 'rb') as f:
-                        f.seek(start)
-                        data = f.read(end - start + 1)
+                        response = HttpResponse(data, status=206)
+                        response['Content-Type'] = 'video/mp4'
+                        response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+                        response['Content-Range'] = f'bytes {start}-{end}/{file_size}'
+                        response['Content-Length'] = str(end - start + 1)
 
-                    response = HttpResponse(data, status=206)
-                    response['Content-Type'] = 'video/mp4'
-                    response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
-                    response['Content-Range'] = f'bytes {start}-{end}/{file_size}'
-                    response['Content-Length'] = str(end - start + 1)
+                        return response
 
-                    return response
-
-            # If no range header, serve the whole file
-            response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
-            response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
-            return response
+                # If no range header, serve the whole file
+                response = FileResponse(open(video_path, 'rb'), content_type='video/mp4')
+                response['Content-Disposition'] = f'inline; filename="{vidio_file}"'
+                return response
+            else:
+                raise Http404("File tidak ditemukan")
         else:
-            raise Http404("File tidak ditemukan")
-    except Transaksi.DoesNotExist:
-        return redirect("menu:pembayaran")
+            return redirect("menu:pembayaran")
             
     except Transaksi.DoesNotExist:
         if request.user.role in ["admin", "pemateri"]:
