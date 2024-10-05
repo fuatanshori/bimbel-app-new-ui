@@ -79,10 +79,6 @@
                         <source src="{{ modul_obj.vidio.url }}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <div class="video-controls">
-                        <button id="rewindButton">Rewind 15 seconds</button>
-                        <button id="skipButton">Skip 15 seconds</button>
-                    </div>
                 </div>
             </div>
             </div>
@@ -92,16 +88,5 @@
       </div>
     </div>
   </div>
-<script>
-    const video = document.getElementById('videoPlayer');
-
-    document.getElementById('rewindButton').addEventListener('click', function() {
-        video.currentTime = Math.max(0, video.currentTime - 15); // Rewind 15 seconds
-    });
-
-    document.getElementById('skipButton').addEventListener('click', function() {
-        video.currentTime = Math.min(video.duration, video.currentTime + 15); // Skip 15 seconds
-    });
-</script>
 {% endblock content %}
 
