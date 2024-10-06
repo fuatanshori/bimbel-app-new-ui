@@ -5,7 +5,7 @@ from menu.pembayaran.models import Transaksi
 from .models import Chat, Modul
 from menu.utils.encode_url import decode_id
 from django.utils import timezone
-
+from django.utils import timezone
 class ChatConsumers(AsyncWebsocketConsumer):
     async def connect(self):
         self.id = self.scope["url_route"]["kwargs"]["group_id"]
@@ -41,7 +41,7 @@ class ChatConsumers(AsyncWebsocketConsumer):
                 'message': message,
                 'user_id': str(self.user.pk),
                 'full_name': self.user.full_name,
-                'timestamp': chat_obj.timestamp.strftime("%B %d, %Y %H:%M")
+                'timestamp': timezone.localtime(chat_obj.timestamp).strftime("%B %d, %Y %H:%M")
             }
         )
 
