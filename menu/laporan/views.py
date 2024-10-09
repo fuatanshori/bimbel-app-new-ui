@@ -1,7 +1,6 @@
 from django.shortcuts import render
-from menu.pembayaran.models import Transaksi
+from menu.pembayaran.models import Transaksi,Tarif,Diskon
 from django.db.models import Q
-from django.utils import timezone
 from django.contrib import messages
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
@@ -23,3 +22,17 @@ def laporan_transaksi(request):
         "transaksi_objs": transaksi_objs,
     }
     return render(request, 'laporan/laporan_transaksi.html', context)
+
+
+@login_required(login_url='user:masuk')
+@admin_required
+def laporan_tarif(request):
+    cari_tarif = request.GET.get('cari_tarif', "")
+    tarif_objs = Tarif.objects.filter(Q(subject__icontains=cari_tarif)
+    ).prefetch_related('diskon_set')
+    if not tarif_objs.exists():
+        messages.warning(request, "Tidak ada tarif ditemukan.")
+    context = {
+        "tarif_objs": tarif_objs,
+    }
+    return render(request, 'laporan/laporan_tarif.html', context)

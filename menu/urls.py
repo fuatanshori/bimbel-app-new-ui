@@ -93,7 +93,12 @@ urlpatterns+=[
 # laporan
 urlpatterns+=[
     path("laporan/",views_laporan.laporan,name="laporan"),
+
     path("laporan/transaksi/",views_laporan.laporan_transaksi,name="laporan-transaksi"),
     path("laporan/transaksi-excel/",laporan_export_views.export_transaksi_excel,name="transaksi-excel"),
-    path("laporan/transaksi-csv/",laporan_export_views.export_transaksi_csv,name="transaksi-csv")
+    path("laporan/transaksi-csv/",laporan_export_views.export_transaksi_csv,name="transaksi-csv"),
+
+    path("laporan/tarif/",views_laporan.laporan_tarif,name="laporan-tarif"),
+    path("laporan/tarif-excel/",laporan_export_views.export_tarif_excel,name="tarif-excel"),
+    path("laporan/tarif-csv/",laporan_export_views.export_tarif_csv,name="tarif-csv"),
 ]
