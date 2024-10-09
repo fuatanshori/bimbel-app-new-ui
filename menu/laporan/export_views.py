@@ -2,28 +2,35 @@ import pandas as pd
 from django.http import HttpResponse
 from django.utils import timezone
 from menu.pembayaran.models import Transaksi
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.db.models import Q
+from core.utils.decorator import admin_pemateri_required,admin_required
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='user:masuk')
+@admin_required
 def export_transaksi_excel(request):
-    # Mengambil query params untuk rentang tanggal
     dari_tanggal = request.GET.get('dari_tanggal')
     sampai_tanggal = request.GET.get('sampai_tanggal')
 
-    # Mengonversi string tanggal menjadi objek datetime
     if dari_tanggal and sampai_tanggal:
         try:
             dari_tanggal = timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d')
             sampai_tanggal = timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d')
+            if dari_tanggal > sampai_tanggal:
+                messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
+                return redirect("menu:laporan-transaksi")
         except ValueError:
-            return HttpResponse("Format tanggal tidak valid. Gunakan YYYY-MM-DD.", status=400)
-        
-        # Filter transaksi berdasarkan rentang tanggal
-        transaksi_data = Transaksi.objects.select_related('user', 'tarif', 'diskon').filter(
-            transaction_time__date__range=(dari_tanggal, sampai_tanggal)
-        )
-    else:
-        # Jika tidak ada rentang tanggal, ambil semua data transaksi
-        transaksi_data = Transaksi.objects.select_related('user', 'tarif', 'diskon').all()
-
+            messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
+            return redirect("menu:laporan-transaksi")
+    
+    filters = Q()
+    if dari_tanggal:
+        filters &= Q(transaction_time__date__gte=dari_tanggal)
+    if sampai_tanggal:
+        filters &= Q(transaction_time__date__lte=sampai_tanggal)
+    transaksi_data = Transaksi.objects.filter(filters) if filters else Transaksi.objects.all()
     data = []
     
     for transaksi in transaksi_data:
@@ -35,10 +42,7 @@ def export_transaksi_excel(request):
         diskon_persen = diskon.persentase_diskon if diskon else 0
         diskon_nama = diskon.diskon_name if diskon else "N/A"
 
-        # Mengonversi transaction_time ke naive datetime (tanpa timezone)
-        transaction_time = transaksi.transaction_time.astimezone().replace(tzinfo=None) if transaksi.transaction_time else 'N/A'
-
-        # Menambahkan data transaksi ke dalam list
+        transaction_time = transaksi.transaction_time.astimezone().replace(tzinfo=None).strftime("%d/%m/%Y") if transaksi.transaction_time else 'N/A'
         data.append({
             'ID Transaksi': transaksi.id_transaksi,
             'Nama Pengguna': user_name,
@@ -51,47 +55,39 @@ def export_transaksi_excel(request):
             'Waktu Transaksi': transaction_time,
         })
 
-    # Mengonversi data ke dalam DataFrame pandas
     df = pd.DataFrame(data)
-
-    # Membuat file Excel
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=Laporan_Transaksi.xlsx'
-
-    # Menggunakan Pandas untuk menulis data ke Excel
     with pd.ExcelWriter(response, engine='openpyxl') as writer:
         df.to_excel(writer, sheet_name='Laporan Transaksi', index=False)
 
     return response
 
 
-
-import pandas as pd
-from django.http import HttpResponse
-from django.utils import timezone
-
+@login_required(login_url='user:masuk')
+@admin_required
 def export_transaksi_csv(request):
-    # Mengambil query params untuk rentang tanggal
     dari_tanggal = request.GET.get('dari_tanggal')
     sampai_tanggal = request.GET.get('sampai_tanggal')
-
-    # Mengonversi string tanggal menjadi objek datetime
     if dari_tanggal and sampai_tanggal:
         try:
             dari_tanggal = timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d')
             sampai_tanggal = timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d')
+            if dari_tanggal > sampai_tanggal:
+                messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
+                return redirect("menu:laporan-transaksi")
         except ValueError:
-            return HttpResponse("Format tanggal tidak valid. Gunakan YYYY-MM-DD.", status=400)
+            messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
+            return redirect("menu:laporan-transaksi")
         
-        # Filter transaksi berdasarkan rentang tanggal
-        transaksi_data = Transaksi.objects.select_related('user', 'tarif', 'diskon').filter(
-            transaction_time__date__range=(dari_tanggal, sampai_tanggal)
-        )
-    else:
-        # Jika tidak ada rentang tanggal, ambil semua data transaksi
-        transaksi_data = Transaksi.objects.select_related('user', 'tarif', 'diskon').all()
-
+    filters = Q()
+    if dari_tanggal:
+        filters &= Q(transaction_time__date__gte=dari_tanggal)
+    if sampai_tanggal:
+        filters &= Q(transaction_time__date__lte=sampai_tanggal)
+    transaksi_data = Transaksi.objects.filter(filters) if filters else Transaksi.objects.all()
     data = []
+
     
     for transaksi in transaksi_data:
         user_name = transaksi.user.full_name if transaksi.user else 'N/A'
@@ -102,10 +98,7 @@ def export_transaksi_csv(request):
         diskon_persen = diskon.persentase_diskon if diskon else 0
         diskon_nama = diskon.diskon_name if diskon else "N/A"
 
-        # Mengonversi transaction_time ke naive datetime (tanpa timezone)
         transaction_time = transaksi.transaction_time.astimezone().replace(tzinfo=None) if transaksi.transaction_time else 'N/A'
-
-        # Menambahkan data transaksi ke dalam list
         data.append({
             'ID Transaksi': transaksi.id_transaksi,
             'Nama Pengguna': user_name,
@@ -118,14 +111,8 @@ def export_transaksi_csv(request):
             'Waktu Transaksi': transaction_time,
         })
 
-    # Mengonversi data ke dalam DataFrame pandas
     df = pd.DataFrame(data)
-
-    # Membuat file CSV
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=Laporan_Transaksi.csv'
-
-    # Menggunakan Pandas untuk menulis data ke CSV
     df.to_csv(response, index=False)
-
     return response

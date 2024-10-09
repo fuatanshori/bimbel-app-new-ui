@@ -1,0 +1,196 @@
+{% extends "menu_base.html" %}
+{% load static %}
+{% block title %}Menu{% endblock title %}
+{% block content %}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row justify-content-center">
+        <div class="card">
+            <h5 class="card-header">Transaksi</h5>
+            <div class="card-body">
+                <form method="get" class="mb-3">
+                    <div class="row mb-3">
+                        <div class="col-md-12 mb-2">
+                            <label for="cari_transaksi" class="form-label">Cari Transaksi:</label>
+                            <input 
+                                id="cari_transaksi" 
+                                type="text" 
+                                name="cari_transaksi" 
+                                value="{{ request.GET.cari_transaksi }}" 
+                                class="form-control text-black" 
+                                placeholder="Cari Id Transaksi"
+                            >
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-start gap-2">
+                        <button type="submit" class="btn btn-primary col-6 col-lg-2">Filter</button>
+                        <a href="{% url 'menu:laporan-transaksi' %}" class="btn btn-dark text-white col-6 col-lg-2">Reset</a>
+                    </div>
+                </form>
+                <div class="d-flex flex-column flex-lg-row gap-2 mb-3">
+                    <a href="{% url "menu:laporan" %}" class="btn btn-dark col-12 col-lg-2 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
+                    <button data-bs-toggle="modal"data-bs-target="#excelModal" class="btn btn-primary col-12 col-lg-5">Cetak Excel <i class="bx bxs-report"></i></button>
+                    <button data-bs-toggle="modal"data-bs-target="#csvModal" class="btn btn-dark col-12 col-lg-5">Cetak Csv <i class="bx bxs-report"></i></button>
+                </div>
+                {% if messages %}
+                    {% for message in messages %}
+                    <div id="message" class="container" data-duration="4000">
+                        <div{% if message.tags %} class="text-center alert alert-{{ message.tags }}"{% endif %}>
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                            <i class="fa-sharp fa-solid fa-triangle-exclamation"></i>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                <div class="table-responsive text-nowrap">
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr>
+                                <th>Id Transaksi</th>
+                                <th>Nama Pengguna</th>
+                                <th>Layanan Pembayaran</th>
+                                <th>Harga Awal</th>
+                                <th>Nama Diskon</th>
+                                <th>Presentase Diskon</th>
+                                <th>Status Transaksi</th>
+                                <th>Harga Akhir</th>
+                                <th>Waktu Transaksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if transaksi_objs %}
+                                {% for transaksi_obj in transaksi_objs %}
+                                <tr>
+                                    <td>{{ transaksi_obj.pk }}</td>
+                                    <td>{{ transaksi_obj.user.full_name }}</td>
+                                    <td>{{ transaksi_obj.layanan_pembayaran }}</td>
+                                    <td>{{ transaksi_obj.tarif.harga }}</td>
+                                    <td>{% if transaksi_obj.diskon %}{{ transaksi_obj.diskon.diskon_name }}{% else %}None{% endif %}</td>
+                                    <td>{% if transaksi_obj.diskon %}{{ transaksi_obj.diskon.persentase_diskon }}%{% else %}None{% endif %}</td>
+                                    <td>
+                                        {% if transaksi_obj.transaksi_status == 'settlement' %}
+                                            <label class="badge bg-primary">Telah Dibayar</label>
+                                        {% elif transaksi_obj.transaksi_status == 'pending' %}
+                                            <label class="badge bg-danger">Belum Dibayar</label>
+                                        {% elif transaksi_obj.transaksi_status == 'expire' %}
+                                            <label class="badge bg-danger">Pembayaran Melebihi Batas Waktu</label>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ transaksi_obj.harga }}</td>
+                                    <td>{{ transaksi_obj.transaction_time }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" class="text-center">Tidak ada transaksi ditemukan.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="excelModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="excelModalnTitle"></h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <form method="GET" action="{% url "menu:transaksi-excel" %}">
+                  {% csrf_token %}
+                <div class="modal-body">
+                  <div class="row g-2">
+                    <div class="col mb-2">
+                        <label for="dari_tanggal" class="form-label">Dari Tanggal:</label>
+                        <input 
+                            id="dari_tanggal" 
+                            type="date" 
+                            name="dari_tanggal"
+                            class="form-control text-black" 
+                        >
+                    </div>
+                    <div class="col mb-2">
+                        <label for="sampai_tanggal" class="form-label">Sampai Tanggal:</label>
+                        <input 
+                            id="sampai_tanggal" 
+                            type="date" 
+                            name="sampai_tanggal" 
+                            value="{{ request.GET.sampai_tanggal }}" 
+                            class="form-control text-black" 
+                        >
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Close
+                  </button>
+                  <button type="submit" class="btn btn-primary">Export</button>
+                </div>
+              </form>
+              </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="csvModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="csvModalnTitle"></h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <form method="GET" action="{% url "menu:transaksi-csv" %}">
+                  {% csrf_token %}
+                <div class="modal-body">
+                  <div class="row g-2">
+                    <div class="col mb-2">
+                        <label for="dari_tanggal" class="form-label">Dari Tanggal:</label>
+                        <input 
+                            id="dari_tanggal" 
+                            type="date" 
+                            name="dari_tanggal"
+                            class="form-control text-black" 
+                        >
+                    </div>
+                    <div class="col mb-2">
+                        <label for="sampai_tanggal" class="form-label">Sampai Tanggal:</label>
+                        <input 
+                            id="sampai_tanggal" 
+                            type="date" 
+                            name="sampai_tanggal" 
+                            value="{{ request.GET.sampai_tanggal }}" 
+                            class="form-control text-black" 
+                        >
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Close
+                  </button>
+                  <button type="submit" class="btn btn-primary">Export</button>
+                </div>
+              </form>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+{% block script %}
+<script src="{% static "laporan/js/modal.js" %}"></script>
+{% endblock script %}

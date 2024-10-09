@@ -559,8 +559,6 @@ def menu_pembayaran(request):
 @login_required(login_url='user:masuk')
 @admin_required
 def pembayaran_admin_list(request):
-    if request.user.role != "admin":
-        raise Http404
     cari_transaksi=request.GET.get('cari_transaksi', None)
     if cari_transaksi:
         transaksi_objs=Transaksi.objects.filter(
@@ -718,80 +716,3 @@ def edit_diskon(request,id_tarif,id_diskon):
             page = request.GET.get('page') 
             return redirect(f"{reverse('menu:diskon', kwargs={'id_tarif': id_tarif})}?page={page}")
     raise Http404
-
-@login_required(login_url='user:masuk')
-@admin_pemateri_required
-def export_transaksi_csv(request):
-    # Create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="transaksi_report.csv"'
-
-    # Create a CSV writer object
-    writer = csv.writer(response)
-
-    # Write the header row
-    writer.writerow([
-        'ID Transaksi', 'User', 'Tarif', 'Harga', 'Transaksi Status',
-        'VA Number', 'Layanan Pembayaran', 'Transaction Time',
-        'QRCode Link', 'Deep Link Redirect', 'Expiry Time', 'Updated At'
-    ])
-
-    # Fetch data from the Transaksi model
-    transaksi_list = Transaksi.objects.all()
-
-    # Write data rows
-    for transaksi in transaksi_list:
-        writer.writerow([
-            transaksi.id_transaksi,
-            transaksi.user.full_name,  # Adjust this if you want a different user field
-            transaksi.tarif,  # Assuming the Tarif model has a __str__ method
-            transaksi.harga,
-            transaksi.transaksi_status,
-            transaksi.va_number,
-            transaksi.layanan_pembayaran,
-            transaksi.transaction_time,
-            transaksi.qrcode_link,
-            transaksi.deep_link_redirect,
-            transaksi.expiry_time,
-            transaksi.updated_at,
-        ])
-
-    return response
-
-@login_required(login_url='user:masuk')
-@admin_pemateri_required
-def laporan_excel(request):
-    response = HttpResponse(content_type='application/ms-excel')
-    date = datetime.datetime.now(pytz.timezone('Asia/Makassar')).strftime("%H:%M:%S_%m/%b/%Y")
-    response['Content-Disposition'] = f'attachment; filename="laporan_rekap_transaksi_{date}.xls"'
-    wb = xlwt.Workbook(encoding='utf-8')
-    ws = wb.add_sheet('Rekap Transaksi')
-
-    font_style = xlwt.XFStyle()
-    font_style.font.bold = True
-
-    ws.write_merge(0, 0, 0, 6, 'Laporan Rekap Transaksi/Pembayaran', font_style)
-    
-    columns = ['id_transaksi', 'email', 'nama', 'tarif', 'va number', 'layanan_pembayaran', 'status transaksi']
-
-    row_num = 1
-    for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
-
-    font_style = xlwt.XFStyle()
-
-    rows = Transaksi.objects.all().values_list('id_transaksi', 'user__email', 'user__full_name', 'harga', "va_number", 'layanan_pembayaran', 'transaksi_status')
-    
-    for row in rows:
-        row_num += 1
-        converted_row = list(row)
-        
-        converted_row[0] = str(row[0])
-        
-        converted_row[-1] = midtrans.PAYMENT_STATUS[row[-1]]
-        
-        for col_num in range(len(converted_row)):
-            ws.write(row_num, col_num, converted_row[col_num], font_style)
-    
-    wb.save(response)
-    return response
