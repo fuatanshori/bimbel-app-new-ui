@@ -15,6 +15,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = str(os.getenv("STATUS_DEBUG")).lower()=="true"
 # DEBUG = True
 
+
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS if host.strip()]
 CSRF_TRUSTED_ORIGINS = [str(os.getenv("CSRF_TRUSTED_ORIGINS"))]
@@ -23,6 +24,7 @@ CSRF_TRUSTED_ORIGINS = [str(os.getenv("CSRF_TRUSTED_ORIGINS"))]
 # Application definition
 
 INSTALLED_APPS = [
+    # "jazzmin",
     "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     'menu.ujian.apps.UjianConfig',
     'menu.nilai.apps.NilaiConfig',
     'menu.levelstudy.apps.LevelstudyConfig',
+    'menu.laporan.apps.LaporanConfig',
     
     'django_ckeditor_5',
     
@@ -136,7 +139,7 @@ else:
             'NAME': 'bimbel',
             'USER': 'root',
             'PASSWORD': 'mysqladmin',
-            'HOST': '127.0.0.1',
+            'HOST': '192.168.0.102',
             'PORT': '3306',
         }
     }
@@ -144,21 +147,21 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [("127.0.0.1","6379")],
+                "hosts": [("192.168.0.102","6379")],
             },
         },
     }
     CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'LOCATION': 'redis://192.168.0.102:6379/1',
         'OPTIONS': {
             }
         }
     }
-    CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
-    CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/2'
-    REDIS_URL = 'redis://127.0.0.1:6379'
+    CELERY_BROKER_URL = 'redis://192.168.0.102:6379/2'
+    CELERY_RESULT_BACKEND = 'redis://192.168.0.102:6379/2'
+    REDIS_URL = 'redis://192.168.0.102:6379'
     
 
 

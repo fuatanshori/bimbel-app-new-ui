@@ -96,17 +96,7 @@ def buat_pesanan(request):
         diskon_code = request.POST['layanan_pembayaran']
         diskon_code = str(diskon_code).split(" ")
         diskon_code = str(diskon_code[1])
-        try:
-            diskon_objs = Diskon.objects.all()
-            diskon_codes =[]
-            for i in diskon_objs:
-                diskon_codes.append(i.diskon_code)
-            if diskon_code != "":
-                if diskon_code not in diskon_codes:
-                    messages.error(request,"bad request")
-                    return redirect("menu:pembayaran")
-        except Diskon.DoesNotExist:
-            pass
+
         
         tarif_obj = Tarif.get_tarif_is_used()
         harga = 0 if tarif_obj is None else tarif_obj.harga
@@ -116,6 +106,7 @@ def buat_pesanan(request):
             diskon_harga = (persentase_diskon/100)*harga
         except Diskon.DoesNotExist:
             diskon_harga= 0
+            diskon_obj= None
 
         layanan_pembayaran = request.POST['layanan_pembayaran']
         layanan_pembayaran = str(layanan_pembayaran).split(" ")
@@ -183,6 +174,7 @@ def buat_pesanan(request):
                         user=request.user,
                         tarif=tarif_obj,
                         harga = resp_harga,
+                        diskon = diskon_obj,
                         id_transaksi=str(resp.get('transaction_id')),
                         transaksi_status=resp.get('transaction_status'),
                         layanan_pembayaran=resp.get("payment_type"),
@@ -200,6 +192,7 @@ def buat_pesanan(request):
                         user=request.user,
                         tarif=tarif_obj,
                         harga = resp_harga,
+                        diskon = diskon_obj,
                         id_transaksi=str(resp.get('transaction_id')),
                         transaksi_status=resp.get('transaction_status'),
                         va_number=resp.get('va_numbers')[0]['va_number'],
@@ -688,7 +681,6 @@ def add_diskon(request, id_tarif):
             messages.success(request, "Selamat, Diskon berhasil ditambahkan")
             return redirect("menu:diskon",id_tarif=id_tarif)
         else:
-            print("not a valid")
             error_messages = []
             for _, errors in diskon_form.errors.items():
                 for error in errors:

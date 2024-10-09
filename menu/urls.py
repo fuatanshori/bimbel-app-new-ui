@@ -6,7 +6,8 @@ from .ujian import views as views_ujian
 from .nilai import views as views_nilai
 from .mapel import views as views_mapel
 from .levelstudy import views as views_levelstudy
-
+from .laporan import export_views as laporan_export_views
+from .laporan import views as views_laporan
 # menu
 urlpatterns = [
     path('', views_menu.menu, name='menu'),
@@ -89,4 +90,10 @@ urlpatterns+=[
     path('levelstudy/tambah-levelstudy/',views_levelstudy.tambah_levelstudy,name="tambah-levelstudy"),
     path('levelstudy/hapus-levelstudy/<id_levelstudy>/',views_levelstudy.hapus_levelstudy,name="hapus-levelstudy"),
     path('levelstudy/edit-levelstudy/<id_levelstudy>/',views_levelstudy.edit_levelstudy,name="edit-levelstudy"),
+]
+
+# laporan
+urlpatterns+=[
+    path("laporan/transaksi-excel/",laporan_export_views.export_transaksi_excel,name="transaksi-excel"),
+    path("laporan/transaksi-csv/",laporan_export_views.export_transaksi_csv,name="transaksi-csv")
 ]

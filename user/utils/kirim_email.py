@@ -1,6 +1,4 @@
-from core.utils.get_request import current_request
 from django.core.mail import EmailMessage
-from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from celery import shared_task
 

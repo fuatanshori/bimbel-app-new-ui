@@ -3,6 +3,15 @@
 <div class="container-xxl flex-grow-1 container-p-y">
   <!-- Basic Layout & Basic with Icons -->
 <div class="row">
+    {% if mapel_forms.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, errors in mapel_forms.errors.items %}
+                <li>{{ field }}: {{ errors|striptags }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
   <!-- Basic Layout -->
   <div class="col-xxl">
     <div class="card mb-4">
@@ -16,14 +25,12 @@
             <label class="col-sm-2 col-form-label" for="id_nama_mapel">Nama Mapel</label>
             <div class="col-sm-10">
               {{ mapel_forms.nama_mapel }}
-              <small class="text-muted">{{ mapel_forms.nama_mapel.errors }}</small>
             </div>
           </div>
           <div class="row mb-3">
             <label class="col-sm-2 col-form-label" for="id_nama_mapel">Description</label>
             <div class="col-sm-10">
               {{ mapel_forms.description }}
-              <small class="text-muted">{{ mapel_forms.description.errors }}</small>
             </div>
           </div>
           <div class="row justify-content-end">

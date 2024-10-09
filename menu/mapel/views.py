@@ -78,11 +78,11 @@ def tambah_mapel(request, id_levelstudy):
                 messages.success(request, f"Selamat mata pelajaran {nama_mapel} berhasil ditambahkan")
                 return redirect("menu:mapel", id_levelstudy=id_levelstudy)
             except ValidationError:
-                mapel_forms.add_error(None, f"Mata pelajaran dengan nama {nama_mapel} telah dibuat untuk level studi ini.")
+                mapel_forms.add_error("nama_mapel", f"Mata pelajaran dengan nama {nama_mapel} telah dibuat untuk level studi ini.")
                 
     else:
         mapel_forms = MapelForm()
-    
+    print(mapel_forms.errors.as_text())
     context = {
         "mapel_forms": mapel_forms,
         "id_levelstudy": id_levelstudy,
@@ -96,7 +96,6 @@ def edit_mapel(request, id_levelstudy, id_mapel):
     pk_levelstudy = decode_id(id_levelstudy)
     pk_mapel = decode_id(id_mapel)
     mapel_obj = get_object_or_404(MataPelajaran, pk=pk_mapel, level_study__pk=pk_levelstudy)
-    print(mapel_obj)
     if request.method == "POST":
         mapel_forms = MapelForm(request.POST, instance=mapel_obj)
         if mapel_forms.is_valid():

@@ -59,7 +59,7 @@ class Diskon(models.Model):
         if ' ' in self.diskon_code:
             raise ValidationError('diskon code tidak boleh spasi.')
         if self.persentase_diskon > 99 or self.persentase_diskon < 1:
-            raise ValidationError(f'diskon tidak boleh melebihi 99 persen atau kurang dari 0 persen')
+            raise ValidationError(f'diskon tidak boleh melebihi 99 persen atau kurang dari 1 persen')
     
     def get_id_safe(self):
         return encode_id(self.pk)
@@ -72,6 +72,7 @@ class Transaksi(models.Model):
     transaksi_status    = models.CharField(max_length=15, choices=PAYMENT_STATUS,db_index=True)
     va_number           = models.CharField(max_length=18, null=True, blank=True)
     layanan_pembayaran  = models.CharField(max_length=10, null=True, blank=True)
+    diskon              = models.ForeignKey(Diskon,null=True,blank=True,on_delete=models.SET_NULL)
     transaction_time    = models.DateTimeField(null=True, blank=True)
     qrcode_link         = models.TextField(null=True,blank=True)
     deep_link_redirect  = models.TextField(null=True,blank=True)

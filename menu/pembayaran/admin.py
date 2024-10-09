@@ -31,9 +31,7 @@ class TarifAdmin(admin.ModelAdmin):
             
 @admin.register(Transaksi)
 class TransaksiAdmin(admin.ModelAdmin):
-    list_display =["id_transaksi","user","harga","transaksi_status","va_number","layanan_pembayaran","transaction_time","expiry_time"]
-    readonly_fields = ["id_transaksi","va_number","qrcode_link","deep_link_redirect","layanan_pembayaran","transaction_time","expiry_time"]
-# @admin.register(Diskon)
-# class DiskonAdmin(admin.ModelAdmin):
-#     pass
+    list_display =["id_transaksi","user","harga","transaksi_status","va_number","layanan_pembayaran","expiry_time"]
+    readonly_fields = ["id_transaksi","va_number","qrcode_link","deep_link_redirect","layanan_pembayaran","expiry_time"]
+
 

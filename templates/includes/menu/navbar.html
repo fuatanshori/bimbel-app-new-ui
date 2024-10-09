@@ -59,6 +59,14 @@
               </a>
             </li>
             <li><div class="dropdown-divider"></div></li>
+            {% if request.user.role == "admin" %}
+            <li>
+              <a class="dropdown-item" href="{% url "admin:index" %}">
+                <i class="bx bx-cog me-2"></i>
+                <span class="align-middle">Administrator</span>
+              </a>
+            </li>
+            {% endif %}   
             <li>
               <a class="dropdown-item" href="{% url 'user:keluar' %}">
                 <i class="bx bx-power-off me-2"></i>

@@ -5,7 +5,7 @@ from core.utils.decorator import admin_pemateri_required
 from .models import LevelStudy
 from .forms import LevelStudyForm
 from menu.utils.pagination import pagination_queryset
-from menu.utils.encode_url import encode_id,decode_id
+from menu.utils.encode_url import decode_id
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
