@@ -101,4 +101,8 @@ urlpatterns+=[
     path("laporan/tarif/",views_laporan.laporan_tarif,name="laporan-tarif"),
     path("laporan/tarif-excel/",laporan_export_views.export_tarif_excel,name="tarif-excel"),
     path("laporan/tarif-csv/",laporan_export_views.export_tarif_csv,name="tarif-csv"),
+
+    path("laporan/data-pelanggan/",views_laporan.laporan_data_pelanggan,name="laporan-data-pelanggan"),
+    path("laporan/data-pelanggan-excel/",laporan_export_views.export_data_pelanggan_excel,name="data-pelanggan-excel"),
+    path("laporan/data-pelanggan-csv/",laporan_export_views.export_data_pelanggan_csv,name="data-pelanggan-csv"),
 ]

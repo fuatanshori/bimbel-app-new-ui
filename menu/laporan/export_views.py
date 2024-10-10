@@ -1,7 +1,8 @@
 import pandas as pd
 from django.http import HttpResponse
 from django.utils import timezone
-from menu.pembayaran.models import Transaksi,Tarif,Diskon
+from menu.pembayaran.models import Transaksi,Tarif
+from user.models import Profile
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.db.models import Q,Prefetch
@@ -229,4 +230,60 @@ def export_tarif_csv(request):
     # Use Pandas to write the DataFrame to the CSV response
     df.to_csv(path_or_buf=response, index=False, encoding='utf-8')
 
+    return response
+
+@login_required(login_url='user:masuk')
+@admin_required
+def export_data_pelanggan_excel(request):
+    profiles = Profile.objects.all()
+    data = []
+    for profile in profiles:
+        data.append({
+            'Nama Lengkap': profile.nama_lengkap,
+            'Jenis Kelamin': profile.get_jenis_kelamin_display() if profile.jenis_kelamin else 'Tidak diisi',
+            'Tempat Tinggal': profile.tempat_tinggal if profile.tempat_tinggal else 'Tidak diisi',
+            'Nomor Telepon': profile.nomor_telepon if profile.nomor_telepon else 'Tidak diisi',
+            'Tanggal Lahir': profile.tanggal_lahir.strftime('%d %b. %Y') if profile.tanggal_lahir else 'Tidak diisi',
+            'Role': profile.user.role,
+            'Tanggal Bergabung': profile.user.date_joined.strftime('%d %b. %Y') if profile.user else 'Tidak diisi',
+            'Last Login': profile.user.last_login.strftime('%d %b. %Y %H:%M:%S') if profile.user.last_login else 'Belum pernah login',
+            'Created At': profile.user.date_joined.strftime('%d %b. %Y') if profile.user else 'Tidak diisi',
+        })
+
+    # Mengonversi data ke DataFrame pandas
+    df = pd.DataFrame(data)
+
+    # Membuat respons Excel
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=Laporan_Data_Pelanggan.xlsx'
+
+    # Menulis data ke file Excel
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Data Pelanggan', index=False)
+
+    return response
+
+
+@login_required(login_url='user:masuk')
+@admin_required
+def export_data_pelanggan_csv(request):
+    profiles = Profile.objects.all()
+    data = []
+    for profile in profiles:
+        data.append({
+            'Nama Lengkap': profile.nama_lengkap,
+            'Jenis Kelamin': profile.get_jenis_kelamin_display() if profile.jenis_kelamin else 'Tidak diisi',
+            'Tempat Tinggal': profile.tempat_tinggal if profile.tempat_tinggal else 'Tidak diisi',
+            'Nomor Telepon': profile.nomor_telepon if profile.nomor_telepon else 'Tidak diisi',
+            'Tanggal Lahir': profile.tanggal_lahir.strftime('%d %b. %Y') if profile.tanggal_lahir else 'Tidak diisi',
+            'Role': profile.user.role if profile.user else 'Tidak diisi',
+            'Tanggal Bergabung': profile.user.date_joined.strftime('%d %b. %Y') if profile.user else 'Tidak diisi',
+            'Last Login': profile.user.last_login.strftime('%d %b. %Y %H:%M:%S') if profile.user.last_login else 'Belum pernah login',
+            'Created At': profile.user.date_joined.strftime('%d %b. %Y') if profile.user else 'Tidak diisi',
+        })
+
+    df = pd.DataFrame(data)
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Laporan_Data_Pelanggan.csv'
+    df.to_csv(path_or_buf=response, index=False, encoding='utf-8')
     return response

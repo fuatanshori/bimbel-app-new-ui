@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from menu.pembayaran.models import Transaksi,Tarif,Diskon
+from menu.pembayaran.models import Transaksi,Tarif
 from django.db.models import Q
 from django.contrib import messages
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
+from user.models import Profile
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
@@ -36,3 +37,17 @@ def laporan_tarif(request):
         "tarif_objs": tarif_objs,
     }
     return render(request, 'laporan/laporan_tarif.html', context)
+
+
+@login_required(login_url='user:masuk')
+@admin_required
+def laporan_data_pelanggan(request):
+    cari_pelanggan = request.GET.get('cari_pelanggan', "")
+    profile_objs = Profile.objects.filter(Q(nama_lengkap__icontains=cari_pelanggan)
+    )
+    if not profile_objs.exists():
+        messages.warning(request, "Tidak ada tarif ditemukan.")
+    context = {
+        "profile_objs": profile_objs,
+    }
+    return render(request,'laporan/laporan_data_pelanggan.html',context)
