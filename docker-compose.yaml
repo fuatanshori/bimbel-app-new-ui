@@ -26,7 +26,7 @@ services:
         condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health/"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
     networks:
@@ -41,10 +41,10 @@ services:
   # ASGI Server for Django
   django_app_bimbel_asgi:
     container_name: django_app_bimbel_asgi
+    image: fuatanshori12/bimbel-app
     build:
       context: .
       dockerfile: Dockerfile
-    image: fuatanshori12/bimbel-app
     env_file:
       - .env
     restart: always
@@ -61,7 +61,7 @@ services:
         condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
     networks:
@@ -72,6 +72,26 @@ services:
         limits:
           cpus: '2.0'
           memory: 6G
+  
+    celery_worker:
+      container_name: celery_worker
+      image: fuatanshori12/bimbel-app
+      build:
+        context: .
+        dockerfile: Dockerfile
+      command: celery -A core worker --loglevel=info
+      restart: always
+      env_file:
+        - .env
+      volumes:
+        - .:/app
+      networks:
+        - bimbel-net
+      deploy:
+        resources:
+          limits:
+            cpus: '1.0'  # Limit to 1 CPU
+            memory: 2G    # Limit to 2 GB
 
   redis_container:
     container_name: redis_container
@@ -115,25 +135,6 @@ services:
         limits:
           cpus: '1.0'  # Limit to 1 CPU
           memory: 4G    # Limit to 4 GB
-
-  celery_worker:
-    container_name: celery_worker
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: celery -A core worker --loglevel=info
-    restart: always
-    env_file:
-      - .env
-    volumes:
-      - .:/app
-    networks:
-      - bimbel-net
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'  # Limit to 1 CPU
-          memory: 2G    # Limit to 2 GB
 
   phpmyadmin:
     container_name: phpmyadmin
