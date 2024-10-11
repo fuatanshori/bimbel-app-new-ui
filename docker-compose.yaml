@@ -45,7 +45,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: fuatanshori12/bimbel-app
     env_file:
       - .env
     restart: always
