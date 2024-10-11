@@ -4,7 +4,7 @@ global:
 scrape_configs:
   - job_name: 'django_app_bimbel_wsgi'
     static_configs:
-      - targets: ['192.168.1.101:443']
+      - targets: ['192.168.1.101:8001']
 
   - job_name: 'cadvisor'
     static_configs:
