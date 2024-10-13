@@ -10,13 +10,13 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-       - /home/fuatanshori/etc/letsencrypt:/etc/letsencrypt
+       - ~/letsencrypt:/etc/letsencrypt
        - certbot_www:/var/www/certbot
 
   certbot:
     image: certbot/certbot
     volumes:
-      - /home/fuatanshori/etc/letsencrypt:/etc/letsencrypt 
+      - ~/letsencrypt:/etc/letsencrypt 
       - certbot_www:/var/www/certbot    
 volumes:
   certbot_www:
