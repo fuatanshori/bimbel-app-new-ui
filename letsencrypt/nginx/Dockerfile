@@ -12,6 +12,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Copy script untuk memperbarui sertifikat
 COPY renew_certificates.sh /usr/local/bin/renew_certificates.sh
 RUN mkdir -p /var/www/certbot
+RUN sudo chmod -R 777 /var/www/certbot
 
 
 # Perintah untuk menjalankan Nginx
