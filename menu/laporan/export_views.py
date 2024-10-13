@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.db.models import Q,Prefetch
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
-
+from menu.mapel.models import MataPelajaran
 
 @login_required(login_url='user:masuk')
 @admin_required
@@ -286,4 +286,30 @@ def export_data_pelanggan_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=Laporan_Data_Pelanggan.csv'
     df.to_csv(path_or_buf=response, index=False, encoding='utf-8')
+    return response
+
+
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def export_data_mapel(request):
+    mata_pelajaran = MataPelajaran.objects.select_related('level_study').all()
+    
+    data = []
+    for mp in mata_pelajaran:
+        data.append({
+            'Nama Mata Pelajaran': mp.nama_mapel,
+            'Deskripsi': mp.description if mp.description else 'Tidak diisi',
+            'Level Studi': mp.level_study.level_study,
+            'Dibuat Pada': mp.created_at.strftime('%d %b. %Y'),
+            'Diupdate Pada': mp.updated_at.strftime('%d %b. %Y'),
+        })
+    
+    df = pd.DataFrame(data)
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=Laporan_Mata_Pelajaran.xlsx'
+
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Mata Pelajaran', index=False)
+
     return response
