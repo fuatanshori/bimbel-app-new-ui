@@ -232,7 +232,7 @@ services:
       - "443:443"
     volumes:
        - /etc/letsencrypt:/etc/letsencrypt
-       - ./certbot:/var/www/certbot:ro
+       - ./certbot:/var/www/certbot
     depends_on:
       django_app_bimbel_wsgi:
         condition: service_started
