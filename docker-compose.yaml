@@ -51,7 +51,7 @@ services:
     volumes:
       - .:/app
       - /etc/letsencrypt:/etc/letsencrypt
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -e  -b 0.0.0.0 -p 8000 --application-close-timeout 600 core.asgi:application"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne  -b 0.0.0.0 -p 8000 --application-close-timeout 600 core.asgi:application"
     depends_on:
       redis_container:
         condition: service_healthy
