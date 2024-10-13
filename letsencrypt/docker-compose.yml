@@ -11,12 +11,10 @@ services:
       - "443:443"
     volumes:
        - /etc/letsencrypt:/etc/letsencrypt
-       - certbot_www:/var/www/certbot
+       - /var/www/certbot:/var/www/certbot
 
   certbot:
     image: certbot/certbot
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt 
-      - certbot_www:/var/www/certbot    
-  volumes:
-    certbot_www:
+      - /var/www/certbot :/var/www/certbot    
