@@ -10,5 +10,5 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./certbot/conf:/etc/letsencrypt  # Volume untuk menyimpan sertifikat
-      - ./certbot/www:/var/www/certbot    # Volume untuk validasi
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
