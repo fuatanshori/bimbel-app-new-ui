@@ -87,8 +87,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'  # Limit to 0.5 CPU
-          memory: 1G    # Limit to 1 GB
+          cpus: '0.5'
+          memory: 1G
   
   mysql_container:
     container_name: mysql_container
@@ -113,8 +113,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'  # Limit to 1 CPU
-          memory: 4G    # Limit to 4 GB
+          cpus: '1.0'
+          memory: 4G
 
   celery_worker:
     container_name: celery_worker
@@ -133,8 +133,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'  # Limit to 1 CPU
-          memory: 2G    # Limit to 2 GB
+          cpus: '1.0'
+          memory: 2G
 
   phpmyadmin:
     container_name: phpmyadmin
@@ -148,8 +148,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'  # Limit to 0.5 CPU
-          memory: 1G    # Limit to 1 GB
+          cpus: '0.5'
+          memory: 1G
 
   portainer:
     image: portainer/portainer-ce:2.21.2
@@ -167,29 +167,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'  # Limit to 0.5 CPU
-          memory: 1G    # Limit to 1 GB
-
-  # cadvisor:
-  #   container_name: cadvisor
-  #   image: gcr.io/cadvisor/cadvisor
-  #   privileged: true
-  #   restart: always
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /var/run/docker.sock:/var/run/docker.sock:rw
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #     - /dev/disk/:/dev/disk:ro
-  #   networks:
-  #     bimbel-net:
-  #       ipv4_address: 192.168.1.15
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '0.5'  # Limit to 0.5 CPU
-  #         memory: 1G    # Limit to 1 GB
+          cpus: '0.5'
+          memory: 1G
 
   prometheus:
     container_name: prometheus
@@ -202,8 +181,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'  # Limit to 0.5 CPU
-          memory: 1G    # Limit to 1 GB
+          cpus: '0.5'
+          memory: 1G
 
   grafana:
     container_name: grafana
@@ -218,8 +197,15 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'  # Limit to 0.5 CPU
-          memory: 1G    # Limit to 1 GB
+          cpus: '0.5'
+          memory: 1G
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
   nginx:
     container_name: nginx
@@ -250,8 +236,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0'  # Limit to 1 CPU
-          memory: 2G    # Limit to 2 GB
+          cpus: '1.0'
+          memory: 2G
 
 volumes:
   db_volume:
