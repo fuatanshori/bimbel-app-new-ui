@@ -1,23 +1,12 @@
 version: '3.8'
+
 services:
   nginx:
-    container_name: nginx
     build:
-      context: ./nginx
+      context: .
       dockerfile: Dockerfile
-    image: nginx:latest
     ports:
-      - "80:80"
-      - "443:443"
+      - "80:80"  # Mengarahkan port 80 ke host
     volumes:
-       - ~/letsencrypt:/etc/letsencrypt
-       - certbot-data:/var/www/certbot  # Use a local directory
-
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - ~/letsencrypt:/etc/letsencrypt 
-      - certbot-data:/var/www/certbot  # Use a local directory
-
-volumes:
-  certbot-data:  # Mendeklarasikan volume
+      - ./certbot:/var/www/certbot  # Memetakan volume untuk Certbot
+      - ./letsencrypt:/etc/letsencrypt  # Memetakan volume untuk menyimpan sertifikat
