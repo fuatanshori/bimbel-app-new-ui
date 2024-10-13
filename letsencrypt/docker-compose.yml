@@ -11,14 +11,13 @@ services:
       - "443:443"
     volumes:
        - ~/letsencrypt:/etc/letsencrypt
-       - certbot-data:/var/www/certbot  # Menggunakan volume
+       - certbot-data:/var/www/certbot  # Use a local directory
 
   certbot:
     image: certbot/certbot
     volumes:
       - ~/letsencrypt:/etc/letsencrypt 
-      - certbot-data:/var/www/certbot  # Menggunakan volume
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+      - certbot-data:/var/www/certbot  # Use a local directory
 
 volumes:
   certbot-data:  # Mendeklarasikan volume
