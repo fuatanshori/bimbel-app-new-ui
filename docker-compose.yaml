@@ -13,7 +13,7 @@ services:
     restart: always
     volumes:
       - .:/app
-      - letsencrypt_data:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt
     command: bash -c "gunicorn --bind 0.0.0.0:8001 --timeout 600 --workers 5 --worker-class gevent core.wsgi:application"
     depends_on:
       redis_container:
@@ -50,8 +50,8 @@ services:
     restart: always
     volumes:
       - .:/app
-      - letsencrypt_data:/etc/letsencrypt
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne -e ssl:443:privateKey=/etc/letsencrypt/live/bimbelbanua.my.id/privkey.pem:certKey=/etc/letsencrypt/live/bimbelbanua.my.id/fullchain.pem -b 0.0.0.0 -p 8000 --application-close-timeout 600 core.asgi:application"
+      - /etc/letsencrypt:/etc/letsencrypt
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && daphne  -b 0.0.0.0 -p 8000 --application-close-timeout 600 core.asgi:application"
     depends_on:
       redis_container:
         condition: service_healthy
@@ -231,8 +231,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-       - letsencrypt_data:/etc/letsencrypt
-       - certbot_www:/var/www/certbot
+       - /etc/letsencrypt:/etc/letsencrypt
+       - /var/www/certbot:/var/www/certbot
     depends_on:
       django_app_bimbel_wsgi:
         condition: service_started
@@ -252,17 +252,11 @@ services:
         limits:
           cpus: '1.0'  
           memory: 2G   
-  certbot:
-    image: certbot/certbot
-    volumes:
-      - letsencrypt_data:/etc/letsencrypt 
-      - certbot_www:/var/www/certbot    
+
 volumes:
   db_volume:
   portainer_data:
   grafana_data:
-  letsencrypt_data:
-  certbot_www:
 
 networks:
   bimbel-net:
