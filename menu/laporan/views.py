@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from menu.pembayaran.models import Transaksi,Tarif
+from menu.mapel.models import MataPelajaran
 from django.db.models import Q
 from django.contrib import messages
 from core.utils.decorator import admin_pemateri_required,admin_required
@@ -51,3 +52,16 @@ def laporan_data_pelanggan(request):
         "profile_objs": profile_objs,
     }
     return render(request,'laporan/laporan_data_pelanggan.html',context)
+
+@login_required(login_url='user:masuk')
+@admin_required
+def laporan_mata_pelajaran(request):
+    cari_mapel = request.GET.get('cari_mapel', "")
+    mapel_objs = MataPelajaran.objects.filter(Q(nama_mapel__icontains=cari_mapel)
+    )
+    if not mapel_objs.exists():
+        messages.warning(request, "Tidak ada tarif ditemukan.")
+    context = {
+        "mapel_objs": mapel_objs.order_by('level_study'),
+    }
+    return render(request,'laporan/laporan_mata_pelajaran.html',context)

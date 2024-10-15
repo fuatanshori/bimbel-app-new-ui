@@ -107,5 +107,6 @@ urlpatterns+=[
     path("laporan/data-pelanggan-csv/",laporan_export_views.export_data_pelanggan_csv,name="data-pelanggan-csv"),
 
 
+    path("laporan/mata-pelajaran/",views_laporan.laporan_mata_pelajaran,name="laporan-mata-pelajaran"),
     path("laporan/data-mapel-excel/",laporan_export_views.export_data_mapel,name="data-mapel-excel"),
 ]
