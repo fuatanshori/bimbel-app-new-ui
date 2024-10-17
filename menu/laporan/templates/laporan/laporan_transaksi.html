@@ -57,6 +57,7 @@
                                 <th>Status Transaksi</th>
                                 <th>Harga Akhir</th>
                                 <th>Waktu Transaksi</th>
+                                <th>Lihat Invoice</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -80,6 +81,7 @@
                                     </td>
                                     <td>{{ transaksi_obj.harga }}</td>
                                     <td>{{ transaksi_obj.transaction_time }}</td>
+                                    <td><a href="{% url "menu:laporan-transaksi-invoice" id_transaksi=transaksi_obj.pk %}" class="btn btn-primary px-3 py-2">Invoice</a></td>
                                 </tr>
                                 {% endfor %}
                             {% else %}

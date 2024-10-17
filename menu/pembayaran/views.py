@@ -10,7 +10,6 @@ from django.contrib.auth.decorators import login_required
 from django.http.response import JsonResponse,HttpResponse,HttpResponseServerError
 from django.views.decorators.csrf import csrf_exempt
 import json
-import xlwt
 from django.db.models import Q
 from django.contrib import messages
 from reportlab.pdfgen import canvas
@@ -457,6 +456,7 @@ def laporan_invoice(request):
     data = {
         'title': 'Bimbingan belajar banua',
         'date': babel.dates.format_date(datetime.date.today(),locale="id"),
+        'nama' :transaksi_obj.user.full_name,
         'invoice_number': f'#{str(transaksi_obj.id_transaksi)}',
         'price': transaksi_obj.harga,
         'status': midtrans.PAYMENT_STATUS[transaksi_obj.transaksi_status],
@@ -465,22 +465,16 @@ def laporan_invoice(request):
         'waktu_transaksi':waktu_transaksi.strftime("%d-%m-%Y %H:%M WIB"),
         'note': '*Invoice ini sah diterbitkan langsung oleh pihak bimbingan belajar banua'
     }
-    # Ukuran kertas setengah dari A4
     half_A4 = (A4[0], A4[1] / 2)
 
-    # Buat objek BytesIO untuk menampung data PDF di memori
     buffer = BytesIO()
 
-    # Buat objek canvas dengan buffer sebagai output dan ukuran kertas setengah A4
     p = canvas.Canvas(buffer, pagesize=half_A4)
     p.setTitle("Invoice - Bimbingan Belajar Banua")
     width, height = half_A4
 
     p.setFont("Helvetica", 10)
     p.drawString(15 * cm, height - 1 * cm, f"Tanggal Dicetak: {data['date']}")
-    # Header
-    # p.setFillColor(color_header_footer)
-    # p.rect(0, height - 2 * cm, width, 2 * cm, stroke=0, fill=1)
     p.setFillColor(colors.black)
     p.setFont("Helvetica-Bold", 20)
     p.drawString(1 * cm, height - 2.9 * cm, data['title'])
@@ -490,20 +484,34 @@ def laporan_invoice(request):
     
     p.setFont("Helvetica-Bold", 14)
     p.drawString(width - 10 * cm, height - 2.7 * cm, "Invoice")
+
     p.setFont("Helvetica", 12)
     p.drawString(width - 10 * cm, height - 3.2 * cm, data['invoice_number'])
 
-    # Garis pemisah
     p.setStrokeColor(colors.black)
     p.line(1 * cm, height - 3.9 * cm, width - 1 * cm, height - 3.9 * cm)
 
-    # Detail invoice
     p.setFont("Helvetica-Bold", 14)
     p.drawString(2 * cm, height - 5 * cm, "Detail Pembayaran")
+
     p.setFont("Helvetica", 12)
-    p.drawString(2 * cm, height - 6 * cm, f"Layanan Pembayaran: {data['layanan_pembayaran']}")#5.2
+    p.drawString(2 * cm, height - 6 * cm, f"Nama: {data["nama"]} ")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(2 * cm, height - 7 * cm, f"Layanan Pembayaran: {data['layanan_pembayaran']}")#5.2
     if data['virtual_number']:
-        p.drawString(2 * cm, height - 7 * cm, f"Virtual number: {data['virtual_number']}")#5.9
+        p.drawString(2 * cm, height - 8 * cm, f"Virtual number: {data['virtual_number']}")#5.9
+        p.drawString(2 * cm, height - 9 * cm, f"Status: {data['status']}")#6.6
+        p.drawString(2 * cm, height - 10 * cm, f"Waktu Transaksi: {data['waktu_transaksi']}")#6.6
+        p.setStrokeColor(colors.black)
+        p.line(1 * cm, height - 11 * cm, width - 1 * cm, height - 11 * cm)
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(2 * cm, height - 12 * cm, f"Total Harga: Rp. {data['price']}")#8
+        p.setFillColor(colors.black)
+        p.setFont("Helvetica", 10)
+        p.drawString(2 * cm, 1.5 * cm, data['note'])
+    else:
         p.drawString(2 * cm, height - 8 * cm, f"Status: {data['status']}")#6.6
         p.drawString(2 * cm, height - 9 * cm, f"Waktu Transaksi: {data['waktu_transaksi']}")#6.6
         
@@ -513,43 +521,17 @@ def laporan_invoice(request):
 
         p.setFont("Helvetica-Bold", 14)
         p.drawString(2 * cm, height - 12 * cm, f"Total Harga: Rp. {data['price']}")#8
-
-        # Footer
-        # p.setFillColor(color_header_footer)
-        # p.rect(0, 0, width, 2 * cm, stroke=0, fill=1)
         p.setFillColor(colors.black)
         p.setFont("Helvetica", 10)
         p.drawString(2 * cm, 1.5 * cm, data['note'])
-    else:
-        p.drawString(2 * cm, height - 7 * cm, f"Status: {data['status']}")#6.6
-        p.drawString(2 * cm, height - 8 * cm, f"Waktu Transaksi: {data['waktu_transaksi']}")#6.6
-        
-        
-        p.setStrokeColor(colors.black)
-        p.line(1 * cm, height - 11 * cm, width - 1 * cm, height - 11 * cm)
-
-        p.setFont("Helvetica-Bold", 14)
-        p.drawString(2 * cm, height - 12 * cm, f"Total Harga: Rp. {data['price']}")#8
-
-        # Footer
-        # p.setFillColor(color_header_footer)
-        # p.rect(0, 0, width, 2 * cm, stroke=0, fill=1)
-        p.setFillColor(colors.black)
-        p.setFont("Helvetica", 10)
-        p.drawString(2 * cm, 1.5 * cm, data['note'])
-
-    # Selesaikan PDF
     p.showPage()
     p.save()
-
-    # Pindahkan pointer buffer ke awal
     buffer.seek(0)
-
-    # Buat HttpResponse dengan tipe konten 'application/pdf'
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
 
     return response
+
 
 @login_required(login_url='user:masuk')
 @admin_required

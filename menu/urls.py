@@ -95,6 +95,7 @@ urlpatterns+=[
     path("laporan/",views_laporan.laporan,name="laporan"),
 
     path("laporan/transaksi/",views_laporan.laporan_transaksi,name="laporan-transaksi"),
+    path("laporan/transaksi/invoice/<id_transaksi>/",laporan_export_views.laporan_transaksi_invoice,name="laporan-transaksi-invoice"),
     path("laporan/transaksi-excel/",laporan_export_views.export_transaksi_excel,name="transaksi-excel"),
     path("laporan/transaksi-csv/",laporan_export_views.export_transaksi_csv,name="transaksi-csv"),
 

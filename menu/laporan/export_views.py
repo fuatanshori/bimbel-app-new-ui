@@ -1,14 +1,110 @@
 import pandas as pd
-from django.http import HttpResponse
+from django.http import HttpResponse,Http404
 from django.utils import timezone
 from menu.pembayaran.models import Transaksi,Tarif
 from user.models import Profile
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.db.models import Q,Prefetch
+from django.db.models import Q
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
 from menu.mapel.models import MataPelajaran
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from io import BytesIO
+import babel
+import datetime
+from config import midtrans
+from reportlab.lib.pagesizes import A4
+
+@login_required(login_url='user:masuk')
+@admin_required
+def laporan_transaksi_invoice(request,id_transaksi):
+    try:
+        transaksi_obj = Transaksi.objects.get(pk=id_transaksi)
+    except Transaksi.DoesNotExist:
+        raise Http404()
+    waktu_transaksi = timezone.localtime(transaksi_obj.transaction_time)
+    data = {
+        'title': 'Bimbingan belajar banua',
+        'date': babel.dates.format_date(datetime.date.today(),locale="id"),
+        'nama' :transaksi_obj.user.full_name,
+        'invoice_number': f'#{str(transaksi_obj.id_transaksi)}',
+        'price': transaksi_obj.harga,
+        'status': midtrans.PAYMENT_STATUS[transaksi_obj.transaksi_status],
+        'virtual_number': transaksi_obj.va_number,
+        'layanan_pembayaran': str(transaksi_obj.layanan_pembayaran).upper(),
+        'waktu_transaksi':waktu_transaksi.strftime("%d-%m-%Y %H:%M WIB"),
+        'note': '*Invoice ini sah diterbitkan langsung oleh pihak bimbingan belajar banua'
+    }
+    half_A4 = (A4[0], A4[1] / 2)
+
+    buffer = BytesIO()
+
+    p = canvas.Canvas(buffer, pagesize=half_A4)
+    p.setTitle("Invoice - Bimbingan Belajar Banua")
+    width, height = half_A4
+
+    p.setFont("Helvetica", 10)
+    p.drawString(15 * cm, height - 1 * cm, f"Tanggal Dicetak: {data['date']}")
+    p.setFillColor(colors.black)
+    p.setFont("Helvetica-Bold", 20)
+    p.drawString(1 * cm, height - 2.9 * cm, data['title'])
+
+    # Date and Invoice Label
+    p.setFillColor(colors.black)
+    
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(width - 10 * cm, height - 2.7 * cm, "Invoice")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(width - 10 * cm, height - 3.2 * cm, data['invoice_number'])
+
+    p.setStrokeColor(colors.black)
+    p.line(1 * cm, height - 3.9 * cm, width - 1 * cm, height - 3.9 * cm)
+
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(2 * cm, height - 5 * cm, "Detail Pembayaran")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(2 * cm, height - 6 * cm, f"Nama: {data["nama"]} ")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(2 * cm, height - 7 * cm, f"Layanan Pembayaran: {data['layanan_pembayaran']}")#5.2
+    if data['virtual_number']:
+        p.drawString(2 * cm, height - 8 * cm, f"Virtual number: {data['virtual_number']}")#5.9
+        p.drawString(2 * cm, height - 9 * cm, f"Status: {data['status']}")#6.6
+        p.drawString(2 * cm, height - 10 * cm, f"Waktu Transaksi: {data['waktu_transaksi']}")#6.6
+        p.setStrokeColor(colors.black)
+        p.line(1 * cm, height - 11 * cm, width - 1 * cm, height - 11 * cm)
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(2 * cm, height - 12 * cm, f"Total Harga: Rp. {data['price']}")#8
+        p.setFillColor(colors.black)
+        p.setFont("Helvetica", 10)
+        p.drawString(2 * cm, 1.5 * cm, data['note'])
+    else:
+        p.drawString(2 * cm, height - 8 * cm, f"Status: {data['status']}")#6.6
+        p.drawString(2 * cm, height - 9 * cm, f"Waktu Transaksi: {data['waktu_transaksi']}")#6.6
+        
+        
+        p.setStrokeColor(colors.black)
+        p.line(1 * cm, height - 11 * cm, width - 1 * cm, height - 11 * cm)
+
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(2 * cm, height - 12 * cm, f"Total Harga: Rp. {data['price']}")#8
+        p.setFillColor(colors.black)
+        p.setFont("Helvetica", 10)
+        p.drawString(2 * cm, 1.5 * cm, data['note'])
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
+
+    return response
+
 
 @login_required(login_url='user:masuk')
 @admin_required
