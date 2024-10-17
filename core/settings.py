@@ -127,7 +127,6 @@ if IS_DOCKER:
             'pool_class': 'redis.ConnectionPool',
             'max_connections': 100,
             'retry_on_timeout': True,
-            'serializer': "core.utils.json.JSONSerializer",
             }
         }
     }
@@ -164,7 +163,6 @@ else:
                 'pool_class': 'redis.ConnectionPool',
                 'max_connections': 100,
                 'retry_on_timeout': True,
-                'serializer': "core.utils.json.JSONSerializer",
             }
         }
     }
