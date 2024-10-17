@@ -124,12 +124,11 @@ if IS_DOCKER:
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': f'redis://'+'redis_container'+':6379/1',
         'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 100,
-                'retry_on_timeout': True,
+            'pool_class': 'redis.ConnectionPool',
+            'max_connections': 100,
+            'retry_on_timeout': True,
+            'serializer': "core.utils.json.JSONSerializer",
             }
-        }
         }
     }
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -158,18 +157,18 @@ else:
         },
     }
     CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://192.168.0.102:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'CONNECTION_POOL_KWARGS': {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://192.168.0.102:6379/1',
+            'OPTIONS': {
+                'pool_class': 'redis.ConnectionPool',
                 'max_connections': 100,
                 'retry_on_timeout': True,
+                'serializer': "core.utils.json.JSONSerializer",
             }
         }
-        }
     }
+
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
     SESSION_CACHE_ALIAS = 'default'
     CELERY_BROKER_URL = 'redis://192.168.0.102:6379/2'

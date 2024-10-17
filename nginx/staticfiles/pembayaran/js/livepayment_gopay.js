@@ -15,7 +15,8 @@ var modul = document.querySelector('#modul');
 var ujian = document.querySelector('#ujian');
 var nilai = document.querySelector('#nilai');
 
-var socket = new WebSocket('wss://'+ window.location.host +'/ws/pembayaran/'+id_transaksi+"/");
+const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+var socket = new WebSocket(`${protocol}${window.location.host}/ws/pembayaran/${id_transaksi}/`);
 
 socket.onopen = function(event) {
     console.log('Koneksi WebSocket dibuka');

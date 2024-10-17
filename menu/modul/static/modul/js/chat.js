@@ -6,9 +6,8 @@ const getModulId = document.getElementById("idModul");
 const idModul = getModulId.getAttribute("data-id");
 console.log("js conncted")
 function connectWebSocket() {
-    chatSocket = new WebSocket(
-        'wss://' + window.location.host + `/ws/chat/${idModul}/`
-    );
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    chatSocket = new WebSocket(`${protocol}${window.location.host}/ws/chat/${idModul}/`);
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         const message = data.message;

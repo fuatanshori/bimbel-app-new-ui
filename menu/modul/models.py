@@ -30,5 +30,6 @@ class Chat(models.Model):
     user = models.ForeignKey(Users,on_delete=models.CASCADE)
     modul = models.ForeignKey(Modul,on_delete=models.CASCADE)
     message = models.TextField()
+    is_read = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
     
