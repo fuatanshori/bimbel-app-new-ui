@@ -29,8 +29,8 @@
                 </form>
                 <div class="d-flex flex-column flex-lg-row gap-2 mb-3">
                     <a href="{% url "menu:laporan" %}" class="btn btn-dark col-12 col-lg-2 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
-                    <a href="{% url "menu:data-pelanggan-excel" %}" class="btn btn-primary text-white col-12 col-lg-5">Cetak Excel <i class="bx bxs-report"></i></a>
-                    <a href="{% url "menu:data-pelanggan-csv" %}" class="btn btn-dark text-white col-12 col-lg-5">Cetak CSV <i class="bx bxs-report"></i></a>
+                    <a href="{% url "menu:data-mapel-excel" %}" class="btn btn-primary text-white col-12 col-lg-5">Cetak Excel <i class="bx bxs-report"></i></a>
+                    <a href="{% url "menu:data-mapel-csv" %}" class="btn btn-dark text-white col-12 col-lg-5">Cetak CSV <i class="bx bxs-report"></i></a>
                 </div>
                 {% if messages %}
                     {% for message in messages %}
@@ -47,6 +47,7 @@
                             <tr>
                                 <th>Nama Mata Pelajaran</th>
                                 <th>Level Study</th>
+                                <th>Updated At</th>
                                 <th>Created At</th>
                             </tr>
                         </thead>
@@ -56,6 +57,7 @@
                                 <tr>
                                     <td>{{ mapel_obj.nama_mapel}}</td>
                                     <td>{{ mapel_obj.level_study}}</td>
+                                    <td>{{ mapel_obj.updated_at}}</td>
                                     <td>{{ mapel_obj.created_at}}</td>
                                 </tr>
                                 {% endfor %}

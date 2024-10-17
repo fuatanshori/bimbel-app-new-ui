@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 import hashlib
 
 
-# hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat pdf. admin/pemateri
 @login_required(login_url="user:masuk")
 def pdf_protect_membership(request, pdf_file):
     cache_key = f"pdf_{request.user.id}_{pdf_file}"
@@ -45,7 +44,7 @@ def pdf_protect_membership(request, pdf_file):
     
     response = FileResponse(io.BytesIO(pdf_content), content_type='application/pdf')
     response['Cache-Control'] = 'public, max-age=86400'  # Cache selama 1 hari (24 * 60 * 60)
-    response['Expires'] = (datetime.utcnow() + timedelta(days=1)).strftime('%a, %d %b %Y %H:%M:%S GMT')
+    response['Expires'] = (datetime.now() + timedelta(days=1)).strftime('%a, %d %b %Y %H:%M:%S GMT')
     return response
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat vidio. admin/pemateri
