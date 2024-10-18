@@ -9,6 +9,9 @@ import os
 import io
 from datetime import datetime, timedelta
 import hashlib
+from django.views.decorators.cache import cache_control
+from django.utils.decorators import method_decorator
+from django.views.generic.base import RedirectView
 
 
 @login_required(login_url="user:masuk")
@@ -142,3 +145,7 @@ def csrf_failure(request, reason=""):
         {"reason": reason},
         status=403,
     )
+
+@method_decorator(cache_control(max_age=604800), name='dispatch')  # Cache 1 tahun
+class CachedRedirectView(RedirectView):
+    pass

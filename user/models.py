@@ -78,6 +78,8 @@ class Profile(models.Model):
     tempat_tinggal  = models.CharField(max_length=40,null=True)
     nomor_telepon   = models.CharField(max_length=14,null=True)
     tanggal_lahir   = models.DateField(null=True)
+    created_at      = models.DateTimeField(auto_now_add=True)
+    updated_at      = models.DateTimeField(auto_now=True)
     
 
     def __str__(self):
