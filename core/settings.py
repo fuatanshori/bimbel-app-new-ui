@@ -143,7 +143,7 @@ else:
             'NAME': 'bimbel',
             'USER': 'root',
             'PASSWORD': 'mysqladmin',
-            'HOST': '192.168.0.102',
+            'HOST': '127.0.0.1',
             'PORT': '3306',
         }
     }
@@ -151,14 +151,14 @@ else:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [("192.168.0.102","6379")],
+                "hosts": [("127.0.0.1","6379")],
             },
         },
     }
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': 'redis://192.168.0.102:6379/1',
+            'LOCATION': 'redis://127.0.0.1:6379/1',
             'OPTIONS': {
                 'pool_class': 'redis.ConnectionPool',
                 'max_connections': 100,
@@ -169,9 +169,9 @@ else:
 
     SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
     SESSION_CACHE_ALIAS = 'default'
-    CELERY_BROKER_URL = 'redis://192.168.0.102:6379/2'
-    CELERY_RESULT_BACKEND = 'redis://192.168.0.102:6379/2'
-    REDIS_URL = 'redis://192.168.0.102:6379'
+    CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
+    CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/2'
+    REDIS_URL = 'redis://127.0.0.1:6379'
     
 
 
