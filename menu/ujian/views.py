@@ -142,6 +142,8 @@ def detail_ujian(request, id_mapel, id_soal_ujian):
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def ujian(request,id_mapel):
+    if request.user.role in ["admin","pemateri"]:
+        return redirect("menu:daftar-nilai")
     pk = decode_id(id_mapel)
     try:
         mapel_obj = MataPelajaran.objects.get(pk=pk)

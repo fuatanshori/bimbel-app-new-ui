@@ -54,7 +54,7 @@ def laporan_data_pelanggan(request):
     return render(request,'laporan/laporan_data_pelanggan.html',context)
 
 @login_required(login_url='user:masuk')
-@admin_required
+@admin_pemateri_required
 def laporan_mata_pelajaran(request):
     cari_mapel = request.GET.get('cari_mapel', "")
     mapel_objs = MataPelajaran.objects.filter(Q(nama_mapel__icontains=cari_mapel)

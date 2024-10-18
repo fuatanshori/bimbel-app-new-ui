@@ -19,7 +19,7 @@
                 <div class="dropdown-menu dropdown-menu-end">
                     <a class="dropdown-item" href="{% url "menu:daftar-nilai" %}">Semua Level Study</a>
                     {% for levelstudy_obj in levelstudy_objs %}
-                        <a class="dropdown-item" href="{% url "menu:daftar-nilai-permapel" id_levelstudy=levelstudy_obj.get_id_safe %}">{{levelstudy_obj.level_study}}</a>
+                        <a class="dropdown-item" href="{% url "menu:daftar-nilai-perlevelstudy" id_levelstudy=levelstudy_obj.get_id_safe %}">{{levelstudy_obj.level_study}}</a>
                     {% endfor %}
                 </div>
             </div> <!-- category-wrap.// -->
@@ -43,7 +43,7 @@
                   <tbody>
                     {% for nilai_obj in nilai_objs %}
                     <tr>  
-                        <td>{{request.user.full_name}}</td>
+                        <td>{{nilai_obj.user.full_name}}</td>
                         <td>{{nilai_obj.level_study}}</td>
                         <td>{{nilai_obj.mata_pelajaran}}</td>
                         <td>{{nilai_obj.nilai}}</td>
@@ -53,7 +53,7 @@
                         {% if nilai_obj.sertifikat %}
                             <a href="{% url "menu:generate-certificate" id_sertifikat=nilai_obj.sertifikat.get_id_safe %}"class="badge bg-primary text-decoration-none text-white">Sertifikat</a>
                         {% else %}
-                            <a href="" class="btn btn-sm btn-danger">
+                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran_obj.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="btn btn-sm btn-danger">
                                 Lakukan Ujian Ulang
                             </a>
                         {% endif %}

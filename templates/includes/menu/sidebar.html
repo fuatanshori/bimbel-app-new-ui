@@ -84,7 +84,7 @@
           <div data-i18n="Analytics">Ujian</div>
         </a>
       </li>
-      <li id="nilai" class="menu-item {% if request.path|slice:'0:13' == "/menu/nilai/" or request.path|slice:"0:21" == "/menu/nilai-permapel/" %}active{% endif %}" style="
+      <li id="nilai" class="menu-item {% if request.path|slice:'0:13' == "/menu/nilai/" or request.path|slice:"0:26" == "/menu/nilai-perlevelstudy/" %}active{% endif %}" style="
          {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
         {% elif request.user.role == 'pelajar' %}
