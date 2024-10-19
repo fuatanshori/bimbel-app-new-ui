@@ -43,6 +43,24 @@
                     <input class="form-check-input" type="radio" name="jawaban" id="jawaban4" value="jawaban4">
                     <label class="form-check-label" for="jawaban4">{{soal_ujian_obj.jawaban_4}}</label>
                   </div>
+                  {% if soal_ujian_obj.jawaban_5 %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="jawaban" id="jawaban5" value="jawaban5">
+                    <label class="form-check-label" for="jawaban5">{{soal_ujian_obj.jawaban_5}}</label>
+                  </div>
+                  {% endif %}
+                  {% if soal_ujian_obj.jawaban_6 %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="jawaban" id="jawaban6" value="jawaban6">
+                    <label class="form-check-label" for="jawaban6">{{soal_ujian_obj.jawaban_6}}</label>
+                  </div>
+                  {% endif %}
+                  {% if soal_ujian_obj.jawaban_7 %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="jawaban" id="jawaban7" value="jawaban7">
+                    <label class="form-check-label" for="jawaban7">{{soal_ujian_obj.jawaban_7}}</label>
+                  </div>
+                  {% endif %}
                   <div class="my-3">
                     <label class="form-check-label fw-bolder" for="jawaban4">Jawaban: {{soal_ujian_obj.pilih_jawaban_benar}}</label>
                   </div>

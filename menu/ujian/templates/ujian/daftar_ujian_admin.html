@@ -45,6 +45,9 @@
                       <th>Jawaban 2</th>
                       <th>Jawaban 3</th>
                       <th>Jawaban 4</th>
+                      <th>Jawaban 5</th>
+                      <th>Jawaban 6</th>
+                      <th>Jawaban 7</th>
                       <th>Jawaban Benar</th>
                       <th>Action</th>
                     </tr>
@@ -57,6 +60,9 @@
                       <td>{{soal_ujian_obj.jawaban_2}}</td>
                       <td>{{soal_ujian_obj.jawaban_3}}</td>
                       <td>{{soal_ujian_obj.jawaban_4}}</td>
+                      <td>{% if soal_ujian_obj.jawaban_5 %}{{soal_ujian_obj.jawaban_5}} {% else %} N/A {% endif %}</td>
+                      <td>{% if soal_ujian_obj.jawaban_6 %}{{soal_ujian_obj.jawaban_6}} {% else %} N/A {% endif %}</td>
+                      <td>{% if soal_ujian_obj.jawaban_7 %}{{soal_ujian_obj.jawaban_7}} {% else %} N/A {% endif %}</td>
                       <td>{{soal_ujian_obj.pilih_jawaban_benar}}</td>
                       </td>
                       <td>

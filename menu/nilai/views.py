@@ -108,9 +108,9 @@ def generate_certificate(request,id_sertifikat):
 
     nama = str(sertifikat_obj.nama).upper()
     id_cert = str(sertifikat_obj.pk).upper()
-    tingkat_studi = sertifikat_obj.tingkat_studi
-    mata_pelajaran = sertifikat_obj.mata_pelajaran
-    predikat = sertifikat_obj.predikat
+    tingkat_studi = sertifikat_obj.tingkat_studi.upper()
+    mata_pelajaran = sertifikat_obj.mata_pelajaran.upper()
+    predikat = sertifikat_obj.predikat.upper()
     nilai = sertifikat_obj.nilai
     tanggal_lahir = sertifikat_obj.tanggal_lahir
     tanggal_dibuat = sertifikat_obj.created_at
@@ -161,9 +161,9 @@ def generate_certificate(request,id_sertifikat):
 
     domain = get_current_site(request).domain
     endpoint = reverse("menu:generate-certificate",args=[id_sertifikat])
-    qr_data = f"http://{domain}{endpoint}"
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}{endpoint}"
     qr_code_image = qrcode.make(qr_data)
-
     qr_buffer = BytesIO()
     qr_code_image.save(qr_buffer, format='PNG')
     qr_buffer.seek(0)
