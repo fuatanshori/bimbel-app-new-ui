@@ -68,7 +68,7 @@ def laporan_transaksi_invoice(request,id_transaksi):
     p.drawString(2 * cm, height - 5 * cm, "Detail Pembayaran")
 
     p.setFont("Helvetica", 12)
-    p.drawString(2 * cm, height - 6 * cm, f"Nama: {data["nama"]} ")
+    p.drawString(2 * cm, height - 6 * cm, f"Nama: {data['nama']} ")
 
     p.setFont("Helvetica", 12)
     p.drawString(2 * cm, height - 7 * cm, f"Layanan Pembayaran: {data['layanan_pembayaran']}")#5.2

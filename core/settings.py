@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'health_check.db',
     'health_check.contrib.migrations',
     'health_check.contrib.celery',              
-    'health_check.contrib.celery_ping',     
     'health_check.contrib.redis',
     
     
