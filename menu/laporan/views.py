@@ -61,7 +61,7 @@ def laporan_mata_pelajaran(request):
     mapel_objs = MataPelajaran.objects.filter(Q(nama_mapel__icontains=cari_mapel)
     )
     if not mapel_objs.exists():
-        messages.warning(request, "Tidak ada tingkat study ditemukan.")
+        messages.warning(request, "Tidak ada data mata pelajaran ditemukan.")
     context = {
         "mapel_objs": mapel_objs.order_by('level_study'),
     }
@@ -77,7 +77,7 @@ def laporan_nilai(request):
                                       Q(level_study__icontains=cari_nilai)
     )
     if not nilai_objs.exists():
-        messages.warning(request, "Tidak ada nilai ditemukan.")
+        messages.warning(request, "Tidak ada data nilai ditemukan.")
     context = {
         "nilai_objs": nilai_objs,
     }

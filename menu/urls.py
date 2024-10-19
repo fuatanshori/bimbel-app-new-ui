@@ -114,4 +114,6 @@ urlpatterns+=[
     
     
     path("laporan/nilai/",views_laporan.laporan_nilai,name="laporan-nilai"),
+    path("laporan/nilai-excel/",laporan_export_views.export_data_nilai_excel,name="nilai-excel"),
+    path("laporan/nilai-csv/",laporan_export_views.export_data_nilai_csv,name="nilai-csv"),
 ]

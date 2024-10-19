@@ -1,14 +1,15 @@
+from menu.pembayaran.models import Transaksi,Tarif
+from menu.mapel.models import MataPelajaran
+from menu.nilai.models import Nilai
 import pandas as pd
 from django.http import HttpResponse,Http404
 from django.utils import timezone
-from menu.pembayaran.models import Transaksi,Tarif
 from user.models import Profile
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.db.models import Q
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
-from menu.mapel.models import MataPelajaran
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.lib.units import cm
@@ -428,4 +429,65 @@ def export_data_mapel_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=Laporan_Mata_Pelajaran.csv'
     df.to_csv(path_or_buf=response, index=False, encoding='utf-8')
+    return response
+
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def export_data_nilai_excel(request):
+    nilai_list = Nilai.objects.select_related('user', 'mata_pelajaran_obj').all()
+    data = []
+    for nilai in nilai_list:
+        data.append({
+            'ID Nilai': nilai.id_nilai,
+            'Nama Pengguna': nilai.user.full_name,
+            'Mata Pelajaran': nilai.mata_pelajaran,
+            'Level Studi': nilai.level_study,
+            'Nilai': nilai.nilai,
+            'Predikat': nilai.predikat,
+            'Status': nilai.status,
+        })
+
+    # Buat DataFrame dari data
+    df = pd.DataFrame(data)
+
+    # Buat respons HTTP dengan tipe konten Excel
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=Laporan_Nilai.xlsx'
+
+    # Tulis DataFrame ke dalam file Excel
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Nilai', index=False)
+
+    return response
+
+
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def export_data_nilai_csv(request):
+    # Ambil semua data nilai
+    nilai_list = Nilai.objects.select_related('user', 'mata_pelajaran_obj').all()
+
+    # Buat data list untuk DataFrame
+    data = []
+    for nilai in nilai_list:
+        data.append({
+            'ID Nilai': nilai.id_nilai,
+            'Nama Pengguna': nilai.user.full_name,
+            'Mata Pelajaran': nilai.mata_pelajaran,
+            'Level Studi': nilai.level_study,
+            'Nilai': nilai.nilai,
+            'Predikat': nilai.predikat,
+            'Status': nilai.status,
+        })
+
+    # Buat DataFrame dari data
+    df = pd.DataFrame(data)
+
+    # Buat respons HTTP dengan tipe konten CSV
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=Laporan_Nilai.csv'
+
+    # Tulis DataFrame ke dalam file CSV
+    df.to_csv(path_or_buf=response, index=False, encoding='utf-8')
+
     return response
