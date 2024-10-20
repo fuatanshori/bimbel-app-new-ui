@@ -40,7 +40,7 @@ class Tarif(models.Model):
 class Diskon(models.Model):
     id_diskon           = models.BigAutoField(unique=True,primary_key=True)
     diskon_name         = models.CharField(max_length=100)
-    diskon_code         = models.CharField(max_length=100,unique=True,db_collation='utf8mb4_bin')
+    diskon_code         = models.CharField(max_length=100,db_collation='utf8mb4_bin')
     is_publish           = models.BooleanField(default=False)
     persentase_diskon   = models.SmallIntegerField(help_text='pilih diskon dari 1 sampai 100 akan dihitung sebagai persen')
     tarif               = models.ForeignKey(Tarif,on_delete=models.CASCADE)
@@ -51,6 +51,7 @@ class Diskon(models.Model):
     class Meta:
         verbose_name_plural = "Diskon"
         ordering = ["-created_at"]
+        unique_together = ('tarif', 'diskon_code')
 
     def __str__(self):
         return self.diskon_name
