@@ -648,25 +648,35 @@ def diskon(request,id_tarif):
 @login_required(login_url='user:masuk')
 @admin_required
 def add_diskon(request, id_tarif):
-    pk= decode_id(id_tarif)
+    pk = decode_id(id_tarif)
     tarif_obj = get_object_or_404(Tarif, pk=pk)
+    
     if request.method == "POST":
         diskon_form = DiskonForm(request.POST)
         
         if diskon_form.is_valid():
-            # Gunakan .save(commit=False) agar bisa menambahkan tarif sebelum menyimpan
+            diskon_code = diskon_form.cleaned_data['diskon_code']
+
+            # Check if a Diskon with the same tarif and diskon_code already exists
+            if Diskon.objects.filter(tarif=tarif_obj, diskon_code=diskon_code).exists():
+                messages.error(request, "Kode diskon sudah digunakan untuk tarif ini.")
+                return redirect("menu:diskon", id_tarif=id_tarif)
+            
+            # If no duplicate exists, save the Diskon object
             diskon_obj = diskon_form.save(commit=False)
-            diskon_obj.tarif = tarif_obj  # Menambahkan objek tarif yang terkait
-            diskon_obj.save()  # Simpan objek diskon
+            diskon_obj.tarif = tarif_obj  # Associate the Diskon with the correct Tarif
+            diskon_obj.save()  # Save the Diskon object
+            
             messages.success(request, "Selamat, Diskon berhasil ditambahkan")
-            return redirect("menu:diskon",id_tarif=id_tarif)
+            return redirect("menu:diskon", id_tarif=id_tarif)
         else:
+            # Handle form validation errors
             error_messages = []
             for _, errors in diskon_form.errors.items():
                 for error in errors:
                     error_messages.append(f"{error}")
             messages.error(request, " | ".join(error_messages))
-            return redirect("menu:diskon",id_tarif=id_tarif)
+            return redirect("menu:diskon", id_tarif=id_tarif)
 
 @login_required(login_url='user:masuk')
 @admin_required
