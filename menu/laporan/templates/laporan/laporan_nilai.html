@@ -6,31 +6,31 @@
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row justify-content-center">
         <div class="card">
-            <h5 class="card-header">Laporan Rekap Mata Pelajaran</h5>
+            <h5 class="card-header">Laporan Nilai</h5>
             <div class="card-body">
                 <form method="get" class="mb-3">
                     <div class="row mb-3">
                         <div class="col-md-12 mb-2">
                             <label for="cari_pelanggan" class="form-label">Cari Mata Pelajaran:</label>
                             <input 
-                                id="cari_mapel" 
+                                id="cari_nilai" 
                                 type="text" 
-                                name="cari_mapel" 
-                                value="{{ request.GET.cari_mapel }}" 
+                                name="cari_nilai" 
+                                value="{{ request.GET.cari_nilai }}" 
                                 class="form-control text-black" 
-                                placeholder="Cari Nama Mata Pelajaran"
+                                placeholder="Cari Nilai nama, mata pelajaran, level study"
                             >
                         </div>
                     </div>
                     <div class="d-flex justify-content-start gap-2">
                         <button type="submit" class="btn btn-primary col-6 col-lg-2">Filter</button>
-                        <a href="{% url "menu:laporan-mata-pelajaran" %}" class="btn btn-dark text-white col-6 col-lg-2">Reset</a>
+                        <a href="{% url "menu:laporan-nilai" %}" class="btn btn-dark text-white col-6 col-lg-2">Reset</a>
                     </div>
                 </form>
                 <div class="d-flex flex-column flex-lg-row gap-2 mb-3">
                     <a href="{% url "menu:laporan" %}" class="btn btn-dark col-12 col-lg-2 text-white"><i class="tf-icon bx bx-chevron-left"></i>Back</a>
-                    <a href="{% url "menu:data-mapel-excel" %}" class="btn btn-primary text-white col-12 col-lg-5">Cetak Excel <i class="bx bxs-report"></i></a>
-                    <a href="{% url "menu:data-mapel-csv" %}" class="btn btn-dark text-white col-12 col-lg-5">Cetak CSV <i class="bx bxs-report"></i></a>
+                    <a href="{% url "menu:nilai-excel" %}" class="btn btn-primary text-white col-12 col-lg-5">Cetak Excel <i class="bx bxs-report"></i></a>
+                    <a href="{% url "menu:nilai-csv" %}" class="btn btn-dark text-white col-12 col-lg-5">Cetak CSV <i class="bx bxs-report"></i></a>
                 </div>
                 {% if messages %}
                     {% for message in messages %}
@@ -45,25 +45,29 @@
                     <table class="table table-borderless">
                         <thead>
                             <tr>
-                                <th>Nama Mata Pelajaran</th>
+                                <th>Nama Lengkap</th>
+                                <th>Mata Pelajaran</th>
                                 <th>Level Study</th>
-                                <th>Updated At</th>
-                                <th>Created At</th>
+                                <th>Nilai</th>
+                                <th>Predikat</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% if mapel_objs %}
-                                {% for mapel_obj in mapel_objs %}
+                            {% if nilai_objs %}
+                                {% for nilai_obj in nilai_objs %}
                                 <tr>
-                                    <td>{{ mapel_obj.nama_mapel}}</td>
-                                    <td>{{ mapel_obj.level_study}}</td>
-                                    <td>{{ mapel_obj.updated_at}}</td>
-                                    <td>{{ mapel_obj.created_at}}</td>
+                                    <td>{{ nilai_obj.user.full_name}}</td>
+                                    <td>{{ nilai_obj.mata_pelajaran}}</td>
+                                    <td>{{ nilai_obj.level_study}}</td>
+                                    <td>{{ nilai_obj.nilai}}</td>
+                                    <td>{{ nilai_obj.predikat}}</td>
+                                    <td>{{ nilai_obj.status}}</td>
                                 </tr>
                                 {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="9" class="text-center">Tidak ada mata pelajaran ditemukan.</td>
+                                    <td colspan="9" class="text-center">Tidak ada data Nilai ditemukan.</td>
                                 </tr>
                             {% endif %}
                         </tbody>

@@ -16,7 +16,7 @@ def pagination_queryset(request,queryset,amount_perpage=2):
     if left_index < 1:
         left_index = 1
     
-    right_index = (int(page)+2)
+    right_index = (int(page)+3)
     if right_index > paginator.num_pages:
         right_index = paginator.num_pages + 1
     custom_range =range(left_index,right_index)

@@ -87,6 +87,9 @@ def tambah_ujian(request,id_mapel):
             jawaban_2 = soal_ujian_forms.cleaned_data['jawaban_2']
             jawaban_3 = soal_ujian_forms.cleaned_data['jawaban_3']
             jawaban_4 = soal_ujian_forms.cleaned_data['jawaban_4']
+            jawaban_5 = soal_ujian_forms.cleaned_data['jawaban_5']
+            jawaban_6 = soal_ujian_forms.cleaned_data['jawaban_6']
+            jawaban_7 = soal_ujian_forms.cleaned_data['jawaban_7']
             pilih_jawaban_benar = soal_ujian_forms.cleaned_data['pilih_jawaban_benar']
             
             SoalUjian.objects.create(
@@ -96,6 +99,9 @@ def tambah_ujian(request,id_mapel):
                 jawaban_2=jawaban_2,
                 jawaban_3=jawaban_3,
                 jawaban_4=jawaban_4,
+                jawaban_5=jawaban_5,
+                jawaban_6=jawaban_6,
+                jawaban_7=jawaban_7,
                 pilih_jawaban_benar=pilih_jawaban_benar,
                 mata_pelajaran = mapel_obj,
             ).save()
@@ -142,6 +148,8 @@ def detail_ujian(request, id_mapel, id_soal_ujian):
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def ujian(request,id_mapel):
+    if request.user.role in ["admin","pemateri"]:
+        return redirect("menu:daftar-nilai")
     pk = decode_id(id_mapel)
     try:
         mapel_obj = MataPelajaran.objects.get(pk=pk)

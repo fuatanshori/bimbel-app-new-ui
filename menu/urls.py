@@ -66,7 +66,7 @@ urlpatterns+=[
 # nilai
 urlpatterns+=[
     path("nilai/", views_nilai.daftar_nilai, name='daftar-nilai'),
-    path("nilai-permapel/<id_mapel>/", views_nilai.daftar_nilai_permapel, name='daftar-nilai-permapel'),
+    path("nilai-perlevelstudy/<id_levelstudy>/", views_nilai.daftar_nilai_perlevelstudy, name='daftar-nilai-perlevelstudy'),
     path("nilai/ujian_ulang/<id_mapel>/<id_nilai>/",views_nilai.lakukan_ujian_ulang,name='ujian-ulang'),
     path("sertifikat/<id_sertifikat>/",views_nilai.generate_certificate,name='generate-certificate'),
     path("search/sertifikat/",views_nilai.search_certificate,name='search-certificate')
@@ -111,4 +111,9 @@ urlpatterns+=[
     path("laporan/mata-pelajaran/",views_laporan.laporan_mata_pelajaran,name="laporan-mata-pelajaran"),
     path("laporan/data-mapel-excel/",laporan_export_views.export_data_mapel_excel,name="data-mapel-excel"),
     path("laporan/data-mapel-csv/",laporan_export_views.export_data_mapel_csv,name="data-mapel-csv"),
+    
+    
+    path("laporan/nilai/",views_laporan.laporan_nilai,name="laporan-nilai"),
+    path("laporan/nilai-excel/",laporan_export_views.export_data_nilai_excel,name="nilai-excel"),
+    path("laporan/nilai-csv/",laporan_export_views.export_data_nilai_csv,name="nilai-csv"),
 ]

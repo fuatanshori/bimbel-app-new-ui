@@ -31,7 +31,7 @@ class PreventMultipleLoginsMiddleware(MiddlewareMixin):
 
 class ValidateProfileMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        if request.user.is_authenticated:
+        if request.user.is_authenticated and request.user.role == "pelajar":
             excluded_paths = [reverse('user:add-profile'), 
                               reverse('user:keluar'),
                               settings.STATIC_URL,

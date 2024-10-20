@@ -10,16 +10,16 @@
           <div class="col-lg col-sm col-md col-6 flex-grow-0">
             <div class="category-wrap dropdown d-inline-block float-start">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
-                    {% if request.path == '/menu/' or request.path|slice:'0:21' == "/menu/nilai-permapel/" %}
-                        <i class="mdi mdi-format-list-bulleted"></i> {{nama_mapel}}
+                    {% if request.path == '/menu/' or request.path|slice:'0:26' == "/menu/nilai-perlevelstudy/" %}
+                        <i class="mdi mdi-format-list-bulleted"></i> {{level_study}}
                     {% else %}
-                        <i class="mdi mdi-format-list-bulleted"></i> Semua Mata Pelajaran
+                        <i class="mdi mdi-format-list-bulleted"></i> Semua Level Study
                     {% endif %}
                 </button>
                 <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" href="{% url "menu:daftar-nilai" %}">Semua Mata Pelajaran</a>
-                    {% for mapel_obj in mapel_objs %}
-                        <a class="dropdown-item" href="{% url "menu:daftar-nilai-permapel" id_mapel=mapel_obj.get_id_safe %}">{{mapel_obj.nama_mapel}}</a>
+                    <a class="dropdown-item" href="{% url "menu:daftar-nilai" %}">Semua Level Study</a>
+                    {% for levelstudy_obj in levelstudy_objs %}
+                        <a class="dropdown-item" href="{% url "menu:daftar-nilai-perlevelstudy" id_levelstudy=levelstudy_obj.get_id_safe %}">{{levelstudy_obj.level_study}}</a>
                     {% endfor %}
                 </div>
             </div> <!-- category-wrap.// -->
@@ -43,7 +43,7 @@
                   <tbody>
                     {% for nilai_obj in nilai_objs %}
                     <tr>  
-                        <td>{{request.user.full_name}}</td>
+                        <td>{{nilai_obj.user.full_name}}</td>
                         <td>{{nilai_obj.level_study}}</td>
                         <td>{{nilai_obj.mata_pelajaran}}</td>
                         <td>{{nilai_obj.nilai}}</td>
@@ -53,7 +53,7 @@
                         {% if nilai_obj.sertifikat %}
                             <a href="{% url "menu:generate-certificate" id_sertifikat=nilai_obj.sertifikat.get_id_safe %}"class="badge bg-primary text-decoration-none text-white">Sertifikat</a>
                         {% else %}
-                            <a href="" class="btn btn-sm btn-danger">
+                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran_obj.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="btn btn-sm btn-danger">
                                 Lakukan Ujian Ulang
                             </a>
                         {% endif %}

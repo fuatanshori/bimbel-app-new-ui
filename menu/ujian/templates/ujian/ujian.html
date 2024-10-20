@@ -52,6 +52,27 @@
                       id="gridRadios4" value="jawaban4" required>
                     <label class="form-check-label" for="gridRadios4">{{soal_ujian_obj.jawaban_4}}</label>
                   </div>
+                  {% if soal_ujian_obj.jawaban_5 %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios5" value="jawaban5" required>
+                    <label class="form-check-label" for="gridRadios5">{{soal_ujian_obj.jawaban_5}}</label>
+                  </div>
+                  {% endif %}
+                  {% if soal_ujian_obj.jawaban_6 %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios6" value="jawaban6" required>
+                    <label class="form-check-label" for="gridRadios6">{{soal_ujian_obj.jawaban_6}}</label>
+                  </div>
+                  {% endif %}
+                  {% if soal_ujian_obj.jawaban_7 %}
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="{{soal_ujian_obj.soal}}"
+                      id="gridRadios7" value="jawaban7" required>
+                    <label class="form-check-label" for="gridRadios7">{{soal_ujian_obj.jawaban_7}}</label>
+                  </div>
+                  {% endif %}
                 </div>
               </div>
             </div>

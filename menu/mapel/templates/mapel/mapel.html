@@ -59,11 +59,11 @@
                   </tbody>
                 </table>
 
-                {% include "includes/menu/pagination.html" with queryset=mapel_objs custom_range=custom_range %}
-
+                
               </div>
-        </div>
-      </div>
+            </div>
+            {% include "includes/menu/pagination.html" with queryset=mapel_objs custom_range=custom_range %}
+          </div>
     </div>
   </div>
 {% endblock content %}

@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import Http404
 from menu.nilai.models import Nilai
 from menu.mapel.models import MataPelajaran
+from menu.levelstudy.models import LevelStudy
 from django.contrib.auth.decorators import login_required
 from core.utils.decorator import transaksi_settlement_required
 from menu.utils.encode_url import decode_id
@@ -34,10 +35,10 @@ def daftar_nilai(request):
 
     except Nilai.DoesNotExist:
         pass
-    mapel_objs = MataPelajaran.objects.all()
+    levelstudy_objs = LevelStudy.objects.all()
     context = {
         "nilai_objs": nilai_objs,
-        "mapel_objs":mapel_objs,
+        "levelstudy_objs":levelstudy_objs,
     }
     return render(request, 'nilai/nilai.html', context)
 
@@ -62,23 +63,23 @@ def lakukan_ujian_ulang(request,id_mapel,id_nilai):
 
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
-def daftar_nilai_permapel(request,id_mapel):
-    pk = decode_id(id_mapel)
+def daftar_nilai_perlevelstudy(request,id_levelstudy):
+    pk = decode_id(id_levelstudy)
     try:
         if request.user.role in ['pemateri',"admin"]:
-            nilai_objs = Nilai.objects.filter(mata_pelajaran_obj__pk=pk).select_related('sertifikat')
+            nilai_objs = Nilai.objects.filter(mata_pelajaran_obj__level_study__pk=pk).select_related('sertifikat')
         else:
-            nilai_objs = Nilai.objects.filter(user=request.user,mata_pelajaran_obj__pk=pk).select_related('sertifikat')
+            nilai_objs = Nilai.objects.filter(user=request.user,mata_pelajaran_obj__level_study__pk=pk).select_related('sertifikat')
 
     except Nilai.DoesNotExist:
         pass
-    mapel_objs = MataPelajaran.objects.all()
-    nama_mapel = get_object_or_404(MataPelajaran,pk=pk).nama_mapel
+    levelstudy_objs = LevelStudy.objects.all()
+    level_study = get_object_or_404(LevelStudy,pk=pk).level_study
     context = {
         "nilai_objs": nilai_objs,
-        "mapel_objs":mapel_objs,
-        "nama_mapel":nama_mapel,
-        "id_mapel":id_mapel
+        "levelstudy_objs":levelstudy_objs,
+        "level_study":level_study,
+        "id_levelstudy":id_levelstudy
     }
     return render(request, 'nilai/nilai.html', context)
 
@@ -107,9 +108,9 @@ def generate_certificate(request,id_sertifikat):
 
     nama = str(sertifikat_obj.nama).upper()
     id_cert = str(sertifikat_obj.pk).upper()
-    tingkat_studi = sertifikat_obj.tingkat_studi
-    mata_pelajaran = sertifikat_obj.mata_pelajaran
-    predikat = sertifikat_obj.predikat
+    tingkat_studi = sertifikat_obj.tingkat_studi.upper()
+    mata_pelajaran = sertifikat_obj.mata_pelajaran.upper()
+    predikat = sertifikat_obj.predikat.upper()
     nilai = sertifikat_obj.nilai
     tanggal_lahir = sertifikat_obj.tanggal_lahir
     tanggal_dibuat = sertifikat_obj.created_at
@@ -160,9 +161,9 @@ def generate_certificate(request,id_sertifikat):
 
     domain = get_current_site(request).domain
     endpoint = reverse("menu:generate-certificate",args=[id_sertifikat])
-    qr_data = f"http://{domain}{endpoint}"
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}{endpoint}"
     qr_code_image = qrcode.make(qr_data)
-
     qr_buffer = BytesIO()
     qr_code_image.save(qr_buffer, format='PNG')
     qr_buffer.seek(0)

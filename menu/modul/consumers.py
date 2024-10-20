@@ -5,7 +5,8 @@ from menu.pembayaran.models import Transaksi
 from .models import Chat, Modul
 from menu.utils.encode_url import decode_id
 from django.utils import timezone
-from django.utils import timezone
+
+
 class ChatConsumers(AsyncWebsocketConsumer):
     async def connect(self):
         self.id = self.scope["url_route"]["kwargs"]["group_id"]

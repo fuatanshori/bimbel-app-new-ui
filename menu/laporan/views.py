@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from menu.pembayaran.models import Transaksi,Tarif
 from menu.mapel.models import MataPelajaran
+from menu.nilai.models import Nilai
 from django.db.models import Q
 from django.contrib import messages
 from core.utils.decorator import admin_pemateri_required,admin_required
@@ -47,21 +48,37 @@ def laporan_data_pelanggan(request):
     profile_objs = Profile.objects.filter(Q(nama_lengkap__icontains=cari_pelanggan)
     )
     if not profile_objs.exists():
-        messages.warning(request, "Tidak ada tarif ditemukan.")
+        messages.warning(request, "Tidak ada data pelanggan ditemukan.")
     context = {
         "profile_objs": profile_objs,
     }
     return render(request,'laporan/laporan_data_pelanggan.html',context)
 
 @login_required(login_url='user:masuk')
-@admin_required
+@admin_pemateri_required
 def laporan_mata_pelajaran(request):
     cari_mapel = request.GET.get('cari_mapel', "")
     mapel_objs = MataPelajaran.objects.filter(Q(nama_mapel__icontains=cari_mapel)
     )
     if not mapel_objs.exists():
-        messages.warning(request, "Tidak ada tarif ditemukan.")
+        messages.warning(request, "Tidak ada data mata pelajaran ditemukan.")
     context = {
         "mapel_objs": mapel_objs.order_by('level_study'),
     }
     return render(request,'laporan/laporan_mata_pelajaran.html',context)
+
+
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def laporan_nilai(request):
+    cari_nilai = request.GET.get('cari_nilai', "")
+    nilai_objs = Nilai.objects.filter(Q(user__full_name__icontains=cari_nilai )|
+                                      Q(mata_pelajaran__icontains=cari_nilai)|
+                                      Q(level_study__icontains=cari_nilai)
+    )
+    if not nilai_objs.exists():
+        messages.warning(request, "Tidak ada data nilai ditemukan.")
+    context = {
+        "nilai_objs": nilai_objs,
+    }
+    return render(request,'laporan/laporan_nilai.html',context)

@@ -46,3 +46,6 @@ class Sertifikat(models.Model):
         
     def get_id_safe(self):
         return encode_id(self.pk)
+    
+    def __str__(self):
+        return f"{self.nama}  -  {self.tingkat_studi}  -  {self.mata_pelajaran}"

@@ -11,6 +11,9 @@ class SoalUjianForm(forms.ModelForm):
         self.fields['jawaban_2'].widget.attrs['class'] = 'form-control '
         self.fields['jawaban_3'].widget.attrs['class'] = 'form-control '
         self.fields['jawaban_4'].widget.attrs['class'] = 'form-control '
+        self.fields['jawaban_5'].widget.attrs['class'] = 'form-control '
+        self.fields['jawaban_6'].widget.attrs['class'] = 'form-control '
+        self.fields['jawaban_7'].widget.attrs['class'] = 'form-control '
         self.fields['pilih_jawaban_benar'].widget.attrs['class'] = 'form-select'
     
     
