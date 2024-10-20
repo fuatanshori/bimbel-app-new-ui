@@ -657,20 +657,17 @@ def add_diskon(request, id_tarif):
         if diskon_form.is_valid():
             diskon_code = diskon_form.cleaned_data['diskon_code']
 
-            # Check if a Diskon with the same tarif and diskon_code already exists
             if Diskon.objects.filter(tarif=tarif_obj, diskon_code=diskon_code).exists():
                 messages.error(request, "Kode diskon sudah digunakan untuk tarif ini.")
                 return redirect("menu:diskon", id_tarif=id_tarif)
             
-            # If no duplicate exists, save the Diskon object
             diskon_obj = diskon_form.save(commit=False)
-            diskon_obj.tarif = tarif_obj  # Associate the Diskon with the correct Tarif
-            diskon_obj.save()  # Save the Diskon object
+            diskon_obj.tarif = tarif_obj 
+            diskon_obj.save()  
             
             messages.success(request, "Selamat, Diskon berhasil ditambahkan")
             return redirect("menu:diskon", id_tarif=id_tarif)
         else:
-            # Handle form validation errors
             error_messages = []
             for _, errors in diskon_form.errors.items():
                 for error in errors:
@@ -690,21 +687,34 @@ def delete_diskon(request,id_tarif,id_diskon):
 
 @login_required(login_url='user:masuk')
 @admin_required
-def edit_diskon(request,id_tarif,id_diskon):
+def edit_diskon(request, id_tarif, id_diskon):
+    diskon_obj = get_object_or_404(Diskon, pk=id_diskon)
+
     if request.method == "POST":
-        diskon_obj = get_object_or_404(Diskon, pk=id_diskon)
         diskon_form = DiskonForm(request.POST, instance=diskon_obj)
+
         if diskon_form.is_valid():
+            diskon_code = diskon_form.cleaned_data['diskon_code']
+
+            # Check if another Diskon with the same tarif and diskon_code exists
+            if Diskon.objects.filter(tarif=diskon_obj.tarif, diskon_code=diskon_code).exclude(pk=id_diskon).exists():
+                messages.error(request, "Kode diskon sudah digunakan untuk tarif ini.")
+                page = request.GET.get('page')
+                return redirect(f"{reverse('menu:diskon', kwargs={'id_tarif': id_tarif})}?page={page}")
+
+            # If no duplicate exists, save the changes
             diskon_form.save()
             messages.success(request, "Diskon berhasil diedit.")
-            page = request.GET.get('page') 
+            page = request.GET.get('page')
             return redirect(f"{reverse('menu:diskon', kwargs={'id_tarif': id_tarif})}?page={page}")
         else:
+            # Handle form validation errors
             error_messages = []
             for field, errors in diskon_form.errors.items():
                 for error in errors:
                     error_messages.append(f"{field}: {error}")
             messages.error(request, " | ".join(error_messages))
-            page = request.GET.get('page') 
+            page = request.GET.get('page')
             return redirect(f"{reverse('menu:diskon', kwargs={'id_tarif': id_tarif})}?page={page}")
+
     raise Http404
