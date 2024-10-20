@@ -438,7 +438,6 @@ def export_data_nilai_excel(request):
     data = []
     for nilai in nilai_list:
         data.append({
-            'ID Nilai': nilai.id_nilai,
             'Nama Pengguna': nilai.user.full_name,
             'Mata Pelajaran': nilai.mata_pelajaran,
             'Level Studi': nilai.level_study,
@@ -471,7 +470,6 @@ def export_data_nilai_csv(request):
     data = []
     for nilai in nilai_list:
         data.append({
-            'ID Nilai': nilai.id_nilai,
             'Nama Pengguna': nilai.user.full_name,
             'Mata Pelajaran': nilai.mata_pelajaran,
             'Level Studi': nilai.level_study,
