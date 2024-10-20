@@ -170,26 +170,26 @@ services:
           cpus: '0.5' 
           memory: 1G 
 
-  # cadvisor:
-  #   container_name: cadvisor
-  #   image: gcr.io/cadvisor/cadvisor
-  #   privileged: true
-  #   restart: always
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /var/run/docker.sock:/var/run/docker.sock:rw
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #     - /dev/disk/:/dev/disk:ro
-  #   networks:
-  #     bimbel-net:
-  #       ipv4_address: 192.168.1.15
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: '0.5'  # Limit to 0.5 CPU
-  #         memory: 1G    # Limit to 1 GB
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor
+    privileged: true
+    restart: always
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      bimbel-net:
+        ipv4_address: 192.168.1.15
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'  # Limit to 0.5 CPU
+          memory: 1G    # Limit to 1 GB
 
   prometheus:
     container_name: prometheus
