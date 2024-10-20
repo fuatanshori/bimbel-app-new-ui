@@ -50,15 +50,15 @@ def pembayaran(request):
         tarif_obj = Tarif.get_tarif_is_used()
         harga = 0 if tarif_obj is None else tarif_obj.harga
         try:
-            diskon_obj=Diskon.objects.get(diskon_code__exact=str(diskon),tarif=tarif)
-            persentase_diskon =diskon_obj.persentase_diskon
+            diskon_obj=Diskon.objects.get(diskon_code__exact=str(diskon),tarif=tarif_obj)
+            persentase_diskon = diskon_obj.persentase_diskon
             if datetime.date.today() > diskon_obj.kedaluwarsa:
                 diskon_harga = 0
                 is_valid_diskon = False
                 messages.error(request,"diskon kedaluwarsa")
             else:
                 is_valid_diskon = True
-                diskon_harga=(persentase_diskon/100)*harga
+                diskon_harga = (persentase_diskon/100)*harga
                 messages.success(request,"diskon berhasil digunakan")
             context = {
                 'title': 'menu pembayaran',
@@ -100,7 +100,7 @@ def buat_pesanan(request):
         tarif_obj = Tarif.get_tarif_is_used()
         harga = 0 if tarif_obj is None else tarif_obj.harga
         try:
-            diskon_obj =  Diskon.objects.get(diskon_code__exact=diskon_code,tarif=tarif)
+            diskon_obj =  Diskon.objects.get(diskon_code__exact=diskon_code,tarif=tarif_obj)
             persentase_diskon = diskon_obj.persentase_diskon
             diskon_harga = (persentase_diskon/100)*harga
         except Diskon.DoesNotExist:
