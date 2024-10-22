@@ -167,7 +167,7 @@ def ujian(request,id_mapel):
         salah = 0
         benar = 0
         for soal_ujian_obj in soal_ujian_objs:
-            if soal_ujian_obj.pilih_jawaban_benar == request.POST.get(soal_ujian_obj.get_id_safe):
+            if soal_ujian_obj.pilih_jawaban_benar == request.POST.get(soal_ujian_obj.get_id):
                 benar+=1
             else:
                 salah+=1

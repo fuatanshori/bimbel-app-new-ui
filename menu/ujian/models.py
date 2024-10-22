@@ -39,5 +39,8 @@ class SoalUjian(models.Model):
     
     def get_id_safe(self):
         return encode_id(self.pk)
-
+    
+    @property
+    def get_id(self):
+        return f"soal__{self.pk}"
 
