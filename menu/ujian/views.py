@@ -105,6 +105,7 @@ def tambah_ujian(request,id_mapel):
                 pilih_jawaban_benar=pilih_jawaban_benar,
                 mata_pelajaran = mapel_obj,
             ).save()
+            messages.success(request,"Ujian berhasil ditambahkan")
             return redirect("menu:daftar-ujian-admin-pemateri",id_mapel=id_mapel)
     soal_ujian_forms = SoalUjianForm(request.POST or None,request.FILES or None)
     context={
@@ -123,6 +124,7 @@ def edit_ujian(request, id_mapel, id_soal_ujian):
         soal_ujian_forms = SoalUjianForm(request.POST , request.FILES ,instance=soal_ujian_obj)
         if soal_ujian_forms.is_valid():
             soal_ujian_forms.save()
+            messages.success(request,"Ujian berhasil di edit")
             return redirect("menu:daftar-ujian-admin-pemateri",id_mapel=id_mapel)
     else:
         soal_ujian_forms = SoalUjianForm(instance=soal_ujian_obj)
@@ -165,7 +167,7 @@ def ujian(request,id_mapel):
         salah = 0
         benar = 0
         for soal_ujian_obj in soal_ujian_objs:
-            if soal_ujian_obj.pilih_jawaban_benar == request.POST.get(soal_ujian_obj.soal):
+            if soal_ujian_obj.pilih_jawaban_benar == request.POST.get(soal_ujian_obj.get_id_safe):
                 benar+=1
             else:
                 salah+=1
@@ -175,18 +177,22 @@ def ujian(request,id_mapel):
         except ZeroDivisionError:
             nilai = 0
 
-        if nilai >= 90:
+        if nilai >= 95:
+            predikat = "A+"
+        elif nilai >= 90:
             predikat = "A"
+        elif nilai >= 85:
+            predikat = "A-"
         elif nilai >= 80:
             predikat = "B+"
-        elif nilai >= 70:
+        elif nilai >= 75:
             predikat = "B"
-        elif nilai >= 60:
+        elif nilai >= 70:
             predikat = "B-"
         else:
             predikat = "C"
         
-        status = "tidak lulus" if nilai <=60 else "lulus"
+        status = "tidak lulus" if nilai < 70 else "lulus"
         nilai_obj = Nilai.objects.create(
             user = request.user,
             mata_pelajaran_obj = mapel_obj,
