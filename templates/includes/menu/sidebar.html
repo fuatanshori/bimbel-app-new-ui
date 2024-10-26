@@ -11,9 +11,19 @@
     </div>
 
     <div class="menu-inner-shadow"></div>
-
     <ul class="menu-inner py-1">
       <!-- Dashboard -->
+      <li class="menu-item {% if request.path|slice:'0:14' == "/menu/statistik/"%}active{% endif %}" style="
+      {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
+          display:block;
+      {% else %}
+          display:none;
+      {% endif %}">
+      <a href="" class="menu-link">
+        <i class="menu-icon tf-icons bx bx-stats"></i>
+        <div data-i18n="Analytics">Statistik</div>
+      </a>
+    </li>
       <li class="menu-item {% if request.path == '/menu/'%}active{% endif %}">
         <a href="{% url "menu:menu" %}" class="menu-link">
           <i class="menu-icon tf-icons bx bx-home-circle"></i>
@@ -107,7 +117,7 @@
         {% else %}
             display:none;
         {% endif %}">
-        <a href="" class="menu-link">
+        <a href="{% url "menu:laporan" %}" class="menu-link">
           <i class="menu-icon tf-icons bx bxs-report"></i>
           <div data-i18n="Analytics">Laporan</div>
         </a>

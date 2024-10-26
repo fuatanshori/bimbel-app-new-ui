@@ -6,7 +6,6 @@ from .ujian import views as views_ujian
 from .nilai import views as views_nilai
 from .mapel import views as views_mapel
 from .levelstudy import views as views_levelstudy
-from .laporan import export_views as laporan_export_views
 from .laporan import views as views_laporan
 # menu
 urlpatterns = [
@@ -93,7 +92,8 @@ urlpatterns+=[
 # laporan
 urlpatterns+=[
     path("laporan/",views_laporan.laporan,name="laporan"),
-    path('reports/total-revenue-per-tarif/', views_laporan.laporan_pendapatan, name='total_revenue_per_tarif'),
-    path('reports/pdf/', views_laporan.get_tarif_diskon, name='pdf'),
-    
+    path('laporan/transaksi/', views_laporan.laporan_transaksi, name='laporan-transaksi-cetak'),
+    path('laporan/penggunaan-diskon/', views_laporan.laporan_penggunaan_diskon, name='laporan-penggunaan-diskon-cetak'),
+    path('laporan/penggunaan-layanan-pembayaran/', views_laporan.laporan_penggunaan_layanan_pembayaran, name='laporan-penggunaan-layanan-pembayaran'),
+    path('laporan/ujian-diikuti/', views_laporan.laporan_ujian_diikuti, name='laporan-ujian-diikuti'),
 ]

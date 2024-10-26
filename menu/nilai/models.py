@@ -20,6 +20,12 @@ class Nilai(models.Model):
     predikat            = models.CharField(max_length=2)
     status              = models.CharField(max_length=12,choices=choices)
 
+    def save(self, *args, **kwargs):
+        if self.level_study:
+            self.level_study = self.level_study.strip().lower()
+        if self.mata_pelajaran:
+            self.mata_pelajaran = self.mata_pelajaran.strip().lower()
+        super().save(*args, **kwargs)
     def __str__(self) -> str:
         return f"{self.mata_pelajaran} = {self.nilai}"
     

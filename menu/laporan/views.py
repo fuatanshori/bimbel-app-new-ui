@@ -1,6 +1,6 @@
 import qrcode
 import base64
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from io import BytesIO
 import datetime
 from django.db.models import Count, Q,Sum
@@ -8,61 +8,75 @@ from django.utils import timezone
 from menu.pembayaran.models import Transaksi,Tarif,Diskon
 from menu.mapel.models import MataPelajaran
 from menu.nilai.models import Nilai
-from django.db.models import Q
+from django.db.models import Q, Sum, F,Avg,Min,Max,StdDev
 from django.contrib import messages
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
-from user.models import Profile
+from config import midtrans
+from menu.levelstudy.models import LevelStudy 
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def laporan(request):
     return render(request,"laporan/laporan.html")
 
-def laporan_pendapatan(request):
-    # Query all transactions
-    transaksi_list = Transaksi.objects.filter(transaksi_status="settlement")
 
-    # Initialize variables for calculations
-    total_harga_awal = 0
-    total_diskon = 0
-    total_potongan = 0
-    total_harga_akhir = 0
+@login_required(login_url='user:masuk')
+@admin_required
+def laporan_transaksi(request):
+    dari_tanggal = request.GET.get('dari_tanggal')
+    sampai_tanggal = request.GET.get('sampai_tanggal')
+    payment_status = request.GET.get('payment_status')
+    try:
+        if dari_tanggal:
+            dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
+        if sampai_tanggal:
+            sampai_tanggal = timezone.make_aware(timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d'))
 
-    # Prepare the data for rendering
-    laporan_data = []
+        if dari_tanggal and sampai_tanggal and dari_tanggal > sampai_tanggal:
+            messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
+            return redirect("menu:laporan")
+    except ValueError:
+        messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
+        return redirect("menu:laporan")
     
-    for transaksi in transaksi_list:
-        harga_awal = transaksi.tarif.harga if transaksi.tarif is not None else 0
-        diskon_persen = transaksi.diskon.persentase_diskon if transaksi.diskon else 0
-        potongan = harga_awal * (diskon_persen / 100)
-        harga_akhir = harga_awal - potongan
+    filters = Q()
+    if dari_tanggal:
+        filters &= Q(transaction_time__date__gte=dari_tanggal)
+    if sampai_tanggal:
+        filters &= Q(transaction_time__date__lte=sampai_tanggal)
+    if payment_status:
+        filters &= Q(transaksi_status=payment_status)
 
-        # Append data for each transaction
+    transaksi_list = Transaksi.objects.filter(filters)
+    totals = transaksi_list.aggregate(
+        total_harga_awal=Sum('harga_awal'),
+        total_diskon=Sum(F('diskon__persentase_diskon'), default=0),
+        total_potongan=Sum('harga_terpotong'),
+        total_harga_akhir=Sum('harga_akhir')
+    )
+
+    laporan_data = []
+    for transaksi in transaksi_list:
+        diskon_persen = transaksi.diskon.persentase_diskon if transaksi.diskon else 0
+
         laporan_data.append({
             'nama': transaksi.user.full_name,
-            'tanggal_transaksi': transaksi.transaction_time.strftime("%d/%m/%Y") if transaksi.transaction_time else 'N/A',
-            'harga_awal': harga_awal,
+            'tanggal_transaksi': timezone.localtime(transaksi.transaction_time).strftime("%d/%m/%Y") if transaksi.transaction_time else 'N/A',
+            'harga_awal': transaksi.harga_awal,
             'diskon': diskon_persen,
-            'potongan': potongan,
-            'harga_akhir': harga_akhir,
+            'potongan': transaksi.harga_terpotong,
+            'harga_akhir': transaksi.harga_akhir,
         })
 
-        # Update total values
-        total_harga_awal += harga_awal
-        total_diskon += diskon_persen
-        total_potongan += potongan
-        total_harga_akhir += harga_akhir
-
-    # Prepare totals for rendering
     total_data = {
-        'total_harga_awal': total_harga_awal,
-        'total_diskon': total_diskon,
-        'total_potongan': total_potongan,
-        'total_harga_akhir': total_harga_akhir,
+        'total_harga_awal': totals['total_harga_awal'] or 0,
+        'total_diskon': totals['total_diskon'] or 0,
+        'total_potongan': totals['total_potongan'] or 0,
+        'total_harga_akhir': totals['total_harga_akhir'] or 0,
     }
 
-    qr_data = "Dummy Signature Data"  # Replace with actual data
+    qr_data = "Dummy Signature Data"
     qr_img = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -72,52 +86,67 @@ def laporan_pendapatan(request):
     qr_img.add_data(qr_data)
     qr_img.make(fit=True)
 
-    # Create a QR code image
     img = qr_img.make_image(fill_color="black", back_color="transparent")
 
-    # Save the transparent QR code to a BytesIO object
     qr_io = BytesIO()
     img.save(qr_io, format='PNG')
     qr_io.seek(0)
 
-    # Encode the image in base64
     qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
 
-    # Render the template with the data and QR code
     return render(request, 'laporan/laporan_transaksi_cetak.html', {
         'laporan_data': laporan_data,
         'total_data': total_data,
-        'qr_code': qr_code_b64,  # Pass the base64 encoded QR code image
-        "current_date": datetime.date.today(),
+        'qr_code': qr_code_b64, 
+        'current_date': datetime.date.today(),
+        'dari_tanggal': dari_tanggal,
+        'sampai_tanggal': sampai_tanggal,
+        'payment_status':"Semua Transaksi" if not payment_status else midtrans.PAYMENT_STATUS[payment_status],
     })
 
-def get_tarif_diskon(request):
-    filter_type = request.GET.get('filter', 'all')  # Default 'all'
+@login_required(login_url='user:masuk')
+@admin_required
+def laporan_penggunaan_diskon(request):
+    filter_type = request.GET.get('filter', 'all')
+    payment_status = request.GET.get('payment_status', 'all')
+    
     tarif_list = Tarif.objects.all()
+    
     tarif_diskon_data = {}
     total_diskon_terpakai = 0
-    total_harga_terpotong = 0  # Untuk menghitung total harga yang terpotong
+    total_harga_terpotong = 0
     today = timezone.now().date()
-
+    ft = {
+        'active':'Diskon Aktif',
+        'all':'Semua Diskon',
+        'expired':"Diskon Kedaluwarsa"
+    }
     for tarif in tarif_list:
         diskon_query = Diskon.objects.filter(tarif=tarif)
-        
         if filter_type == 'active':
             diskon_query = diskon_query.filter(kedaluwarsa__gte=today)
         elif filter_type == 'expired':
             diskon_query = diskon_query.filter(kedaluwarsa__lt=today)
         
-        diskon_list = diskon_query.annotate(
-            jumlah_terpakai=Count('transaksi')
-        )
-        
-        if diskon_list.exists():
+        if payment_status != "all":
+            diskon_list = diskon_query.annotate(
+                jumlah_terpakai=Count('transaksi',filter=Q(transaksi__transaksi_status=payment_status))
+            )
+        else:
+            diskon_list = diskon_query.annotate(
+                jumlah_terpakai=Count('transaksi')
+            )
+        if diskon_list.exists(): 
             tarif_diskon_data[tarif] = []
             for diskon in diskon_list:
                 total_diskon_terpakai += diskon.jumlah_terpakai
                 
-                # Hitung total harga terpotong dari transaksi yang menggunakan diskon ini
-                potongan_harga = Transaksi.objects.filter(diskon=diskon,transaksi_status="settlement").aggregate(
+                potongan_harga_query = Transaksi.objects.filter(diskon=diskon)
+                
+                if payment_status != 'all':
+                    potongan_harga_query = potongan_harga_query.filter(transaksi_status=payment_status)
+                
+                potongan_harga = potongan_harga_query.aggregate(
                     total_potongan=Sum('harga_terpotong')
                 )['total_potongan'] or 0
                 
@@ -128,17 +157,115 @@ def get_tarif_diskon(request):
                     'jumlah_terpakai': diskon.jumlah_terpakai,
                     'kedaluwarsa': diskon.kedaluwarsa,
                     'status': 'Aktif' if diskon.kedaluwarsa >= today else 'Kedaluwarsa',
-                    'potongan_harga': potongan_harga,  # Ambil potongan harga dari database
+                    'potongan_harga': potongan_harga,
                 })
 
     current_date = datetime.date.today()
-
+    
     context = {
         'tarif_diskon_data': tarif_diskon_data,
         'total_diskon_terpakai': total_diskon_terpakai,
-        'total_harga_terpotong': total_harga_terpotong,  # Tambahkan total harga yang terpotong ke context
+        'total_harga_terpotong': total_harga_terpotong,
         'current_date': current_date,
-        'filter_type': filter_type,
+        'filter_type': ft[filter_type],
+        'payment_status': "Semua Transaksi" if payment_status == "all" else midtrans.PAYMENT_STATUS[payment_status],
     }
 
     return render(request, 'laporan/laporan_diskon_terpakai_cetak.html', context)
+
+@login_required(login_url='user:masuk')
+@admin_required
+def laporan_penggunaan_layanan_pembayaran(request):
+    payment_status = request.GET.get('payment_status')
+    dari_tanggal = request.GET.get('dari_tanggal')
+    sampai_tanggal = request.GET.get('sampai_tanggal')
+    try:
+        if dari_tanggal:
+            dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
+        if sampai_tanggal:
+            sampai_tanggal = timezone.make_aware(timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d'))
+
+        if dari_tanggal and sampai_tanggal and dari_tanggal > sampai_tanggal:
+            messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
+            return redirect("menu:laporan")
+    except ValueError:
+        messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
+        return redirect("menu:laporan")
+    
+    filters = Q()
+    if dari_tanggal:
+        filters &= Q(transaction_time__date__gte=dari_tanggal)
+    if sampai_tanggal:
+        filters &= Q(transaction_time__date__lte=sampai_tanggal)
+    if payment_status:
+        filters &= Q(transaksi_status=payment_status)
+    payment_method_counts = Transaksi.objects.filter(filters).values('layanan_pembayaran').annotate(jumlah=Count('layanan_pembayaran'))
+    payment_method_counts = list(payment_method_counts)
+    
+    current_date = datetime.date.today()
+    qr_data = "Dummy Signature Data"
+    qr_img = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr_img.add_data(qr_data)
+    qr_img.make(fit=True)
+
+    img = qr_img.make_image(fill_color="black", back_color="transparent")
+    qr_io = BytesIO()
+    img.save(qr_io, format='PNG')
+    qr_io.seek(0)
+    qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
+    return render(request, 'laporan/laporan_layanan_pembayaran_cetak.html', {
+        'payment_method_counts': payment_method_counts,
+        'current_date': current_date,
+        'qr_code':qr_code_b64,
+        'dari_tanggal': dari_tanggal,
+        'sampai_tanggal': sampai_tanggal,
+        'payment_status':"Semua Transaksi" if not payment_status else midtrans.PAYMENT_STATUS[payment_status],
+    })
+
+
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def laporan_ujian_diikuti(request):
+    level_studies = LevelStudy.objects.all()
+    mata_pelajarans = MataPelajaran.objects.all()
+    
+    nilai_counts = Nilai.objects.values(
+        'level_study', 
+        'mata_pelajaran'
+    ).annotate(
+        jumlah_pengikut=Count('user')
+    ).order_by('level_study', 'mata_pelajaran')
+    
+    peserta_count_dict = {}
+    for item in nilai_counts:
+        key = (item['level_study'], item['mata_pelajaran'])
+        peserta_count_dict[key] = item['jumlah_pengikut']
+        
+    grouped_data = {}
+    total_peserta = 0
+    
+    for level in level_studies:
+        level_name = level.level_study
+        if level_name not in grouped_data:
+            grouped_data[level_name] = []
+            
+        mapels = mata_pelajarans.filter(level_study=level)
+        for mapel in mapels:
+            mapel_name = mapel.nama_mapel
+            jumlah = peserta_count_dict.get((level_name, mapel_name), 0)
+            grouped_data[level_name].append({
+                'mata_pelajaran': mapel_name,
+                'jumlah_pengikut': jumlah
+            })
+            total_peserta += jumlah
+    
+    context = {
+        'level_mapel_data': grouped_data,
+        'total_peserta': total_peserta,
+    }
+    return render(request, 'laporan/laporan_ujian_diikuti_cetak.html', context)

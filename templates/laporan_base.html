@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %}</title>
+    {% include "includes/laporan/styles.html" %}
+</head>
+<body>
+    <button onclick="window.print()" class="btn btn-primary download-btn">
+        Download PDF
+    </button>
+
+    <div class="kop-surat">
+        <h2>Bimbingan Belajar Banua</h2>
+        <p>Jalan Kampung Melayu Darat, No 10 Banjarmasin, Kalimantan Selatan</p>
+        <p>Email: info@bimbeljaya.com | Telepon: (021) 12345678</p>
+        <div class="line"></div>
+    </div>
+
+    {% block content %}{% endblock content %}
+
+    <div class="container signature-container">
+        <div class="signature-block">
+            <p class="signature-date">Banjarmasin, {{ current_date }}</p>
+            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="signature-qr"/>
+            <p class="signature-name">Matini Raufina</p>
+            <div class="signature-line"></div>
+        </div>
+    </div>
+
+    {% include "includes/laporan/scripts.html" %}
+</body>
+</html>

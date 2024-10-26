@@ -1,0 +1,36 @@
+<!-- templates/laporan_peserta_ujian.html -->
+{% extends "laporan_base.html" %}
+{% block title %}Laporan Peserta Ujian{% endblock title %}
+
+{% block content %}
+<div class="container table-container">
+    <h2 class="text-center">Laporan Peserta Ujian</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Level Study</th>
+                <th>Mata Pelajaran</th>
+                <th>Jumlah Pengikut Ujian</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for level, mapel_list in level_mapel_data.items %}
+                {% for mapel in mapel_list %}
+                    <tr>
+                        {% if forloop.first %}
+                            <td rowspan="{{ mapel_list|length }}">{{ level }}</td>
+                        {% endif %}
+                        <td>{{ mapel.mata_pelajaran }}</td>
+                        <td>{{ mapel.jumlah_pengikut }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="2">Total Pengikut</td>
+                <td>{{ total_peserta }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

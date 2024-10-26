@@ -1,0 +1,95 @@
+{% load static %}
+<link href="{% static "assets/vendor/libs/bootstrap/bootstrap.min.css" %}" rel="stylesheet">
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .kop-surat {
+        text-align: center;
+        margin-bottom: 30px;
+        margin-top: 10px;
+    }
+    .kop-surat h2 {
+        margin: 0;
+        font-size: 24px;
+    }
+    .table-container h2 {
+        margin-bottom: 20px;
+    }
+    .kop-surat p {
+        margin: 5px 0;
+        font-size: 14px;
+    }
+    .line {
+        border-bottom: 2px solid black;
+        margin-top: 10px;
+    }
+    .table-container {
+        margin-top: 30px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+    table {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        text-align: center;
+        padding: 8px;
+    }
+    .total-row {
+        font-weight: bold;
+    }
+    .signature-container {
+        margin-top: 50px;
+        margin-bottom: 30px;
+        padding-right: 50px;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .signature-block {
+        text-align: center;
+        width: 250px;
+    }
+    .signature-date {
+        margin-bottom: 0px;
+        font-size: 16px;
+        text-align: center;
+    }
+    .signature-qr {
+        display: block;
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin: 0 auto 0px;
+    }
+    .signature-name {
+        font-weight: bold;
+        text-align: center;
+        margin: 0 0 3px 0;
+    }
+    .signature-line {
+        width: 100%;
+        border-top: 1px solid #000;
+        margin: 0;
+    }
+
+    /* Hide filter and other elements during print */
+    @media print {
+        .filter-container,
+        .download-btn {
+            display: none;
+        }
+    }
+
+    .download-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+</style>

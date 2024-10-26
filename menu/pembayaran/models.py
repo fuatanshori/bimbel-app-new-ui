@@ -18,7 +18,7 @@ class Tarif(models.Model):
 
     class Meta:
         verbose_name_plural = 'Tarif'
-        ordering = ["-created_at"]
+        ordering = ["subject"]
         
     def __str__(self):
         return f"{self.subject}"
