@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Pendapatan</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .kop-surat {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 10px;
+        }
+        .kop-surat h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .table-container h2 {
+            margin-bottom: 20px;
+        }
+        .kop-surat p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .line {
+            border-bottom: 2px solid black;
+            margin-top: 10px;
+        }
+        .table-container {
+            margin-top: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+            padding: 8px;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+        .signature-container {
+            margin-top: 50px;
+            margin-bottom: 30px;
+            padding-right: 50px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .signature-block {
+            text-align: center;
+            width: 250px;
+        }
+        .signature-date {
+            margin-bottom: 0px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .signature-qr {
+            display: block;
+            width: 100px; /* Adjusted width */
+            height: 100px; /* Adjusted height */
+            object-fit: contain;
+            margin: 0 auto 0px; /* Centered using margin auto */
+        }
+        .signature-name {
+            font-weight: bold;
+            text-align: center;
+            margin: 0 0 3px 0;
+        }
+        .signature-line {
+            width: 100%;
+            border-top: 1px solid #000;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="kop-surat">
+        <h2>Bimbingan Belajar Banua</h2>
+        <p>Jalan Kampung Melayu Darat, No 10 Banjarmasin, Kalimantan Selatan</p>
+        <p>Email: info@bimbeljaya.com | Telepon: (021) 12345678</p>
+        <div class="line"></div>
+    </div>
+
+    <div class="container table-container">
+        <h2 class="text-center">Laporan Transaksi</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Tanggal Transaksi</th>
+                    <th>Harga Awal</th>
+                    <th>Diskon</th>
+                    <th>Potongan</th>
+                    <th>Harga Akhir</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in laporan_data %}
+                <tr>
+                    <td>{{ item.nama }}</td>
+                    <td>{{ item.tanggal_transaksi }}</td>
+                    <td>{{ item.harga_awal }}</td>
+                    <td>{{ item.diskon }}</td>
+                    <td>{{ item.potongan }}</td>
+                    <td>{{ item.harga_akhir }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="2">Total Pendapatan</td>
+                    <td>{{ total_data.total_harga_awal }}</td>
+                    <td colspan="2"></td>
+                    <td>{{ total_data.total_harga_akhir }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container signature-container">
+        <div class="signature-block">
+            <p class="signature-date">Banjarmasin, {{ current_date }}</p>
+            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="signature-qr"/>
+            <p class="signature-name">Matini Raufina</p>
+            <div class="signature-line"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

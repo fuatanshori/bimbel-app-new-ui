@@ -172,7 +172,9 @@ def buat_pesanan(request):
                     transaksi_obj = Transaksi.objects.create(
                         user=request.user,
                         tarif=tarif_obj,
-                        harga = resp_harga,
+                        harga_akhir = resp_harga,
+                        harga_awal=harga,
+                        harga_terpotong=harga-resp_harga,
                         diskon = diskon_obj,
                         id_transaksi=str(resp.get('transaction_id')),
                         transaksi_status=resp.get('transaction_status'),
@@ -190,7 +192,9 @@ def buat_pesanan(request):
                     transaksi_obj = Transaksi.objects.create(
                         user=request.user,
                         tarif=tarif_obj,
-                        harga = resp_harga,
+                        harga_akhir = resp_harga,
+                        harga_awal=harga,
+                        harga_terpotong=harga-resp_harga,
                         diskon = diskon_obj,
                         id_transaksi=str(resp.get('transaction_id')),
                         transaksi_status=resp.get('transaction_status'),
@@ -222,14 +226,13 @@ def invoice_gopay(request,id_transaksi):
         if transaksi_obj:
             context = {
                 'vn': transaksi_obj.va_number,
-                'harga':transaksi_obj.harga,
+                'harga':transaksi_obj.harga_akhir,
                 'layanan_pembayaran': transaksi_obj.layanan_pembayaran,
                 'id_transaksi': transaksi_obj.id_transaksi,
                 'status_transaksi': midtrans.PAYMENT_STATUS[transaksi_obj.transaksi_status],
                 'expiry_time': transaksi_obj.expiry_time,
                 'qr_code':transaksi_obj.qrcode_link,
                 'deep_link_redirect':transaksi_obj.deep_link_redirect,
-
             }
             return render(request, 'pembayaran/invoice-gopay.html', context)
     except Transaksi.DoesNotExist:
@@ -283,7 +286,7 @@ def invoice(request, id_transaksi):
         if transaksi_obj:
             context = {
                 'vn': transaksi_obj.va_number,
-                'harga':transaksi_obj.harga,
+                'harga':transaksi_obj.harga_akhir,
                 'bank': transaksi_obj.layanan_pembayaran,
                 'id_transaksi': transaksi_obj.id_transaksi,
                 'status_transaksi': midtrans.PAYMENT_STATUS[transaksi_obj.transaksi_status],
@@ -458,7 +461,7 @@ def laporan_invoice(request):
         'date': babel.dates.format_date(datetime.date.today(),locale="id"),
         'nama' :transaksi_obj.user.full_name,
         'invoice_number': f'#{str(transaksi_obj.id_transaksi)}',
-        'price': transaksi_obj.harga,
+        'price': transaksi_obj.harga_akhir,
         'status': midtrans.PAYMENT_STATUS[transaksi_obj.transaksi_status],
         'virtual_number': transaksi_obj.va_number,
         'layanan_pembayaran': str(transaksi_obj.layanan_pembayaran).upper(),

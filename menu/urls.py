@@ -93,27 +93,7 @@ urlpatterns+=[
 # laporan
 urlpatterns+=[
     path("laporan/",views_laporan.laporan,name="laporan"),
-
-    path("laporan/transaksi/",views_laporan.laporan_transaksi,name="laporan-transaksi"),
-    path("laporan/transaksi/invoice/<id_transaksi>/",laporan_export_views.laporan_transaksi_invoice,name="laporan-transaksi-invoice"),
-    path("laporan/transaksi-excel/",laporan_export_views.export_transaksi_excel,name="transaksi-excel"),
-    path("laporan/transaksi-csv/",laporan_export_views.export_transaksi_csv,name="transaksi-csv"),
-
-    path("laporan/tarif/",views_laporan.laporan_tarif,name="laporan-tarif"),
-    path("laporan/tarif-excel/",laporan_export_views.export_tarif_excel,name="tarif-excel"),
-    path("laporan/tarif-csv/",laporan_export_views.export_tarif_csv,name="tarif-csv"),
-
-    path("laporan/data-pelanggan/",views_laporan.laporan_data_pelanggan,name="laporan-data-pelanggan"),
-    path("laporan/data-pelanggan-excel/",laporan_export_views.export_data_pelanggan_excel,name="data-pelanggan-excel"),
-    path("laporan/data-pelanggan-csv/",laporan_export_views.export_data_pelanggan_csv,name="data-pelanggan-csv"),
-
-
-    path("laporan/mata-pelajaran/",views_laporan.laporan_mata_pelajaran,name="laporan-mata-pelajaran"),
-    path("laporan/data-mapel-excel/",laporan_export_views.export_data_mapel_excel,name="data-mapel-excel"),
-    path("laporan/data-mapel-csv/",laporan_export_views.export_data_mapel_csv,name="data-mapel-csv"),
+    path('reports/total-revenue-per-tarif/', views_laporan.laporan_pendapatan, name='total_revenue_per_tarif'),
+    path('reports/pdf/', views_laporan.get_tarif_diskon, name='pdf'),
     
-    
-    path("laporan/nilai/",views_laporan.laporan_nilai,name="laporan-nilai"),
-    path("laporan/nilai-excel/",laporan_export_views.export_data_nilai_excel,name="nilai-excel"),
-    path("laporan/nilai-csv/",laporan_export_views.export_data_nilai_csv,name="nilai-csv"),
 ]
