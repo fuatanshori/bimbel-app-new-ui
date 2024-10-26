@@ -1,5 +1,5 @@
-from django.shortcuts import render
 from django.shortcuts import render, redirect, HttpResponse,get_object_or_404
+from django.http import Http404
 from .models import MataPelajaran
 from config import midtrans
 from django.contrib.auth.decorators import login_required
@@ -221,7 +221,7 @@ def ujian(request,id_mapel):
 
     soal_ujian_objs_lists = list(SoalUjian.objects.filter(mata_pelajaran__pk=pk))
     if len(soal_ujian_objs_lists)==0:
-        return HttpResponse("soal ujian belum dibuat")
+        raise Http404()
     random.shuffle((soal_ujian_objs_lists))
     
     context = {
