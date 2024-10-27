@@ -13,7 +13,7 @@ from core.utils.decorator import admin_pemateri_required,transaksi_settlement_re
 from menu.utils.encode_url import decode_id
 from menu.utils.pagination import pagination_queryset
 from .models import Chat
-
+from django.db.models import Count
 # Create your views here.
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
@@ -22,7 +22,7 @@ PAYMENT_STATUS = midtrans.PAYMENT_STATUS
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def modul_levelstudy(request):
-    levelstudy_objs = LevelStudy.objects.all()
+    levelstudy_objs = LevelStudy.objects.annotate(mapel_count=Count('matapelajaran'))
     context = {
         'levelstudy_objs': levelstudy_objs,
     }
@@ -33,10 +33,13 @@ def modul_levelstudy(request):
 @transaksi_settlement_required
 def modul_mapel(request,id_levelstudy):
     pk =decode_id(id_levelstudy)
-    mapel_objs = MataPelajaran.objects.filter(level_study__pk=pk)
+    mapel_objs = MataPelajaran.objects.filter(level_study__pk=pk).annotate(modul_count=Count('modul'))
+    levelstudy_objs = LevelStudy.objects.get(pk=pk)
     context = {
         'mapel_objs': mapel_objs,
-        "id_levelstudy":id_levelstudy
+        "id_levelstudy":id_levelstudy,
+        "kelas":levelstudy_objs.kelas,
+        "level":levelstudy_objs.level_study,
     }
     return render(request, 'modul/modul_mapel.html', context)
 

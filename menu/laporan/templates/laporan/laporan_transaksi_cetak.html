@@ -4,7 +4,7 @@
 <div class="container table-container">
     <h2 class="text-center">Laporan Transaksi</h2>
     <div class="d-flex justify-content-center align-items-center mb-3">
-        <p class="mb-0 mr-3"><strong>Periode : </strong>{% if dari_tanggal %}{{dari_tanggal|date}}{% else %}Semua Waktu{% endif %} <strong>sd</strong> {% if sampai_tanggal %}{{sampai_tanggal|date}}{% else %}Semua Waktu{% endif %}</p>
+        <p class="mb-0 mr-3"><strong>Periode Transaksi : </strong>{% if dari_tanggal %}{{dari_tanggal|date}}{% else %}Semua Waktu{% endif %} <strong>sd</strong> {% if sampai_tanggal %}{{sampai_tanggal|date}}{% else %}Semua Waktu{% endif %}</p>
         <p class="mb-0"><strong>Status Pembayaran : </strong>{% if payment_status %}{{payment_status}}{% else %}Semua Transaksi{% endif %}</p>
     </div>
     <table>
@@ -12,6 +12,7 @@
             <tr>
                 <th>Nama</th>
                 <th>Tanggal Transaksi</th>
+                <th>Status Pembayaran</th>
                 <th>Harga Awal</th>
                 <th>Diskon</th>
                 <th>Potongan</th>
@@ -23,6 +24,7 @@
             <tr>
                 <td>{{ item.nama }}</td>
                 <td>{{ item.tanggal_transaksi }}</td>
+                <td>{{ item.transaksi_status }}</td>
                 <td>Rp. {{ item.harga_awal }}</td>
                 <td>{{ item.diskon }}%</td>
                 <td>Rp. {{ item.potongan }}</td>
@@ -30,9 +32,10 @@
             </tr>
             {% endfor %}
             <tr class="total-row">
-                <td colspan="2">Total Transaksi</td>
+                <td colspan="3">Total</td>
                 <td>Rp. {{ total_data.total_harga_awal }}</td>
-                <td colspan="2"></td>
+                <td></td>
+                <td>Rp. {{total_data.total_potongan}}</td>
                 <td>Rp. {{ total_data.total_harga_akhir }}</td>
             </tr>
         </tbody>

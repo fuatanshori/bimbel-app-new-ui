@@ -5,30 +5,45 @@
 {% block content %}
 <div class="container table-container">
     <h2 class="text-center">Laporan Peserta Ujian</h2>
-    
-    <table>
-        <thead>
+    <div class="d-flex justify-content-center align-items-center mb-3">
+        <p class="mb-0 mr-3"><strong>Mata Plajaran :</strong> {% if mapel %}{{mapel}}{% else %}Semua Mata Plajaran{% endif %}</p>
+    </div>
+    <table >
+        <thead >
             <tr>
                 <th>Level Study</th>
+                <th>Kelas</th>
                 <th>Mata Pelajaran</th>
                 <th>Jumlah Pengikut Ujian</th>
             </tr>
         </thead>
         <tbody>
-            {% for level, mapel_list in level_mapel_data.items %}
-                {% for mapel in mapel_list %}
-                    <tr>
-                        {% if forloop.first %}
-                            <td rowspan="{{ mapel_list|length }}">{{ level }}</td>
-                        {% endif %}
-                        <td>{{ mapel.mata_pelajaran }}</td>
-                        <td>{{ mapel.jumlah_pengikut }}</td>
-                    </tr>
-                {% endfor %}
+            {% for item in data %}
+            <tr>
+                {% comment %} {% if item.level_rowspan > 0 %}
+                <td rowspan="{{ item.level_rowspan }}" class="align-middle">{{ item.level_study }}</td>
+                {% endif %}
+                {% if item.kelas_rowspan > 0 %}
+                <td rowspan="{{ item.kelas_rowspan }}" class="align-middle">{{ item.kelas }}</td>
+                {% endif %}
+                <td>{{ item.mata_pelajaran }}</td>
+                <td class="text-center">{{ item.jumlah_pengikut }}</td> {% endcomment %}
+                
+                <td>{{ item.level_study }}</td>
+                <td>{{ item.kelas }}</td>
+                <td>{{ item.mata_pelajaran }}</td>
+                <td class="text-center">{{ item.jumlah_pengikut }}</td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" >Tidak ada data</td>
+            </tr>
             {% endfor %}
-            <tr class="total-row">
-                <td colspan="2">Total Pengikut</td>
-                <td>{{ total_peserta }}</td>
+            <!-- Baris Total -->
+            <tr class=" font-weight-bold">
+                <td colspan="3" class="text-end">Total Pengikut Ujian</td>
+                <td >{{ total_pengikut }}</td>
             </tr>
         </tbody>
     </table>

@@ -95,5 +95,6 @@ urlpatterns+=[
     path('laporan/transaksi/', views_laporan.laporan_transaksi, name='laporan-transaksi-cetak'),
     path('laporan/penggunaan-diskon/', views_laporan.laporan_penggunaan_diskon, name='laporan-penggunaan-diskon-cetak'),
     path('laporan/penggunaan-layanan-pembayaran/', views_laporan.laporan_penggunaan_layanan_pembayaran, name='laporan-penggunaan-layanan-pembayaran'),
+    path('laporan/nilai/', views_laporan.laporan_nilai, name='laporan-nilai'),
     path('laporan/ujian-diikuti/', views_laporan.laporan_ujian_diikuti, name='laporan-ujian-diikuti'),
 ]

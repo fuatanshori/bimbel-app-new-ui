@@ -1,119 +1,249 @@
 {% extends "menu_base.html" %}
 
-{% block title %}menu  {% endblock title %}
+{% block title %}menu{% endblock title %}
 {% block content %}
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row">
       <div class="col-lg-12 order-1">
         <div class="row">
-          <div class="col-lg-6 col-md-12 col-12 mb-4 row-2"  style="{% if request.user.role == 'pemateri' %}display:none;{% endif %}">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bx-money text-success' style="font-size: 60px;"></i>
+          <!-- Card Pembayaran -->
+          <div class="col-lg-6 col-md-12 col-12 mb-4" style="{% if request.user.role == 'pemateri' %}display:none;{% endif %}">
+            <div class="card border-0 shadow-sm hover:shadow">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="card-title mb-0">
+                    <i class='bx bx-money text-success me-2' style="font-size: 35px; vertical-align: middle;"></i>
+                    Pembayaran
+                  </h4>
+                  <span class="badge bg-success rounded-pill fs-6">
+                    {{transaksi_count}} Transaksi
+                  </span>
                 </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Pembayaran</h3>
-                <a href="{% url "menu:pembayaran" %}" class="btn btn-primary">kunjungi</a>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                  <div class="col-7">
+                    <div class="d-flex flex-column">
+                      <small class="text-muted mb-1">Total Pembayaran</small>
+                      <div class="d-flex align-items-center">
+                        <h3 class="fw-bold mb-0 me-2">{{transaksi_count}}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-5 text-end">
+                    <a href="{% url 'menu:pembayaran' %}" class="btn btn-primary px-4">
+                      <i class='bx bx-right-arrow-alt me-1'></i>
+                      Kunjungi
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
         {% if status_transaksi == "Telah Dibayar" or request.user.role == 'admin' or request.user.role == 'pemateri' %}
         {% if request.user.role != "pelajar" %}  
-        <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bxs-graduation text-success' style="font-size: 60px;"></i>
+          <!-- Card Level Study -->
+          <div class="col-lg-6 col-md-12 col-12 mb-4">
+            <div class="card border-0 shadow-sm hover:shadow">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="card-title mb-0">
+                    <i class='bx bxs-graduation text-success me-2' style="font-size: 35px; vertical-align: middle;"></i>
+                    Level Study
+                  </h4>
+                  <span class="badge bg-success rounded-pill fs-6">
+                    {{levelstudy_count}} Level
+                  </span>
                 </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Level Study</h3>
-                  <a href="{% url "menu:levelstudy" %}" class="btn btn-primary">kunjungi</a>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                  <div class="col-7">
+                    <div class="d-flex flex-column">
+                      <small class="text-muted mb-1">Total Level Study</small>
+                      <div class="d-flex align-items-center">
+                        <h3 class="fw-bold mb-0 me-2">{{levelstudy_count}}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-5 text-end">
+                    <a href="{% url 'menu:levelstudy' %}" class="btn btn-primary px-4">
+                      <i class='bx bx-right-arrow-alt me-1'></i>
+                      Kunjungi
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Card Mata Pelajaran -->
           <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around">
-                <div class="w-100">
-                  <i class='bx bx-book-content text-primary' style="font-size: 60px;"></i>
+            <div class="card border-0 shadow-sm hover:shadow">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="card-title mb-0">
+                    <i class='bx bx-book-content text-primary me-2' style="font-size: 35px; vertical-align: middle;"></i>
+                    Mata Pelajaran
+                  </h4>
+                  <span class="badge bg-primary rounded-pill fs-6">
+                    {{mapel_count}} Mapel
+                  </span>
                 </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Mata Pelajaran</h3>
-                  <a href="{% url "menu:mapel-levelstudy" %}" class="btn btn-primary">kunjungi</a>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                  <div class="col-7">
+                    <div class="d-flex flex-column">
+                      <small class="text-muted mb-1">Total Mata Pelajaran</small>
+                      <div class="d-flex align-items-center">
+                        <h3 class="fw-bold mb-0 me-2">{{mapel_count}}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-5 text-end">
+                    <a href="{% url 'menu:mapel-levelstudy' %}" class="btn btn-primary px-4">
+                      <i class='bx bx-right-arrow-alt me-1'></i>
+                      Kunjungi
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           {% endif %}
-          
+
+          <!-- Card Modul -->
           <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row  align-items-center justify-content-around">
-                <div class="w-100">
-                  <i class='bx bx-book-open text-primary' style="font-size: 60px;"></i>
+            <div class="card border-0 shadow-sm hover:shadow">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="card-title mb-0">
+                    <i class='bx bx-book-open text-primary me-2' style="font-size: 35px; vertical-align: middle;"></i>
+                    Modul
+                  </h4>
+                  <span class="badge bg-primary rounded-pill fs-6">
+                    {{modul_count}} Modul
+                  </span>
                 </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Modul</h3>
-                  <a href="{% url "menu:levelstudy-modul" %}" class="btn btn-primary">kunjungi</a>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                  <div class="col-7">
+                    <div class="d-flex flex-column">
+                      <small class="text-muted mb-1">Total Modul</small>
+                      <div class="d-flex align-items-center">
+                        <h3 class="fw-bold mb-0 me-2">{{modul_count}}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-5 text-end">
+                    <a href="{% url 'menu:levelstudy-modul' %}" class="btn btn-primary px-4">
+                      <i class='bx bx-right-arrow-alt me-1'></i>
+                      Kunjungi
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Card Ujian -->
           <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bxs-vial text-warning' style="font-size: 60px;"></i>
+            <div class="card border-0 shadow-sm hover:shadow">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="card-title mb-0">
+                    <i class='bx bxs-vial text-warning me-2' style="font-size: 35px; vertical-align: middle;"></i>
+                    Ujian
+                  </h4>
+                  <span class="badge bg-warning rounded-pill fs-6">
+                    {{ujian_count}} Soal Ujian
+                  </span>
                 </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Ujian</h3>
-                  <a href="{% url "menu:levelstudy-ujian" %}" class="btn btn-primary">kunjungi</a>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                  <div class="col-7">
+                    <div class="d-flex flex-column">
+                      <small class="text-muted mb-1">Total Soal Ujian</small>
+                      <div class="d-flex align-items-center">
+                        <h3 class="fw-bold mb-0 me-2">{{ujian_count}}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-5 text-end">
+                    <a href="{% url 'menu:levelstudy-ujian' %}" class="btn btn-primary px-4">
+                      <i class='bx bx-right-arrow-alt me-1'></i>
+                      Kunjungi
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- Card Nilai -->
           <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bx-trophy text-warning' style="font-size: 60px;"></i>
+            <div class="card border-0 shadow-sm hover:shadow">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="card-title mb-0">
+                    <i class='bx bx-trophy text-warning me-2' style="font-size: 35px; vertical-align: middle;"></i>
+                    Nilai
+                  </h4>
+                  <span class="badge bg-warning rounded-pill fs-6">
+                    {{nilai_count}} Nilai
+                  </span>
                 </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Nilai</h3>
-                  <a href="{% url "menu:pembayaran" %}" class="btn btn-primary">kunjungi</a>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                  <div class="col-7">
+                    <div class="d-flex flex-column">
+                      <small class="text-muted mb-1">Total Nilai</small>
+                      <div class="d-flex align-items-center">
+                        <h3 class="fw-bold mb-0 me-2">{{nilai_count}}</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-5 text-end">
+                    <a href="{% url 'menu:daftar-nilai' %}" class="btn btn-primary px-4">
+                      <i class='bx bx-right-arrow-alt me-1'></i>
+                      Kunjungi
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
           {% if request.user.role != "pelajar" %}  
+          <!-- Card Laporan -->
           <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bxs-report text-danger' style="font-size: 60px;"></i>
+            <div class="card border-0 shadow-sm hover:shadow">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h4 class="card-title mb-0">
+                    <i class='bx bxs-report text-danger me-2' style="font-size: 35px; vertical-align: middle;"></i>
+                    Laporan
+                  </h4>
+                  <span class="badge bg-danger rounded-pill fs-6">
+                    7 Laporan
+                  </span>
                 </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Laporan</h3>
-                  <a href="{% url "menu:laporan" %}" class="btn btn-primary">kunjungi</a>
-                </div>
-              </div>
-            </div>
-          </div>
-          {% endif %}
-          {% if request.user.role == "admin" %}
-          <div class="col-lg-6 col-md-12 col-12 mb-4">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-around ">
-                <div class="w-100">
-                  <i class='bx bx-stats text-danger' style="font-size: 60px;"></i>
-                </div>
-                <div class="w-100">
-                  <h3 class="card-title mb-4">Statistik</h3>
-                  <a href="" class="btn btn-primary">kunjungi</a>
+                <hr class="my-3">
+                <div class="row align-items-center">
+                  <div class="col-7">
+                    <div class="d-flex flex-column">
+                      <small class="text-muted mb-1">Total Laporan</small>
+                      <div class="d-flex align-items-center">
+                        <h3 class="fw-bold mb-0 me-2">7</h3>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-5 text-end">
+                    <a href="{% url 'menu:laporan' %}" class="btn btn-primary px-4">
+                      <i class='bx bx-right-arrow-alt me-1'></i>
+                      Kunjungi
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>

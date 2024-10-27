@@ -31,6 +31,7 @@
                   <thead>
                     <tr>
                         <th>Nama</th>
+                        <th>Kelas</th>
                         <th>Tingkat Studi</th>
                         <th>Mata Pelajaran</th>
                         <th>Nilai</th>
@@ -44,6 +45,7 @@
                     {% for nilai_obj in nilai_objs %}
                     <tr>  
                         <td>{{nilai_obj.user.full_name}}</td>
+                        <td>{{nilai_obj.kelas}}</td>
                         <td>{{nilai_obj.level_study}}</td>
                         <td>{{nilai_obj.mata_pelajaran}}</td>
                         <td>{{nilai_obj.nilai}}</td>

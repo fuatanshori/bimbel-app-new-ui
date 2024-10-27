@@ -5,8 +5,7 @@
 <div class="container table-container">
     <h2 class="text-center">Laporan Penggunaan Layanan Pembayaran</h2>
     <div class="d-flex justify-content-center align-items-center mb-3">
-        <p class="mb-0 mr-3"><strong>Periode : </strong>{% if dari_tanggal %}{{dari_tanggal|date}}{% else %}Semua Waktu{% endif %} <strong>sd</strong> {% if sampai_tanggal %}{{sampai_tanggal|date}}{% else %}Semua Waktu{% endif %}</p>
-        <p class="mb-0"><strong>Status Pembayaran : </strong>{% if payment_status %}{{payment_status}}{% else %}Semua Transaksi{% endif %}</p>
+        <p class="mb-0"><strong>Layanan Pembayaran : </strong>{% if layanan_pembayaran %}{{layanan_pembayaran}}{% else %}Semua Layanan Pembayaran{% endif %}</p>
     </div>
     <table>
         <thead>

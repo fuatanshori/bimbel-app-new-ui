@@ -49,11 +49,11 @@ def lakukan_ujian_ulang(request,id_mapel,id_nilai):
     try:
         mapel_obj = MataPelajaran.objects.get(pk=pk_mapel)
         if request.user.role == "pemateri" or request.user.role == "admin":
-            nilai_obj = Nilai.objects.get(pk=pk_nilai,status="tidak lulus",mata_pelajaran=mapel_obj)
+            nilai_obj = Nilai.objects.get(pk=pk_nilai,status="tidak lulus",mata_pelajaran_obj=mapel_obj)
             nilai_obj.delete()
             return redirect("menu:daftar-nilai")
         elif request.user.role == "pelajar":
-            nilai_obj = Nilai.objects.get(pk=pk_nilai,status="tidak lulus",mata_pelajaran=mapel_obj,user=request.user)
+            nilai_obj = Nilai.objects.get(pk=pk_nilai,status="tidak lulus",mata_pelajaran_obj=mapel_obj,user=request.user)
             nilai_obj.delete()
             return redirect("menu:ujian",id_mapel=id_mapel)
     except MataPelajaran.DoesNotExist:
@@ -108,16 +108,18 @@ def generate_certificate(request,id_sertifikat):
 
     nama = str(sertifikat_obj.nama).upper()
     id_cert = str(sertifikat_obj.pk).upper()
+    kelas = sertifikat_obj.kelas.upper()
     tingkat_studi = sertifikat_obj.tingkat_studi.upper()
     mata_pelajaran = sertifikat_obj.mata_pelajaran.upper()
     predikat = sertifikat_obj.predikat.upper()
     nilai = sertifikat_obj.nilai
-    tanggal_lahir = sertifikat_obj.tanggal_lahir
-    tanggal_dibuat = sertifikat_obj.created_at
+    tanggal_lahir = sertifikat_obj.tanggal_lahir.strftime("%d-%m-%Y")
+    tanggal_dibuat = sertifikat_obj.created_at.strftime("%d-%m-%Y")
 
     positions = {
         "nama": (image_width / 2, 620),
-        "id_sertifikat": (550, 770),
+        "id_sertifikat": (550, 715),
+        "kelas": (550, 770),
         "tingkat_studi": (550, 830),
         "mata_pelajaran": (550, 890),
         "predikat": (550, 950),
@@ -136,6 +138,7 @@ def generate_certificate(request,id_sertifikat):
     pdf.setFont("LeagueSpartan-Regular", 32)
 
     pdf.drawString(positions['id_sertifikat'][0], image_height - positions['id_sertifikat'][1], "ID SERTIFIKAT")
+    pdf.drawString(positions['kelas'][0], image_height - positions['kelas'][1], "KELAS")
     pdf.drawString(positions['tingkat_studi'][0], image_height - positions['tingkat_studi'][1], "TINGKAT STUDI")
     pdf.drawString(positions['mata_pelajaran'][0], image_height - positions['mata_pelajaran'][1], "MATA PELAJARAN")
     pdf.drawString(positions['predikat'][0], image_height - positions['predikat'][1], "PREDIKAT")
@@ -144,6 +147,7 @@ def generate_certificate(request,id_sertifikat):
     pdf.drawString(positions['tanggal_dibuat'][0], image_height - positions['tanggal_dibuat'][1], "TANGGAL DIBUAT")
 
     pdf.drawString(860, image_height - positions['id_sertifikat'][1], ":")
+    pdf.drawString(860, image_height - positions['kelas'][1], ":")
     pdf.drawString(860, image_height - positions['tingkat_studi'][1], ":")
     pdf.drawString(860, image_height - positions['mata_pelajaran'][1], ":")
     pdf.drawString(860, image_height - positions['predikat'][1], ":")
@@ -152,6 +156,7 @@ def generate_certificate(request,id_sertifikat):
     pdf.drawString(860, image_height - positions['tanggal_dibuat'][1], ":")
  
     pdf.drawString(880, image_height - positions['id_sertifikat'][1], f"{id_cert}")
+    pdf.drawString(880, image_height - positions['kelas'][1], f"{kelas}")
     pdf.drawString(880, image_height - positions['tingkat_studi'][1], f"{tingkat_studi}")
     pdf.drawString(880, image_height - positions['mata_pelajaran'][1], f"{mata_pelajaran}")
     pdf.drawString(880, image_height - positions['predikat'][1], f"{predikat}")

@@ -6,6 +6,9 @@ from .models import LevelStudy
 from .forms import LevelStudyForm
 from menu.utils.pagination import pagination_queryset
 from menu.utils.encode_url import decode_id
+from django.core.exceptions import ValidationError
+
+
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
@@ -28,6 +31,8 @@ def tambah_levelstudy(request):
             level_study_form.save()  # Simpan objek menggunakan save() langsung
             messages.success(request, f"Selamat, level study {level_study_form.cleaned_data['level_study']} berhasil ditambahkan.")
             return redirect("menu:levelstudy")
+        else:
+            messages.error(request, f"Gagal tingkat studi {level_study_form.cleaned_data['level_study']} dan kelas {level_study_form.cleaned_data['kelas']} telah ada.")
     else:
         level_study_form = LevelStudyForm()  # Hanya inisialisasi untuk GET
 
@@ -45,17 +50,24 @@ def hapus_levelstudy(request, id_levelstudy):
     messages.success(request, f"Selamat, level study {levelstudy_obj.level_study} berhasil dihapus.")
     return redirect("menu:levelstudy")
 
+
+
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def edit_levelstudy(request, id_levelstudy):
     pk = decode_id(id_levelstudy)
     levelstudy_obj = get_object_or_404(LevelStudy, pk=pk)  # Menggunakan get_object_or_404
+    
     if request.method == "POST":
         level_study_form = LevelStudyForm(request.POST, instance=levelstudy_obj)
+        
         if level_study_form.is_valid():
             level_study_form.save()
             messages.success(request, f"Selamat, level study {levelstudy_obj.level_study} berhasil diperbarui.")
             return redirect("menu:levelstudy")
+        else:
+            messages.error(request, f"Gagal tingkat studi {levelstudy_obj.level_study} dan kelas {levelstudy_obj.kelas} telah ada.")
+
     else:
         level_study_form = LevelStudyForm(instance=levelstudy_obj)
 

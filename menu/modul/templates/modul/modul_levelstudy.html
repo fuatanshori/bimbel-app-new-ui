@@ -1,25 +1,44 @@
 {% extends "menu_base.html" %}
-{% block title %}modul  {% endblock title %}
+
+{% block title %}Modul{% endblock title %}
+
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
-    <div class="row">
-      <div class="col-lg-12 order-1">
-        <div class="row">
+  <div class="text-center mb-4">
+    <h1 class="display-4 fw-bold">LEVEL STUDY</h1>
+    <p class="lead text-muted">Pilih level studi yang sesuai untuk memulai membaca modul</p>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-12 order-1">
+      <div class="row g-3">
         {% for levelstudy_obj in levelstudy_objs %}
-          <div class="col-lg-4 col-md-12 col-12 mb-4 row-2">
-            <div class="card">
-              <div class="card-body d-flex flex-row align-items-center justify-content-center">
-                <div class="">
-                  <h3 class="card-title mb-4 text-center">{{levelstudy_obj.level_study}}</h3>
-                  <a href="{% url "menu:mapel-modul" id_levelstudy=levelstudy_obj.get_id_safe %}" class="btn btn-primary">kunjungi</a>
+          <div class="col-xl-3 col-lg-4 col-md-6 col-sm-12">
+            <div class="card h-100 border-0 rounded ">
+              <div class="card-body d-flex flex-column justify-content-between">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div class="d-flex align-items-center">
+                    <div class="icon-circle bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                      <i class="bx bx-book fs-3"></i>
+                    </div>
+                    <div>
+                      <h5 class="mb-0 fw-bold" style="font-size: 1.25rem;">{{ levelstudy_obj.level_study }}</h5>
+                      <small class="text-muted" style="font-size: 0.9rem;">Kelas {{ levelstudy_obj.kelas }}</small>
+                    </div>
+                  </div>
+                  <span class="badge bg-label-info text-dark rounded-pill">{{ levelstudy_obj.mapel_count }} Mapel</span>
+                </div>
+                <div class="text-center mt-auto">
+                  <a href="{% url 'menu:mapel-modul' id_levelstudy=levelstudy_obj.get_id_safe %}" 
+                     class="btn btn-outline-primary btn-sm rounded-pill mt-3">
+                    <i class="bx bx-right-arrow-alt me-1"></i> Kunjungi
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         {% endfor %}
-        </div>
       </div>
     </div>
   </div>
-
+</div>
 {% endblock content %}

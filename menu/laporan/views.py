@@ -8,18 +8,25 @@ from django.utils import timezone
 from menu.pembayaran.models import Transaksi,Tarif,Diskon
 from menu.mapel.models import MataPelajaran
 from menu.nilai.models import Nilai
-from django.db.models import Q, Sum, F,Avg,Min,Max,StdDev
+from django.db.models import Q, Sum, F,OuterRef, Subquery
 from django.contrib import messages
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
 from config import midtrans
 from menu.levelstudy.models import LevelStudy 
 
+from django.db import connection
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def laporan(request):
-    return render(request,"laporan/laporan.html")
 
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT DISTINCT nama_mapel FROM mapel_matapelajaran")
+        unique_mapel = cursor.fetchall()
+    mapel_objs = [row[0] for row in unique_mapel]
+    levelstudy_objs = LevelStudy.objects.all()
+
+    return render(request,"laporan/laporan.html",{"mapel_objs":mapel_objs,"levelstudy_objs":levelstudy_objs})
 
 @login_required(login_url='user:masuk')
 @admin_required
@@ -67,6 +74,7 @@ def laporan_transaksi(request):
             'diskon': diskon_persen,
             'potongan': transaksi.harga_terpotong,
             'harga_akhir': transaksi.harga_akhir,
+            'transaksi_status': midtrans.PAYMENT_STATUS[transaksi.transaksi_status],
         })
 
     total_data = {
@@ -108,8 +116,6 @@ def laporan_transaksi(request):
 @admin_required
 def laporan_penggunaan_diskon(request):
     filter_type = request.GET.get('filter', 'all')
-    payment_status = request.GET.get('payment_status', 'all')
-    
     tarif_list = Tarif.objects.all()
     
     tarif_diskon_data = {}
@@ -128,14 +134,9 @@ def laporan_penggunaan_diskon(request):
         elif filter_type == 'expired':
             diskon_query = diskon_query.filter(kedaluwarsa__lt=today)
         
-        if payment_status != "all":
-            diskon_list = diskon_query.annotate(
-                jumlah_terpakai=Count('transaksi',filter=Q(transaksi__transaksi_status=payment_status))
-            )
-        else:
-            diskon_list = diskon_query.annotate(
-                jumlah_terpakai=Count('transaksi')
-            )
+        diskon_list = diskon_query.annotate(
+            jumlah_terpakai=Count('transaksi')
+        )
         if diskon_list.exists(): 
             tarif_diskon_data[tarif] = []
             for diskon in diskon_list:
@@ -143,9 +144,7 @@ def laporan_penggunaan_diskon(request):
                 
                 potongan_harga_query = Transaksi.objects.filter(diskon=diskon)
                 
-                if payment_status != 'all':
-                    potongan_harga_query = potongan_harga_query.filter(transaksi_status=payment_status)
-                
+
                 potongan_harga = potongan_harga_query.aggregate(
                     total_potongan=Sum('harga_terpotong')
                 )['total_potongan'] or 0
@@ -168,7 +167,6 @@ def laporan_penggunaan_diskon(request):
         'total_harga_terpotong': total_harga_terpotong,
         'current_date': current_date,
         'filter_type': ft[filter_type],
-        'payment_status': "Semua Transaksi" if payment_status == "all" else midtrans.PAYMENT_STATUS[payment_status],
     }
 
     return render(request, 'laporan/laporan_diskon_terpakai_cetak.html', context)
@@ -176,29 +174,11 @@ def laporan_penggunaan_diskon(request):
 @login_required(login_url='user:masuk')
 @admin_required
 def laporan_penggunaan_layanan_pembayaran(request):
-    payment_status = request.GET.get('payment_status')
-    dari_tanggal = request.GET.get('dari_tanggal')
-    sampai_tanggal = request.GET.get('sampai_tanggal')
-    try:
-        if dari_tanggal:
-            dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
-        if sampai_tanggal:
-            sampai_tanggal = timezone.make_aware(timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d'))
-
-        if dari_tanggal and sampai_tanggal and dari_tanggal > sampai_tanggal:
-            messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
-            return redirect("menu:laporan")
-    except ValueError:
-        messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
-        return redirect("menu:laporan")
-    
+    layanan_pembayaran = request.GET.get('layanan_pembayaran')
     filters = Q()
-    if dari_tanggal:
-        filters &= Q(transaction_time__date__gte=dari_tanggal)
-    if sampai_tanggal:
-        filters &= Q(transaction_time__date__lte=sampai_tanggal)
-    if payment_status:
-        filters &= Q(transaksi_status=payment_status)
+    if layanan_pembayaran:
+        filters &= Q(layanan_pembayaran__icontains=layanan_pembayaran)
+
     payment_method_counts = Transaksi.objects.filter(filters).values('layanan_pembayaran').annotate(jumlah=Count('layanan_pembayaran'))
     payment_method_counts = list(payment_method_counts)
     
@@ -222,50 +202,154 @@ def laporan_penggunaan_layanan_pembayaran(request):
         'payment_method_counts': payment_method_counts,
         'current_date': current_date,
         'qr_code':qr_code_b64,
-        'dari_tanggal': dari_tanggal,
-        'sampai_tanggal': sampai_tanggal,
-        'payment_status':"Semua Transaksi" if not payment_status else midtrans.PAYMENT_STATUS[payment_status],
+        'layanan_pembayaran':layanan_pembayaran if layanan_pembayaran else "Semua layanan Pembayaran"
     })
 
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def laporan_ujian_diikuti(request):
-    level_studies = LevelStudy.objects.all()
-    mata_pelajarans = MataPelajaran.objects.all()
-    
-    nilai_counts = Nilai.objects.values(
-        'level_study', 
-        'mata_pelajaran'
+    mapel = request.GET.get('mapel')
+    filters = Q()
+    if mapel:
+        filters &= Q(nama_mapel__icontains=mapel)
+    mapel_dengan_nilai = MataPelajaran.objects.select_related('level_study').values(
+        'level_study__level_study',
+        'level_study__kelas',
+        'nama_mapel'
     ).annotate(
-        jumlah_pengikut=Count('user')
-    ).order_by('level_study', 'mata_pelajaran')
+        jumlah_pengikut=Count('nilai', distinct=True)
+    ).order_by(
+        'level_study__level_study',
+        'level_study__kelas',
+        'nama_mapel'
+    ).filter(filters)
     
-    peserta_count_dict = {}
-    for item in nilai_counts:
-        key = (item['level_study'], item['mata_pelajaran'])
-        peserta_count_dict[key] = item['jumlah_pengikut']
+    # Format data untuk template dengan informasi rowspan
+    formatted_data = []
+    current_data = list(mapel_dengan_nilai)
+    
+    # Hitung rowspan untuk level study dan kelas
+    level_count = {}  # Counter untuk level study
+    kelas_count = {}  # Counter untuk kombinasi level-kelas
+    total_pengikut = 0
+    
+    for item in current_data:
+        level = item['level_study__level_study']
+        kelas = item['level_study__kelas']
+        level_kelas = f"{level}-{kelas}"
         
-    grouped_data = {}
-    total_peserta = 0
+        # Hitung untuk level study
+        if level not in level_count:
+            level_count[level] = 0
+        level_count[level] += 1
+        
+        # Hitung untuk kelas
+        if level_kelas not in kelas_count:
+            kelas_count[level_kelas] = 0
+        kelas_count[level_kelas] += 1
+        
+        total_pengikut += item['jumlah_pengikut']
     
-    for level in level_studies:
-        level_name = level.level_study
-        if level_name not in grouped_data:
-            grouped_data[level_name] = []
-            
-        mapels = mata_pelajarans.filter(level_study=level)
-        for mapel in mapels:
-            mapel_name = mapel.nama_mapel
-            jumlah = peserta_count_dict.get((level_name, mapel_name), 0)
-            grouped_data[level_name].append({
-                'mata_pelajaran': mapel_name,
-                'jumlah_pengikut': jumlah
-            })
-            total_peserta += jumlah
+    # Format data dengan rowspan
+    current_level = None
+    current_kelas = None
+    current_level_kelas = None
+    
+    for item in current_data:
+        level = item['level_study__level_study']
+        kelas = item['level_study__kelas']
+        level_kelas = f"{level}-{kelas}"
+        
+        # Tentukan rowspan untuk level study
+        level_rowspan = level_count.get(level, 1) if level != current_level else 0
+        
+        # Tentukan rowspan untuk kelas
+        kelas_rowspan = kelas_count.get(level_kelas, 1) if level_kelas != current_level_kelas else 0
+        
+        formatted_data.append({
+            'level_study': level,
+            'level_rowspan': level_rowspan,
+            'kelas': kelas,
+            'kelas_rowspan': kelas_rowspan,
+            'mata_pelajaran': item['nama_mapel'],
+            'jumlah_pengikut': item['jumlah_pengikut']
+        })
+        
+        current_level = level
+        current_level_kelas = level_kelas
     
     context = {
-        'level_mapel_data': grouped_data,
-        'total_peserta': total_peserta,
+        'data': formatted_data,
+        'total_pengikut': total_pengikut,
+        'title': 'Laporan Jumlah Peserta Ujian'
     }
     return render(request, 'laporan/laporan_ujian_diikuti_cetak.html', context)
+
+
+def laporan_nilai(request):
+    status_param = request.GET.get('status')
+    dari_tanggal = request.GET.get('dari_tanggal')
+    sampai_tanggal = request.GET.get('sampai_tanggal')
+    try:
+        if dari_tanggal:
+            dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
+        if sampai_tanggal:
+            sampai_tanggal = timezone.make_aware(timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d'))
+
+        if dari_tanggal and sampai_tanggal and dari_tanggal > sampai_tanggal:
+            messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
+            return redirect("menu:laporan")
+    except ValueError:
+        messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
+        return redirect("menu:laporan")
+    
+    filters = Q()
+    filters = Q()
+    if dari_tanggal:
+        filters &= Q(tanggal_ujian__date__gte=dari_tanggal)
+    if sampai_tanggal:
+        filters &= Q(tanggal_ujian__date__lte=sampai_tanggal)
+    if status_param:
+        filters &= Q(status=status_param)
+
+    nilai_objs = Nilai.objects.filter(filters)
+    # Menghitung total lulus dan tidak lulus
+    total_lulus = nilai_objs.filter(status='lulus').count()
+    total_tidak_lulus = nilai_objs.filter(status='tidak lulus').count()
+
+    # Menyiapkan konteks untuk ditampilkan di template
+    context = {
+        'nilai_objs': nilai_objs,
+        'total_lulus': total_lulus,
+        'total_tidak_lulus': total_tidak_lulus,
+        'dari_tanggal': dari_tanggal,
+        'sampai_tanggal': sampai_tanggal,
+    }
+    
+    return render(request, 'laporan/laporan_nilai.html', context)
+
+
+
+def laporan_nilai_persiswa(request):
+    # Mengambil semua nilai dari model Nilai
+    nilai_siswa = Nilai.objects.all()
+
+    # Menghitung total dan rata-rata nilai
+    total_nilai = sum(nilai.nilai for nilai in nilai_siswa)
+    jumlah_mapel = nilai_siswa.count()
+    rata_rata = total_nilai / jumlah_mapel if jumlah_mapel > 0 else 0
+    
+    # Menghitung jumlah lulus dan tidak lulus
+    jumlah_lulus = nilai_siswa.filter(status='lulus').count()
+    jumlah_tidak_lulus = nilai_siswa.filter(status='tidak lulus').count()
+
+    # Menyiapkan konteks untuk ditampilkan di template
+    context = {
+        'nilai_siswa': nilai_siswa,
+        'rata_rata': rata_rata,
+        'jumlah_lulus': jumlah_lulus,
+        'jumlah_tidak_lulus': jumlah_tidak_lulus,
+    }
+    
+    return render(request, 'laporan/laporan_nilai.html', context)

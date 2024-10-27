@@ -1,6 +1,6 @@
 {% extends "menu_base.html" %}
 
-{% block title %}levelstudy  {% endblock title %}
+{% block title %}levelstudy{% endblock title %}
 {% block content %}
 
 <div class="container-xxl flex-grow-1 container-p-y ">
@@ -40,6 +40,7 @@
                   <thead>
                     <tr>
                       <th>Level Study</th>
+                      <th>Kelas</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -47,7 +48,7 @@
                     {% for levelstudy_obj in levelstudy_objs %}
                     <tr>
                       <td>{{levelstudy_obj.level_study}}</td>
-                      </td>
+                      <td>{{levelstudy_obj.kelas}}</td>
                       <td>
                         <a href="{% url "menu:hapus-levelstudy" id_levelstudy=levelstudy_obj.get_id_safe %}" class="btn btn-danger">delete</a>
                         <a href="{% url "menu:edit-levelstudy" id_levelstudy=levelstudy_obj.get_id_safe %}" class="btn btn-primary">Edit Level Study</a>

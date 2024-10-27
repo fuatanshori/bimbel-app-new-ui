@@ -130,8 +130,10 @@ def profile_foto(request, image_file):
     response['Cache-Control'] = 'public, max-age=86400'
     return response
 
-def custom_404_handler(request):
-    context = {}
+def custom_404_handler(request,exception):
+    context = {
+         'message': str(exception),
+    }
     return render(request,"404.html",context,status=404)
 
 def custom_500_handler(request):

@@ -4,7 +4,6 @@ from .models import Nilai,Sertifikat
 
 @admin.register(Nilai)
 class NilaiAdmin(admin.ModelAdmin):
-    readonly_fields=["level_study","mata_pelajaran","nilai","predikat","status","mata_pelajaran_obj","user"]
-
+    list_display = ("level_study","mata_pelajaran","nilai","predikat","status","mata_pelajaran_obj","user",'tanggal_ujian')
 
 admin.site.register(Sertifikat)

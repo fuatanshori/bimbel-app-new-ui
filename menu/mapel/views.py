@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from menu.levelstudy.models import LevelStudy
 from menu.utils.pagination import pagination_queryset
 from menu.utils.encode_url import decode_id
+from django.db.models import Count
 # Create your views here.
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
@@ -20,11 +21,9 @@ PAYMENT_STATUS = midtrans.PAYMENT_STATUS
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def levelstudy_mapel(request):
-    amount_perpage=5
-    custom_range,levelstudy_objs = pagination_queryset(request,LevelStudy.objects.all(),amount_perpage)
+    levelstudy_objs = LevelStudy.objects.annotate(mapel_count=Count('matapelajaran'))
     context = {
         'levelstudy_objs': levelstudy_objs,
-        "custom_range":custom_range,
     }
     return render(request, 'mapel/levelstudy_mapel.html', context)
 

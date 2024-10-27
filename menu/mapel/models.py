@@ -12,7 +12,7 @@ class MataPelajaran(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.nama_mapel}"
+        return f"{self.pk}. {self.level_study.level_study}-{self.nama_mapel}"
     
    
     class Meta:

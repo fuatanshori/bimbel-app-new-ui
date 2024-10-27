@@ -44,7 +44,7 @@ def pembayaran(request):
             return redirect("menu:invoice", id_transaksi=transaksi_obj.id_transaksi)
     except Transaksi.DoesNotExist:
         if request.user.role == "admin":
-            return redirect("menu:tarif")
+            return redirect("menu:pembayaran-admin-list")
     diskon = request.POST.get('diskon', '')
     if request.method == "POST":
         tarif_obj = Tarif.get_tarif_is_used()

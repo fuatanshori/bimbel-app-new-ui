@@ -13,6 +13,7 @@ from menu.utils.encode_url import decode_id
 from menu.utils.pagination import pagination_queryset
 from django.contrib import messages
 from user.models import Profile
+from django.db.models import Count
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
@@ -22,7 +23,7 @@ PAYMENT_STATUS = midtrans.PAYMENT_STATUS
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def levelstudy_ujian(request):
-    levelstudy_objs = LevelStudy.objects.all()
+    levelstudy_objs = LevelStudy.objects.annotate(mapel_count=Count('matapelajaran'))
     context = {
         'levelstudy_objs': levelstudy_objs,
     }
@@ -32,10 +33,14 @@ def levelstudy_ujian(request):
 @transaksi_settlement_required
 def ujian_mapel(request,id_levelstudy):
     pk = decode_id(id_levelstudy)
-    mapel_objs = MataPelajaran.objects.filter(level_study__pk=pk)
+    mapel_objs = MataPelajaran.objects.filter(level_study__pk=pk).annotate(ujian_count=Count('soalujian'))
+    levelstudy_objs = LevelStudy.objects.get(pk=pk)
+
+        
     context = {
         'mapel_objs': mapel_objs,
-        
+        "kelas":levelstudy_objs.kelas,
+        "level":levelstudy_objs.level_study,
     }
     return render(request, 'ujian/ujian_mapel.html', context)
 
@@ -155,7 +160,7 @@ def ujian(request,id_mapel):
     pk = decode_id(id_mapel)
     try:
         mapel_obj = MataPelajaran.objects.get(pk=pk)
-        nilai = Nilai.objects.get(user=request.user,mata_pelajaran=mapel_obj)
+        nilai = Nilai.objects.get(user=request.user,mata_pelajaran_obj=mapel_obj)
         return redirect("menu:nilai-setelah-ujian",id_mapel=id_mapel,id_nilai=nilai.get_id_safe())
     except Nilai.DoesNotExist:
         pass
@@ -199,6 +204,7 @@ def ujian(request,id_mapel):
             nilai = nilai,
             predikat=predikat,
             status = status,
+            kelas = mapel_obj.level_study.kelas,
             mata_pelajaran= mapel_obj.nama_mapel,
             level_study = mapel_obj.level_study.level_study
         )
@@ -209,6 +215,7 @@ def ujian(request,id_mapel):
                 user = request.user,
                 nama = profile_obj.nama_lengkap,
                 tingkat_studi = mapel_obj.level_study.level_study,
+                kelas = mapel_obj.level_study.kelas,
                 mata_pelajaran =mapel_obj.nama_mapel,
                 predikat=nilai_obj.predikat,
                 nilai=nilai_obj.nilai,
@@ -221,7 +228,7 @@ def ujian(request,id_mapel):
 
     soal_ujian_objs_lists = list(SoalUjian.objects.filter(mata_pelajaran__pk=pk))
     if len(soal_ujian_objs_lists)==0:
-        raise Http404()
+        raise Http404("Ujian Belum Dibuat")
     random.shuffle((soal_ujian_objs_lists))
     
     context = {

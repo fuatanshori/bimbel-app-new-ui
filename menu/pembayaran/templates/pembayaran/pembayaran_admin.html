@@ -1,56 +1,67 @@
 {% extends "menu_base.html" %}
 
-{% block title %}pembayaran  {% endblock title %}
-{% block content %}
+{% block title %}Pembayaran{% endblock title %}
 
-<div class="container-xxl flex-grow-1 container-p-y ">
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
     <div class="row justify-content-center">
-      <div class="card">
-        <h5 class="card-header">Transaksi User</h5>
-        <div class="d-flex flex-column gap-2 col-lg-6">
-          
-          <form method="get" class="d-flex align-items-center gap-2">
-              <input style="border-radius: 4px;" type="text" name="cari_transaksi" value="{{ request.GET.cari_transaksi }}" class="form-control text-black" placeholder="cari pembayaran">
-              <button type="submit" class="btn btn-primary px-4">go</button>
-          </form>
-      </div>
-      
-        
-        <div class="table-responsive text-nowrap">
-          <table class="table table-borderless">
-            <thead>
-              <tr>
-                <th>User Email</th>
-                <th>Id Transaksi</th>
-                <th>Va Number</th>
-                <th>Tarif</th>
-                <th>Layanan Pembayaran</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {% for transaksi_obj in transaksi_objs %}
-                  <tr>
-                    <td>{{transaksi_obj.user}}</td>
-                    <td>{{transaksi_obj.id_transaksi}}</td>
-                    <td>{{transaksi_obj.va_number}}</td>
-                    <td>{{transaksi_obj.tarif.harga}}</td>
-                    <td>{{transaksi_obj.layanan_pembayaran}}</td>
-                    {% if transaksi_obj.transaksi_status == 'settlement' %}
-                    <td><label class="badge bg-primary">Telah Dibayar</label></td>
-                    {% elif transaksi_obj.transaksi_status == 'pending' %}
-                    <td><label class="badge bg-danger">Belum Dibayar</label></td>
-                    {% elif transaksi_obj.transaksi_status == 'expire' %}
-                    <td><label class="badge bg-danger">Pembayaran Melebihi Batas Waktu</label></td>
-                    {% endif %}
-                  </tr>
-                  {% endfor %}
-              </tr>
-            </tbody>
-          </table>
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Transaksi User</h5>
+                    <!-- Button for managing tarif -->
+                    <a href="{% url "menu:tarif" %}" class="btn btn-dark">Manajemen Tarif</a>
+                </div>
+
+                <div class="card-body">
+                    <!-- Search form -->
+                    <form method="get" class="mb-4 d-flex align-items-center gap-2">
+                        <input type="text" name="cari_transaksi" value="{{ request.GET.cari_transaksi }}" class="form-control" placeholder="Cari pembayaran">
+                        <button type="submit" class="btn btn-primary px-4">Go</button>
+                    </form>
+
+                    <!-- Transaction table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>User Email</th>
+                                    <th>ID Transaksi</th>
+                                    <th>VA Number</th>
+                                    <th>Tarif</th>
+                                    <th>Layanan Pembayaran</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaksi_obj in transaksi_objs %}
+                                    <tr>
+                                        <td>{{ transaksi_obj.user }}</td>
+                                        <td>{{ transaksi_obj.id_transaksi }}</td>
+                                        <td>{{ transaksi_obj.va_number }}</td>
+                                        <td>{{ transaksi_obj.tarif.harga }}</td>
+                                        <td>{{ transaksi_obj.layanan_pembayaran }}</td>
+                                        <td>
+                                            {% if transaksi_obj.transaksi_status == 'settlement' %}
+                                                <span class="badge bg-primary">Telah Dibayar</span>
+                                            {% elif transaksi_obj.transaksi_status == 'pending' %}
+                                                <span class="badge bg-warning text-dark">Belum Dibayar</span>
+                                            {% elif transaksi_obj.transaksi_status == 'expire' %}
+                                                <span class="badge bg-danger">Pembayaran Melebihi Batas Waktu</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Tidak ada transaksi ditemukan</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 {% endblock content %}
