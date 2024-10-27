@@ -14,6 +14,7 @@ if (status_trans === "Belum Dibayar"){
 var modul = document.querySelector('#modul');
 var ujian = document.querySelector('#ujian');
 var nilai = document.querySelector('#nilai');
+var laporan = document.querySelector('#laporan');
 
 const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
 var socket = new WebSocket(`${protocol}${window.location.host}/ws/pembayaran/${id_transaksi}/`);
@@ -35,6 +36,7 @@ socket.onmessage = function(event) {
         modul.style.display='block';
         ujian.style.display='block';
         nilai.style.display='block';   
+        laporan.style.display='block';   
         
         socket.onclose();   
     }

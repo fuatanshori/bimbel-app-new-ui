@@ -9,7 +9,6 @@ var btnStatusInvoice = document.getElementById("btn_status_invoice")
 var modul = document.querySelector('#modul');
 var ujian = document.querySelector('#ujian');
 var nilai = document.querySelector('#nilai');
-var quizBtn = document.getElementById('quiz');
 const transDataElement = document.getElementById('trans-data');
 const id_transaksi = transDataElement.getAttribute('data-id');
 

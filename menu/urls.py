@@ -97,4 +97,5 @@ urlpatterns+=[
     path('laporan/penggunaan-layanan-pembayaran/', views_laporan.laporan_penggunaan_layanan_pembayaran, name='laporan-penggunaan-layanan-pembayaran'),
     path('laporan/nilai/', views_laporan.laporan_nilai, name='laporan-nilai'),
     path('laporan/ujian-diikuti/', views_laporan.laporan_ujian_diikuti, name='laporan-ujian-diikuti'),
+    path('laporan/nilai-perpelajar/', views_laporan.laporan_nilai_persiswa, name='laporan-nilai-perpelajar'),
 ]

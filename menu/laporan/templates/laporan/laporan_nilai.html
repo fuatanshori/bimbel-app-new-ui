@@ -5,7 +5,7 @@
     <h2 class="text-center">Laporan Nilai Ujian</h2>
     <div class="d-flex justify-content-center align-items-center mb-3">
         <p class="mb-0 mr-3"><strong>Periode Ujian : </strong>{% if dari_tanggal %}{{dari_tanggal|date}}{% else %}Semua Waktu{% endif %} <strong>sd</strong> {% if sampai_tanggal %}{{sampai_tanggal|date}}{% else %}Semua Waktu{% endif %}</p>
-        <p class="mb-0"><strong>Status Ujian : </strong>{% if status %}{{status}}{% else %}Semua Ujian{% endif %}</p>
+        <p class="mb-0"><strong>Status Ujian : </strong>{{status|capfirst}}</p>
     </div>
     <table>
         <thead>
@@ -17,8 +17,8 @@
                 <th>Nama Mata Pelajaran</th>
                 <th>Nilai</th>
                 <th>Predikat</th>
-                <th>Status</th>
                 <th>Tanggal Ujian</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -36,11 +36,11 @@
             </tr>
             {% endfor %}
             <tr class="total-row">
-                <td colspan="7">TOTAL LULUS</td>
+                <td colspan="8">TOTAL LULUS</td>
                 <td>{{ total_lulus }}</td>
             </tr>
             <tr class="total-row">
-                <td colspan="7">TOTAL TIDAK LULUS</td>   
+                <td colspan="8">TOTAL TIDAK LULUS</td>   
                 <td>{{ total_tidak_lulus }}</td>
             </tr>
         </tbody>

@@ -14,12 +14,11 @@ from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
 from config import midtrans
 from menu.levelstudy.models import LevelStudy 
-
 from django.db import connection
-@login_required(login_url='user:masuk')
-@admin_pemateri_required
-def laporan(request):
+from user.models import Profile
 
+@login_required(login_url='user:masuk')
+def laporan(request):
     with connection.cursor() as cursor:
         cursor.execute("SELECT DISTINCT nama_mapel FROM mapel_matapelajaran")
         unique_mapel = cursor.fetchall()
@@ -160,13 +159,30 @@ def laporan_penggunaan_diskon(request):
                 })
 
     current_date = datetime.date.today()
-    
+    qr_data = "Dummy Signature Data"
+    qr_img = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr_img.add_data(qr_data)
+    qr_img.make(fit=True)
+
+    img = qr_img.make_image(fill_color="black", back_color="transparent")
+
+    qr_io = BytesIO()
+    img.save(qr_io, format='PNG')
+    qr_io.seek(0)
+
+    qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     context = {
         'tarif_diskon_data': tarif_diskon_data,
         'total_diskon_terpakai': total_diskon_terpakai,
         'total_harga_terpotong': total_harga_terpotong,
         'current_date': current_date,
         'filter_type': ft[filter_type],
+        'qr_code': qr_code_b64, 
     }
 
     return render(request, 'laporan/laporan_diskon_terpakai_cetak.html', context)
@@ -278,15 +294,35 @@ def laporan_ujian_diikuti(request):
         
         current_level = level
         current_level_kelas = level_kelas
-    
+    current_date = datetime.date.today()
+    qr_data = "Dummy Signature Data"
+    qr_img = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr_img.add_data(qr_data)
+    qr_img.make(fit=True)
+
+    img = qr_img.make_image(fill_color="black", back_color="transparent")
+
+    qr_io = BytesIO()
+    img.save(qr_io, format='PNG')
+    qr_io.seek(0)
+
+    qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     context = {
         'data': formatted_data,
         'total_pengikut': total_pengikut,
-        'title': 'Laporan Jumlah Peserta Ujian'
+        'title': 'Laporan Jumlah Peserta Ujian',
+        'qr_code': qr_code_b64, 
+        'current_date': current_date,
     }
     return render(request, 'laporan/laporan_ujian_diikuti_cetak.html', context)
 
-
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
 def laporan_nilai(request):
     status_param = request.GET.get('status')
     dari_tanggal = request.GET.get('dari_tanggal')
@@ -305,7 +341,6 @@ def laporan_nilai(request):
         return redirect("menu:laporan")
     
     filters = Q()
-    filters = Q()
     if dari_tanggal:
         filters &= Q(tanggal_ujian__date__gte=dari_tanggal)
     if sampai_tanggal:
@@ -318,38 +353,98 @@ def laporan_nilai(request):
     total_lulus = nilai_objs.filter(status='lulus').count()
     total_tidak_lulus = nilai_objs.filter(status='tidak lulus').count()
 
-    # Menyiapkan konteks untuk ditampilkan di template
+    current_date = datetime.date.today()
+    qr_data = "Dummy Signature Data"
+    qr_img = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr_img.add_data(qr_data)
+    qr_img.make(fit=True)
+
+    img = qr_img.make_image(fill_color="black", back_color="transparent")
+
+    qr_io = BytesIO()
+    img.save(qr_io, format='PNG')
+    qr_io.seek(0)
+
+    qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     context = {
         'nilai_objs': nilai_objs,
         'total_lulus': total_lulus,
         'total_tidak_lulus': total_tidak_lulus,
         'dari_tanggal': dari_tanggal,
         'sampai_tanggal': sampai_tanggal,
+        'qr_code': qr_code_b64, 
+        'current_date': current_date,
+        'status':status_param if status_param else "Semua Ujian"
     }
     
     return render(request, 'laporan/laporan_nilai.html', context)
 
 
-
+@login_required(login_url='user:masuk')
 def laporan_nilai_persiswa(request):
-    # Mengambil semua nilai dari model Nilai
-    nilai_siswa = Nilai.objects.all()
+    status_param = request.GET.get('status')
+    dari_tanggal = request.GET.get('dari_tanggal')
+    sampai_tanggal = request.GET.get('sampai_tanggal')
+    try:
+        if dari_tanggal:
+            dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
+        if sampai_tanggal:
+            sampai_tanggal = timezone.make_aware(timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d'))
 
-    # Menghitung total dan rata-rata nilai
+        if dari_tanggal and sampai_tanggal and dari_tanggal > sampai_tanggal:
+            messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
+            return redirect("menu:laporan")
+    except ValueError:
+        messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
+        return redirect("menu:laporan")
+    
+    filters = Q(user=request.user)
+    if dari_tanggal:
+        filters &= Q(tanggal_ujian__date__gte=dari_tanggal)
+    if sampai_tanggal:
+        filters &= Q(tanggal_ujian__date__lte=sampai_tanggal)
+    if status_param:
+        filters &= Q(status=status_param)
+
+    nilai_siswa = Nilai.objects.filter(filters)
     total_nilai = sum(nilai.nilai for nilai in nilai_siswa)
     jumlah_mapel = nilai_siswa.count()
     rata_rata = total_nilai / jumlah_mapel if jumlah_mapel > 0 else 0
-    
-    # Menghitung jumlah lulus dan tidak lulus
     jumlah_lulus = nilai_siswa.filter(status='lulus').count()
     jumlah_tidak_lulus = nilai_siswa.filter(status='tidak lulus').count()
+    current_date = datetime.date.today()
+    qr_data = "Dummy Signature Data"
+    qr_img = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr_img.add_data(qr_data)
+    qr_img.make(fit=True)
 
-    # Menyiapkan konteks untuk ditampilkan di template
+    img = qr_img.make_image(fill_color="black", back_color="transparent")
+
+    qr_io = BytesIO()
+    img.save(qr_io, format='PNG')
+    qr_io.seek(0)
+
+    qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     context = {
         'nilai_siswa': nilai_siswa,
         'rata_rata': rata_rata,
         'jumlah_lulus': jumlah_lulus,
         'jumlah_tidak_lulus': jumlah_tidak_lulus,
+        'qr_code': qr_code_b64, 
+        'current_date': current_date,
+        'dari_tanggal': dari_tanggal,
+        'sampai_tanggal': sampai_tanggal,
+        'status':status_param if status_param else "Semua Ujian",
+        'profile_obj':Profile.objects.get(user=request.user)
     }
-    
-    return render(request, 'laporan/laporan_nilai.html', context)
+    return render(request, 'laporan/laporan_nilai_persiswa.html', context)

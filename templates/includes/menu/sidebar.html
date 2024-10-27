@@ -99,11 +99,17 @@
           <div data-i18n="Analytics">Nilai</div>
         </a>
       </li>
-      <li class="menu-item {% if request.path|slice:'0:14' == "/menu/laporan/"%}active{% endif %}" style="
+      <li id="laporan" class="menu-item {% if request.path|slice:'0:14' == "/menu/laporan/"%}active{% endif %}" style="
         {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
-        {% else %}
-            display:none;
+        {% elif request.user.role == 'pelajar' %}
+            {% if status_transaksi %}
+                {% if status_transaksi != 'Telah Dibayar' %}
+                    display:none;
+                {% endif %}
+            {% else %}
+                display:none;
+            {% endif %}
         {% endif %}">
         <a href="{% url "menu:laporan" %}" class="menu-link">
           <i class="menu-icon tf-icons bx bxs-report"></i>
