@@ -225,7 +225,7 @@
                     Laporan
                   </h4>
                   <span class="badge bg-danger rounded-pill fs-6">
-                    7 Laporan
+                    {% if request.user.role == "admin" %}6{% elif request.user.role == "pemateri" %}2{% else %}1{% endif %} Laporan
                   </span>
                 </div>
                 <hr class="my-3">

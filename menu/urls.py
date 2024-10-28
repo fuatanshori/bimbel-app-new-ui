@@ -99,9 +99,10 @@ urlpatterns+=[
     path('laporan/nilai/', views_laporan.laporan_nilai, name='laporan-nilai'),
     path('laporan/ujian-diikuti/', views_laporan.laporan_ujian_diikuti, name='laporan-ujian-diikuti'),
     path('laporan/nilai-perpelajar/', views_laporan.laporan_nilai_persiswa, name='laporan-nilai-perpelajar'),
+    path('laporan/testimoni/', views_laporan.laporan_testimoni, name='laporan-testimoni'),
 ]
 
 # testimoni
 urlpatterns +=[
-    path("testimoni/",views_testimoni.testimoni,name="testimoni")
+    path("testimoni/",views_testimoni.testimoni,name="testimoni"),
 ]

@@ -8,7 +8,7 @@ from django.utils import timezone
 from menu.pembayaran.models import Transaksi,Tarif,Diskon
 from menu.mapel.models import MataPelajaran
 from menu.nilai.models import Nilai
-from django.db.models import Q, Sum, F,OuterRef, Subquery
+from django.db.models import Q, Sum, F,Avg
 from django.contrib import messages
 from core.utils.decorator import admin_pemateri_required,admin_required
 from django.contrib.auth.decorators import login_required
@@ -16,6 +16,8 @@ from config import midtrans
 from menu.levelstudy.models import LevelStudy 
 from django.db import connection
 from user.models import Profile
+from menu.testimoni.models import Testimoni
+from django.contrib.sites.shortcuts import get_current_site
 
 @login_required(login_url='user:masuk')
 def laporan(request):
@@ -82,8 +84,9 @@ def laporan_transaksi(request):
         'total_potongan': totals['total_potongan'] or 0,
         'total_harga_akhir': totals['total_harga_akhir'] or 0,
     }
-
-    qr_data = "Dummy Signature Data"
+    domain = get_current_site(request).domain
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}/static/assets/img/signature/signature.jpeg"
     qr_img = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -159,7 +162,9 @@ def laporan_penggunaan_diskon(request):
                 })
 
     current_date = datetime.date.today()
-    qr_data = "Dummy Signature Data"
+    domain = get_current_site(request).domain
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}/static/assets/img/signature/signature.jpeg"
     qr_img = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -199,7 +204,9 @@ def laporan_penggunaan_layanan_pembayaran(request):
     payment_method_counts = list(payment_method_counts)
     
     current_date = datetime.date.today()
-    qr_data = "Dummy Signature Data"
+    domain = get_current_site(request).domain
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}/static/assets/img/signature/signature.jpeg"
     qr_img = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -210,9 +217,11 @@ def laporan_penggunaan_layanan_pembayaran(request):
     qr_img.make(fit=True)
 
     img = qr_img.make_image(fill_color="black", back_color="transparent")
+
     qr_io = BytesIO()
     img.save(qr_io, format='PNG')
     qr_io.seek(0)
+
     qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     return render(request, 'laporan/laporan_layanan_pembayaran_cetak.html', {
         'payment_method_counts': payment_method_counts,
@@ -295,7 +304,9 @@ def laporan_ujian_diikuti(request):
         current_level = level
         current_level_kelas = level_kelas
     current_date = datetime.date.today()
-    qr_data = "Dummy Signature Data"
+    domain = get_current_site(request).domain
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}/static/assets/img/signature/signature.jpeg"
     qr_img = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -354,7 +365,9 @@ def laporan_nilai(request):
     total_tidak_lulus = nilai_objs.filter(status='tidak lulus').count()
 
     current_date = datetime.date.today()
-    qr_data = "Dummy Signature Data"
+    domain = get_current_site(request).domain
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}/static/assets/img/signature/signature.jpeg"
     qr_img = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -417,8 +430,11 @@ def laporan_nilai_persiswa(request):
     rata_rata = total_nilai / jumlah_mapel if jumlah_mapel > 0 else 0
     jumlah_lulus = nilai_siswa.filter(status='lulus').count()
     jumlah_tidak_lulus = nilai_siswa.filter(status='tidak lulus').count()
+
     current_date = datetime.date.today()
-    qr_data = "Dummy Signature Data"
+    domain = get_current_site(request).domain
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}/static/assets/img/signature/signature.jpeg"
     qr_img = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -448,3 +464,68 @@ def laporan_nilai_persiswa(request):
         'profile_obj':Profile.objects.get(user=request.user)
     }
     return render(request, 'laporan/laporan_nilai_persiswa.html', context)
+
+@login_required(login_url='user:masuk')
+@admin_required
+def laporan_testimoni(request):
+    dari_tanggal = request.GET.get('dari_tanggal')
+    sampai_tanggal = request.GET.get('sampai_tanggal')
+
+    testimoni_objs = Testimoni.objects.all().select_related('user')
+
+    if dari_tanggal:
+        testimoni_objs = testimoni_objs.filter(created_at__date__gte=dari_tanggal)
+    if sampai_tanggal:
+        testimoni_objs = testimoni_objs.filter(created_at__date__lte=sampai_tanggal)
+
+    total_testimoni = testimoni_objs.count()
+
+    total_puas = testimoni_objs.filter(rating__gte=4).count()
+    total_sedang = testimoni_objs.filter(rating=3).count()
+    total_kecewa = testimoni_objs.filter(rating__lte=2).count()
+
+    if total_testimoni > 0:
+        persen_puas = (total_puas / total_testimoni) * 100
+        persen_sedang = (total_sedang / total_testimoni) * 100
+        persen_kecewa = (total_kecewa / total_testimoni) * 100
+    else:
+        persen_puas = persen_sedang = persen_kecewa = 0
+
+    avg_rating = testimoni_objs.aggregate(Avg('rating'))['rating__avg']
+    current_date = datetime.date.today()
+    domain = get_current_site(request).domain
+    protocol = request.scheme
+    qr_data = f"{protocol}://{domain}/static/assets/img/signature/signature.jpeg"
+    qr_img = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr_img.add_data(qr_data)
+    qr_img.make(fit=True)
+
+    img = qr_img.make_image(fill_color="black", back_color="transparent")
+
+    qr_io = BytesIO()
+    img.save(qr_io, format='PNG')
+    qr_io.seek(0)
+
+    qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
+
+    context = {
+        'testimoni_objs': testimoni_objs,
+        'dari_tanggal': dari_tanggal,
+        'sampai_tanggal': sampai_tanggal,
+        'total_testimoni': total_testimoni,
+        'total_puas': total_puas,
+        'total_sedang': total_sedang,
+        'total_kecewa': total_kecewa,
+        'persen_puas': round(persen_puas, 1),
+        'persen_sedang': round(persen_sedang, 1),
+        'persen_kecewa': round(persen_kecewa, 1),
+        'avg_rating': round(avg_rating, 2) if avg_rating else 0,
+        'qr_code': qr_code_b64, 
+        'current_date': current_date,
+    }
+    return render(request, 'laporan/laporan_testimoni.html', context)

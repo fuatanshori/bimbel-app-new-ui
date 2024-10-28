@@ -231,3 +231,51 @@
     </div>
   </div>
 </div>
+
+
+<div class="modal fade" id="cetakTestimoni" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cetakTestimoniTitle"></h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form method="GET" action="{% url "menu:laporan-testimoni" %}">
+      <div class="modal-body">
+        <div class="row g-2">
+          <div class="col mb-2">
+              <label for="dari_tanggal" class="form-label">Dari Tanggal:</label>
+              <input 
+                  id="dari_tanggal" 
+                  type="date" 
+                  name="dari_tanggal"
+                  class="form-control text-black" 
+              >
+          </div>
+          <div class="col mb-2">
+              <label for="sampai_tanggal" class="form-label">Sampai Tanggal:</label>
+              <input 
+                  id="sampai_tanggal" 
+                  type="date" 
+                  name="sampai_tanggal" 
+                  class="form-control text-black"
+              >
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+        <button type="submit" class="btn btn-primary">Export</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>

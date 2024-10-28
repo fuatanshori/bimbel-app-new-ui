@@ -13,7 +13,7 @@ def home(request):
     except Diskon.DoesNotExist:
         diskon_objs = None
     try:
-        testimoni_objs = Testimoni.objects.select_related('user__profile').all()
+        testimoni_objs = Testimoni.objects.select_related('user__profile').order_by('-rating')[:6]
     except Testimoni.DoesNotExist:
         testimoni_objs = None
 

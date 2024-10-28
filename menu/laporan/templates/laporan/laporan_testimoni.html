@@ -1,0 +1,96 @@
+{% extends "laporan_base.html" %}
+{% block title %}Laporan Testimoni Pengguna{% endblock title %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Laporan Testimoni Pengguna</h2>
+    <!-- Info Period dan Rating -->
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <p class="mb-0">
+                <strong>Periode:</strong> 
+                {% if dari_tanggal %}{{dari_tanggal}}{% else %}Semua Waktu{% endif %} 
+                <strong>sd</strong> 
+                {% if sampai_tanggal %}{{sampai_tanggal}}{% else %}Semua Waktu{% endif %}
+                | <strong>Rating Rata-rata:</strong> {{avg_rating}}/5
+            </p>
+        </div>
+    </div>
+
+    <!-- Ringkasan Kategori -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Puas (4-5 ★)</h5>
+                    <p class="card-text">
+                        {{total_puas}} Pengguna<br>
+                        {{persen_puas}}%
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Sedang (3 ★)</h5>
+                    <p class="card-text">
+                        {{total_sedang}} Pengguna<br>
+                        {{persen_sedang}}%
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Kecewa (1-2 ★)</h5>
+                    <p class="card-text">
+                        {{total_kecewa}} Pengguna<br>
+                        {{persen_kecewa}}%
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabel Testimoni -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>No</th>
+                    <th>Nama Pengguna</th>
+                    <th>Rating</th>
+                    <th>Kategori</th>
+                    <th>Ulasan</th>
+                    <th>Tanggal Dibuat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for testimoni in testimoni_objs %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ testimoni.user.full_name }}</td>
+                    <td>{{ testimoni.rating }}/5</td>
+                    <td>
+                        {% if testimoni.rating >= 4 %}
+                            <span >Puas</span>
+                        {% elif testimoni.rating == 3 %}
+                            <span >Sedang</span>
+                        {% else %}
+                            <span >Kecewa</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ testimoni.testimonial_review|truncatechars:40 }}</td>
+                    <td>{{ testimoni.created_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="table-light">
+                    <td colspan="5" class="text-end"><strong>TOTAL TESTIMONI</strong></td>
+                    <td><strong>{{ total_testimoni }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}
