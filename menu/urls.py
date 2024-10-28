@@ -7,6 +7,7 @@ from .nilai import views as views_nilai
 from .mapel import views as views_mapel
 from .levelstudy import views as views_levelstudy
 from .laporan import views as views_laporan
+from .testimoni import views as views_testimoni
 # menu
 urlpatterns = [
     path('', views_menu.menu, name='menu'),
@@ -98,4 +99,9 @@ urlpatterns+=[
     path('laporan/nilai/', views_laporan.laporan_nilai, name='laporan-nilai'),
     path('laporan/ujian-diikuti/', views_laporan.laporan_ujian_diikuti, name='laporan-ujian-diikuti'),
     path('laporan/nilai-perpelajar/', views_laporan.laporan_nilai_persiswa, name='laporan-nilai-perpelajar'),
+]
+
+# testimoni
+urlpatterns +=[
+    path("testimoni/",views_testimoni.testimoni,name="testimoni")
 ]

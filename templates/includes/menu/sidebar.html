@@ -99,6 +99,23 @@
           <div data-i18n="Analytics">Nilai</div>
         </a>
       </li>
+      <li id="testimoni" class="menu-item {% if request.path|slice:'0:16' == "/menu/testimoni/"%}active{% endif %}" style="
+        {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
+            display:block;
+        {% elif request.user.role == 'pelajar' %}
+            {% if status_transaksi %}
+                {% if status_transaksi != 'Telah Dibayar' %}
+                    display:none;
+                {% endif %}
+            {% else %}
+                display:none;
+            {% endif %}
+        {% endif %}">
+        <a href="{% url "menu:testimoni" %}" class="menu-link">
+          <i class='menu-icon tf-icons bx bx-star'></i>
+          <div data-i18n="Analytics">Testimoni</div>
+        </a>
+      </li>
       <li id="laporan" class="menu-item {% if request.path|slice:'0:14' == "/menu/laporan/"%}active{% endif %}" style="
         {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;

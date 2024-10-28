@@ -15,6 +15,7 @@ var modul = document.querySelector('#modul');
 var ujian = document.querySelector('#ujian');
 var nilai = document.querySelector('#nilai');
 var laporan = document.querySelector('#laporan');
+var testimoni = document.querySelector('#testimoni');
 
 const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
 var socket = new WebSocket(`${protocol}${window.location.host}/ws/pembayaran/${id_transaksi}/`);
@@ -37,6 +38,7 @@ socket.onmessage = function(event) {
         ujian.style.display='block';
         nilai.style.display='block';   
         laporan.style.display='block';   
+        testimoni.style.display='block';   
         
         socket.onclose();   
     }

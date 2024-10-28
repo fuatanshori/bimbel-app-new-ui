@@ -9,3 +9,53 @@
 <link rel="stylesheet" href="{% static "home/css/templatemo-chain-app-dev.css" %}">
 <link rel="stylesheet" href="{% static "home/css/animated.css" %}">
 <link rel="stylesheet" href="{% static "home/css/owl.css" %}">
+<link rel="stylesheet" href="{% static "assets/vendor/fonts/boxicons.css" %}" />
+<style>
+    .review-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+      }
+      
+      .review-container::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      .review-container::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      .review-container::-webkit-scrollbar-thumb {
+        background-color: rgba(155, 155, 155, 0.5);
+        border-radius: 20px;
+        border: transparent;
+      }
+      
+      .card {
+        transition: all 0.3s ease;
+      }
+      
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+      }
+      
+      @media (max-width: 768px) {
+        .card {
+          max-height: 450px !important;
+        }
+        
+        .review-container {
+          max-height: 150px !important;
+        }
+      }
+      
+      @media (max-width: 576px) {
+        .card {
+          max-height: 400px !important;
+        }
+        
+        .review-container {
+          max-height: 120px !important;
+        }
+      }
+</style>

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'menu.nilai.apps.NilaiConfig',
     'menu.levelstudy.apps.LevelstudyConfig',
     'menu.laporan.apps.LaporanConfig',
+    'menu.testimoni.apps.TestimoniConfig',
     
     'django_ckeditor_5',
     
