@@ -28,7 +28,9 @@
                                     <th>User Email</th>
                                     <th>ID Transaksi</th>
                                     <th>VA Number</th>
-                                    <th>Tarif</th>
+                                    <th>Harga</th>
+                                    <th>Harga Terpotong</th>
+                                    <th>Harga Akhir</th>
                                     <th>Layanan Pembayaran</th>
                                     <th>Status</th>
                                 </tr>
@@ -39,7 +41,9 @@
                                         <td>{{ transaksi_obj.user }}</td>
                                         <td>{{ transaksi_obj.id_transaksi }}</td>
                                         <td>{{ transaksi_obj.va_number }}</td>
-                                        <td>{{ transaksi_obj.tarif.harga }}</td>
+                                        <td>{{ transaksi_obj.harga_awal }}</td>
+                                        <td>{{ transaksi_obj.harga_terpotong }}</td>
+                                        <td>{{ transaksi_obj.harga_akhir }}</td>
                                         <td>{{ transaksi_obj.layanan_pembayaran }}</td>
                                         <td>
                                             {% if transaksi_obj.transaksi_status == 'settlement' %}

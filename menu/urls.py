@@ -58,7 +58,6 @@ urlpatterns+=[
     path('ujian/tambah/<id_mapel>/', views_ujian.tambah_ujian, name='tambah-ujian'),
     path('ujian/edit/<id_mapel>/<id_soal_ujian>/', views_ujian.edit_ujian, name='edit-ujian'),
     path('ujian/detail/<id_mapel>/<id_soal_ujian>/', views_ujian.detail_ujian, name='detail-ujian'),
-    
     path('ujian/<id_mapel>/', views_ujian.ujian, name='ujian'),
     path('ujian/nilai/<id_mapel>/<id_nilai>/', views_ujian.nilai_setelah_ujian, name='nilai-setelah-ujian'),
 ]
