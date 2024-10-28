@@ -280,7 +280,8 @@ def add_profile(request):
         profile_obj = Profile.objects.get(user=request.user)
         if not any([profile_obj.foto, profile_obj.jenis_kelamin, profile_obj.tempat_tinggal, profile_obj.nomor_telepon, profile_obj.tanggal_lahir]):
             if not request.session.get('profile_message_displayed', False):
-                messages.info(request, "Saat ini anda tidak diizinkan untuk mengakses beberapa halaman, anda harus melengkapi profil.")
+                if request.user.role == "pelajar":
+                    messages.info(request, "Saat ini anda tidak diizinkan untuk mengakses beberapa halaman, anda harus melengkapi profil.")
                 request.session['profile_message_displayed'] = True
     except Profile.DoesNotExist:
         profile_obj = None
