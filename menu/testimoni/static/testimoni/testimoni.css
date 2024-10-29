@@ -3,51 +3,50 @@
     border-radius: 20px;
     padding: 2rem;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  }
-  
-  .rating-container {
+}
+
+.rating-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
     margin-bottom: 2rem;
-  }
-  
-  .rating-title {
+}
+
+.rating-title {
     font-size: 1.2rem;
     font-weight: 600;
     color: #333;
     text-align: center;
-  }
-  
-  .rating-stars {
+}
+
+.rating-stars {
     display: flex;
     gap: 0.5rem;
-  }
-  
-  .star-label {
+}
+
+.star-label {
     cursor: pointer;
     font-size: 2rem;
     transition: all 0.2s ease;
-  }
-  
-  .btn-check {
+}
+
+.btn-check {
     display: none;
-  }
-  
-  .star-label i {
+}
+
+.star-label i {
     color: #ddd;
     transition: all 0.2s ease;
-  }
-  
-  .btn-check:checked + .star-label i,
-  .star-label:hover i,
-  .star-label:hover ~ .star-label i {
+}
+
+.btn-check:checked + .star-label i,
+.star-label:hover i {
     color: #FFD700;
     transform: scale(1.2);
-  }
-  
-  .testimonial-input {
+}
+
+.testimonial-input {
     background: #fff;
     border: 2px solid #eee;
     border-radius: 15px;
@@ -55,22 +54,22 @@
     font-size: 1rem;
     transition: all 0.3s ease;
     resize: none;
-  }
-  
-  .testimonial-input:focus {
+}
+
+.testimonial-input:focus {
     border-color: #FFD700;
     box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
     outline: none;
-  }
-  
-  .char-counter {
+}
+
+.char-counter {
     font-size: 0.8rem;
     color: #666;
     text-align: right;
     margin-top: 0.5rem;
-  }
-  
-  .submit-btn {
+}
+
+.submit-btn {
     background: linear-gradient(45deg, #FFD700, #FFA500);
     border: none;
     border-radius: 50px;
@@ -79,31 +78,31 @@
     color: #fff;
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
-  }
-  
-  .submit-btn:hover {
+}
+
+.submit-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 7px 20px rgba(255, 215, 0, 0.3);
     background: linear-gradient(45deg, #FFA500, #FFD700);
-  }
-  
-  .submit-btn i {
+}
+
+.submit-btn i {
     margin-left: 0.5rem;
-  }
-  
-  .testimonial-header {
+}
+
+.testimonial-header {
     text-align: center;
     margin-bottom: 2rem;
-  }
-  
-  .testimonial-title {
+}
+
+.testimonial-title {
     font-size: 2rem;
     font-weight: 700;
     color: #333;
     margin-bottom: 0.5rem;
-  }
-  
-  .testimonial-subtitle {
+}
+
+.testimonial-subtitle {
     color: #666;
     font-size: 1rem;
-  }
+}
