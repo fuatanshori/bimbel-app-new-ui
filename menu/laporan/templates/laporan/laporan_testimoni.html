@@ -58,7 +58,6 @@
         <table class="table table-bordered table-hover">
             <thead class="table-light">
                 <tr>
-                    <th>No</th>
                     <th>Nama Pengguna</th>
                     <th>Rating</th>
                     <th>Kategori</th>
@@ -69,7 +68,6 @@
             <tbody>
                 {% for testimoni in testimoni_objs %}
                 <tr>
-                    <td>{{ forloop.counter }}</td>
                     <td>{{ testimoni.user.full_name }}</td>
                     <td>{{ testimoni.rating }}/5</td>
                     <td>
