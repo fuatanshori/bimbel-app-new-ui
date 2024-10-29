@@ -1,71 +1,69 @@
 {% extends "menu_base.html" %}
+{% load static %}
+{% block title %}Testimonial{% endblock title %}
 
-{% block title %}testimoni{% endblock title %}
 {% block style %}
-<style></style>
+<link rel="stylesheet" href="{% static "testimoni/testimoni.css" %}" />
 {% endblock style %}
+
 {% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
-          <div class="card-body p-4">
-            <form id="testimonialForm" method="post" action="{% url "menu:testimoni" %}">
-                {% csrf_token %}
-              <!-- Rating -->
-              <div class="mb-4">
-                <label class="form-label">Beri Rating</label>
-                <div class="rating-stars">
-                  <div class="btn-group" role="group" aria-label="Rating stars">
-                    <input type="radio" class="btn-check" name="rating" {% if rating == 1 %}checked{% endif %} id="star1" value="1">
-                    <label class="btn btn-outline-warning" for="star1" >
-                      <i class="bx bxs-star"></i>
-                    </label>
-
-                    <input type="radio" class="btn-check" name="rating" {% if rating == 2 %}checked{% endif %} id="star2" value="2">
-                    <label class="btn btn-outline-warning" for="star2">
-                      <i class="bx bxs-star"></i>
-                    </label>
-  
-                    <input type="radio" class="btn-check" name="rating" {% if rating == 3 %}checked{% endif %} id="star3" value="3">
-                    <label class="btn btn-outline-warning" for="star3">
-                      <i class="bx bxs-star"></i>
-                    </label>
-                    
-                    <input type="radio" class="btn-check" name="rating" {% if rating == 4 %}checked{% endif %} id="star4" value="4">
-                    <label class="btn btn-outline-warning" for="star4">
-                      <i class="bx bxs-star"></i>
-                    </label>
-                    
-                    <input type="radio" class="btn-check" name="rating" id="star5" {% if rating == 5 %}checked{% endif %} value="5" required>
-                    <label class="btn btn-outline-warning" for="star5">
-                      <i class="bx bxs-star"></i>
-                    </label>
-                  </div>
-                </div>
-              </div>
-  
-              <!-- Testimonial Text -->
-              <div class="mb-4">
-                <label for="testimonial" class="form-label">Berikan Testimonial mu</label>
-                <textarea maxlength="60" class="form-control" name="review" id="testimonial" rows="4" required placeholder="Berikan pengalamanmu untuk pelayanan kita...">{% if review %}{{review}}{% endif %}</textarea>
-                <div class="form-text">Maximum 60 characters</div>
-              </div>
-              <!-- Submit Button -->
-              <div class="text-center">
-                <button type="submit" class="btn btn-primary px-5 py-2">
-                  {% if review and rating %}
-                  Edit Testimonial
-                  {% else %}
-                  Submit Testimonial
-                  {% endif %}
-                  <i class="fas fa-paper-plane ms-2"></i>
-                </button>
-              </div>
-            </form>
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="testimonial-header">
+        <h1 class="testimonial-title">Berikan Testimoni Dibawah Ini</h1>
+        <p class="testimonial-subtitle">Bantu kita dalam meningkatkan pengalaman belajar.</p>
+      </div>
+      
+      <div class="testimonial-card">
+        <form id="testimonialForm" method="post" action="{% url 'menu:testimoni' %}">
+          {% csrf_token %}
+          
+          <div class="rating-container">
+            <div class="rating-title">Beri nilai kepada kami</div>
+            <div class="rating-stars">
+              {% for i in '12345'|make_list %}
+              <input type="radio" class="btn-check" name="rating" id="star{{i}}" value="{{i}}" 
+                     {% if rating == i|add:"0" %}checked{% endif %} required>
+              <label class="star-label" for="star{{i}}">
+                <i class="bx bxs-star"></i>
+              </label>
+              {% endfor %}
+            </div>
           </div>
-        </div>
+
+          <div class="mb-4">
+            <textarea 
+              maxlength="60" 
+              class="form-control testimonial-input" 
+              name="review" 
+              id="testimonial" 
+              rows="4" 
+              required 
+              placeholder="Share your experience with us..."
+            >{% if review %}{{review}}{% endif %}</textarea>
+            <div class="char-counter">
+              <span id="charCount">0</span>/60 characters
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="submit-btn">
+              {% if review and rating %}
+                Update Feedback
+              {% else %}
+                Submit Feedback
+              {% endif %}
+              <i class="bx bx-send"></i>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 {% endblock content %}
+
+{% block script %}
+<script src="{% static "testimoni/testimoni.js" %}"></script>
+{% endblock script %}
