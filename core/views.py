@@ -108,7 +108,7 @@ def sertifikat_media_protect(request, image_file):
         return FileResponse(io.BytesIO(img_content), content_type='image/jpeg')
 
 
-@login_required(login_url="user:masuk")
+
 def profile_foto(request, image_file):
     # Membuat cache key yang unik berdasarkan nama file
     cache_key = f"profile_foto_{hashlib.md5(image_file.encode()).hexdigest()}"
