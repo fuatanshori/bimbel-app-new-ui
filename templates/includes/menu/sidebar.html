@@ -99,6 +99,7 @@
           <div data-i18n="Analytics">Nilai</div>
         </a>
       </li>
+      {% if request.user.role != "pemateri" %}
       <li id="testimoni" class="menu-item {% if request.path|slice:'0:16' == "/menu/testimoni/"%}active{% endif %}" style="
         {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
@@ -116,6 +117,7 @@
           <div data-i18n="Analytics">Testimoni</div>
         </a>
       </li>
+      {% endif %}
       <li id="laporan" class="menu-item {% if request.path|slice:'0:14' == "/menu/laporan/"%}active{% endif %}" style="
         {% if request.user.role == 'pemateri' or request.user.role == "admin" %}
             display:block;
