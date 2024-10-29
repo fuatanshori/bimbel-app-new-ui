@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import Testimoni
 from core.utils.decorator import admin_pemateri_required,transaksi_settlement_required
 from django.contrib.auth.decorators import login_required
-
+from django.http import Http404
 # Create your views here.
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
@@ -14,6 +14,8 @@ def testimoni(request):
             "star_range" : range(1, 6),
         }
         return render(request,"testimoni/testimoni_admin.html", context)
+    elif request.user.role == "pemateri":
+        raise Http404
     try:
         testimoni_obj = Testimoni.objects.get(user=request.user)
     except Testimoni.DoesNotExist:
