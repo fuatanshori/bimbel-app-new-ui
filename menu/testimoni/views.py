@@ -7,7 +7,7 @@ from django.http import Http404
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def testimoni(request):
-    if request.user.role != "pelajar":
+    if request.user.role == "admin":
         testimoni_objs = Testimoni.objects.all()
         context = {
             "testimoni_objs":testimoni_objs,
