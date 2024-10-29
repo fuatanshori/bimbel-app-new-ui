@@ -21,7 +21,7 @@ class Modul(models.Model):
 
     class Meta:
         verbose_name_plural = "Modul"
-        ordering = ['-created_at']
+        ordering = ['created_at']
     
     def get_id_safe(self):
         return encode_id(self.pk)
