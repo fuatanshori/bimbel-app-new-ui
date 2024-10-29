@@ -1,10 +1,10 @@
 <!-- templates/laporan_peserta_ujian.html -->
 {% extends "laporan_base.html" %}
-{% block title %}Laporan Peserta Ujian{% endblock title %}
+{% block title %}Laporan Peserta Ujian Per Mata Pelajaran{% endblock title %}
 
 {% block content %}
 <div class="container table-container">
-    <h2 class="text-center">Laporan Peserta Ujian</h2>
+    <h2 class="text-center">Laporan Peserta Ujian Per Mata Pelajaran</h2>
     <div class="d-flex justify-content-center align-items-center mb-3">
         <p class="mb-0 mr-3"><strong>Mata Plajaran :</strong> {% if mapel %}{{mapel}}{% else %}Semua Mata Plajaran{% endif %}</p>
     </div>
@@ -14,7 +14,7 @@
                 <th>Level Study</th>
                 <th>Kelas</th>
                 <th>Mata Pelajaran</th>
-                <th>Jumlah Pengikut Ujian</th>
+                <th>Jumlah Peserta Ujian</th>
             </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@
             {% endfor %}
             <!-- Baris Total -->
             <tr class=" font-weight-bold">
-                <td colspan="3" class="text-end">Total Pengikut Ujian</td>
+                <td colspan="3" class="text-end">Total Peserta Ujian</td>
                 <td >{{ total_pengikut }}</td>
             </tr>
         </tbody>

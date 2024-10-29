@@ -474,9 +474,9 @@ def laporan_testimoni(request):
     testimoni_objs = Testimoni.objects.all().select_related('user')
 
     if dari_tanggal:
-        testimoni_objs = testimoni_objs.filter(created_at__date__gte=dari_tanggal)
+        testimoni_objs = testimoni_objs.filter(tanggal__date__gte=dari_tanggal)
     if sampai_tanggal:
-        testimoni_objs = testimoni_objs.filter(created_at__date__lte=sampai_tanggal)
+        testimoni_objs = testimoni_objs.filter(tanggal__date__lte=sampai_tanggal)
 
     total_testimoni = testimoni_objs.count()
 

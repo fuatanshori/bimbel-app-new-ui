@@ -7,7 +7,7 @@
       <div class="card py-4">
         <div class="card-header">
           <div><h4 class="mb-3">Nilai Ujian</h4></div>
-          <div class="col-lg col-sm col-md col-6 flex-grow-0">
+          {% comment %} <div class="col-lg col-sm col-md col-6 flex-grow-0">
             <div class="category-wrap dropdown d-inline-block float-start">
                 <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
                     {% if request.path == '/menu/' or request.path|slice:'0:26' == "/menu/nilai-perlevelstudy/" %}
@@ -23,7 +23,7 @@
                     {% endfor %}
                 </div>
             </div> <!-- category-wrap.// -->
-          </div> <!-- col.// -->
+          </div> <!-- col.// --> {% endcomment %}
         </div>
         
             <div class="table-responsive text-nowrap">

@@ -6,7 +6,7 @@ from menu.modul.models import Modul
 from menu.ujian.models import SoalUjian
 from menu.nilai.models import Nilai
 from menu.pembayaran.models import Transaksi
-
+from menu.testimoni.models import Testimoni
 
 @login_required(login_url="user:masuk")
 def menu(request):
@@ -14,7 +14,9 @@ def menu(request):
         
         nilai_count = Nilai.objects.filter(user=request.user).count()
         transaksi_count = Transaksi.objects.filter(user=request.user).count()
+        testimoni_count = Testimoni.objects.filter(user=request.user).count()
     else:
+        testimoni_count = Testimoni.objects.all().count()
         nilai_count = Nilai.objects.all().count()
         transaksi_count = Transaksi.objects.all().count()
     levelstudy_count = LevelStudy.objects.all().count()
@@ -28,6 +30,7 @@ def menu(request):
         "ujian_count":ujian_count,
         "transaksi_count":transaksi_count,
         "nilai_count":nilai_count,
+        "testimoni_count":testimoni_count,
 
     }
     return render(request, "menu/menu.html",context)

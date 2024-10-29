@@ -63,7 +63,7 @@
                     <th>Rating</th>
                     <th>Kategori</th>
                     <th>Ulasan</th>
-                    <th>Tanggal Dibuat</th>
+                    <th>Tanggal</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,7 +82,7 @@
                         {% endif %}
                     </td>
                     <td>{{ testimoni.testimonial_review|truncatechars:40 }}</td>
-                    <td>{{ testimoni.created_at|date:"d/m/Y H:i" }}</td>
+                    <td>{{ testimoni.tanggal|date:"d/m/Y H:i" }}</td>
                 </tr>
                 {% endfor %}
                 <tr class="table-light">
