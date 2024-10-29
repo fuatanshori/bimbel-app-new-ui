@@ -411,7 +411,7 @@ def notifikasi_midtrans_handler(request):
     channel_layer = get_channel_layer()
 
     try:
-        transaksi_obj = Transaksi.objects.get(id_transaksi=id_transaksi)
+        transaksi_obj = Transaksi.objects.get(id_transaksi=id_transaksi,transaksi_status="pending")
     except Transaksi.DoesNotExist:
         return JsonResponse({}, status=200)
 
