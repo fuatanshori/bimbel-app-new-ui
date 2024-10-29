@@ -123,7 +123,7 @@ def laporan_penggunaan_diskon(request):
     tarif_diskon_data = {}
     total_diskon_terpakai = 0
     total_harga_terpotong = 0
-    today = timezone.now().date()
+    today = timezone.localtime().date()
     ft = {
         'active':'Diskon Aktif',
         'all':'Semua Diskon',
