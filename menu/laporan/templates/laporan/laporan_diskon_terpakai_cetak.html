@@ -21,9 +21,9 @@
             {% for tarif, diskon_list in tarif_diskon_data.items %}
                 {% for diskon in diskon_list %}
                     <tr>
-                        {% comment %} {% if forloop.first %} {% endcomment %}
-                        {% comment %} <td rowspan="{{ diskon_list|length }}">{{ tarif.subject }}</td> {% endcomment %}
-                        {% comment %} {% endif %} {% endcomment %}
+                        {% comment %} {% if forloop.first %} 
+                        <td rowspan="{{ diskon_list|length }}">{{ tarif.subject }}</td> 
+                        {% endif %} {% endcomment %}
                         <td>{{ tarif.subject }}</td>
                         <td>{{ diskon.nama_diskon }}</td>
                         <td>{{ diskon.kedaluwarsa|date:"d F Y" }}</td>

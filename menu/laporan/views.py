@@ -3,7 +3,7 @@ import base64
 from django.shortcuts import render,redirect
 from io import BytesIO
 import datetime
-from django.db.models import Count, Q,Sum
+from django.db.models import Count, Q,Sum,Case,When
 from django.utils import timezone
 from menu.pembayaran.models import Transaksi,Tarif,Diskon
 from menu.mapel.models import MataPelajaran
@@ -332,25 +332,28 @@ def laporan_ujian_diikuti(request):
     }
     return render(request, 'laporan/laporan_ujian_diikuti_cetak.html', context)
 
+from collections import defaultdict
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def laporan_nilai(request):
     status_param = request.GET.get('status')
     dari_tanggal = request.GET.get('dari_tanggal')
     sampai_tanggal = request.GET.get('sampai_tanggal')
+    
     try:
         if dari_tanggal:
             dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
         if sampai_tanggal:
             sampai_tanggal = timezone.make_aware(timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d'))
-
+        
         if dari_tanggal and sampai_tanggal and dari_tanggal > sampai_tanggal:
             messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
             return redirect("menu:laporan")
     except ValueError:
         messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
         return redirect("menu:laporan")
-    
+
+    # Base query with filters
     filters = Q()
     if dari_tanggal:
         filters &= Q(tanggal_ujian__date__gte=dari_tanggal)
@@ -359,11 +362,79 @@ def laporan_nilai(request):
     if status_param:
         filters &= Q(status=status_param)
 
-    nilai_objs = Nilai.objects.filter(filters)
-    # Menghitung total lulus dan tidak lulus
-    total_lulus = nilai_objs.filter(status='lulus').count()
-    total_tidak_lulus = nilai_objs.filter(status='tidak lulus').count()
+    # Get nilai objects with annotations
+    nilai_data = Nilai.objects.filter(filters).values(
+        'user__full_name',
+        'level_study',
+        'mata_pelajaran',
+        'nilai',
+        'kelas',
+        'predikat',
+        'tanggal_ujian',
+        'status',
+    ).order_by('user__full_name', 'level_study', 'kelas', 'mata_pelajaran', 'tanggal_ujian')
 
+    # Process data for rowspans
+    processed_data = []
+    current_user = None
+    current_level = None
+    current_kelas = None
+    current_mapel = None
+    user_count = defaultdict(int)
+    level_count = defaultdict(int)
+    kelas_count = defaultdict(int)
+    mapel_count = defaultdict(int)
+
+    # First pass: count spans
+    for item in nilai_data:
+        user_key = item['user__full_name']
+        level_key = f"{user_key}-{item['level_study']}"
+        kelas_key = f"{level_key}-{item['kelas']}"
+        mapel_key = f"{kelas_key}-{item['mata_pelajaran']}"
+        
+        user_count[user_key] += 1
+        level_count[level_key] += 1
+        kelas_count[kelas_key] += 1
+        mapel_count[mapel_key] += 1
+
+    # Second pass: create final data structure with grouping
+    for item in nilai_data:
+        user_key = item['user__full_name']
+        level_key = f"{user_key}-{item['level_study']}"
+        kelas_key = f"{level_key}-{item['kelas']}"
+        mapel_key = f"{kelas_key}-{item['mata_pelajaran']}"
+        
+        record = {
+            'nama': item['user__full_name'],
+            'level_study': item['level_study'],
+            'kelas': item['kelas'],
+            'mata_pelajaran': item['mata_pelajaran'],
+            'nilai': item['nilai'],
+            'predikat': item['predikat'],
+            'tanggal': timezone.localtime(item['tanggal_ujian']).strftime('%d %b. %Y, %H.%M'),
+            'status': item['status'],
+            'nama_rowspan': user_count[user_key] if current_user != user_key else 0,
+            'level_rowspan': level_count[level_key] if current_level != level_key else 0,
+            'kelas_rowspan': kelas_count[kelas_key] if current_kelas != kelas_key else 0,
+            'mapel_rowspan': mapel_count[mapel_key] if current_mapel != mapel_key else 0,
+        }
+        
+        if current_user != user_key:
+            current_user = user_key
+        if current_level != level_key:
+            current_level = level_key
+        if current_kelas != kelas_key:
+            current_kelas = kelas_key
+        if current_mapel != mapel_key:
+            current_mapel = mapel_key
+            
+        processed_data.append(record)
+
+    # Calculate totals
+    total_lulus = len([x for x in nilai_data if x['status'] == 'lulus'])
+    total_tidak_lulus = len([x for x in nilai_data if x['status'] == 'tidak lulus'])
+
+    # Generate QR code (unchanged)
     current_date = datetime.date.today()
     domain = get_current_site(request).domain
     protocol = request.scheme
@@ -376,25 +447,23 @@ def laporan_nilai(request):
     )
     qr_img.add_data(qr_data)
     qr_img.make(fit=True)
-
+    
     img = qr_img.make_image(fill_color="black", back_color="transparent")
-
     qr_io = BytesIO()
     img.save(qr_io, format='PNG')
     qr_io.seek(0)
-
     qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
+
     context = {
-        'nilai_objs': nilai_objs,
+        'data': processed_data,
         'total_lulus': total_lulus,
         'total_tidak_lulus': total_tidak_lulus,
         'dari_tanggal': dari_tanggal,
         'sampai_tanggal': sampai_tanggal,
-        'qr_code': qr_code_b64, 
+        'qr_code': qr_code_b64,
         'current_date': current_date,
-        'status':status_param if status_param else "Semua Ujian"
+        'status': status_param if status_param else "Semua Ujian"
     }
-    
     return render(request, 'laporan/laporan_nilai.html', context)
 
 
@@ -403,12 +472,13 @@ def laporan_nilai_persiswa(request):
     status_param = request.GET.get('status')
     dari_tanggal = request.GET.get('dari_tanggal')
     sampai_tanggal = request.GET.get('sampai_tanggal')
+    
     try:
         if dari_tanggal:
             dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
         if sampai_tanggal:
             sampai_tanggal = timezone.make_aware(timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d'))
-
+        
         if dari_tanggal and sampai_tanggal and dari_tanggal > sampai_tanggal:
             messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
             return redirect("menu:laporan")
@@ -416,6 +486,7 @@ def laporan_nilai_persiswa(request):
         messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
         return redirect("menu:laporan")
     
+    # Build filter
     filters = Q(user=request.user)
     if dari_tanggal:
         filters &= Q(tanggal_ujian__date__gte=dari_tanggal)
@@ -424,13 +495,68 @@ def laporan_nilai_persiswa(request):
     if status_param:
         filters &= Q(status=status_param)
 
-    nilai_siswa = Nilai.objects.filter(filters)
-    total_nilai = sum(nilai.nilai for nilai in nilai_siswa)
-    jumlah_mapel = nilai_siswa.count()
-    rata_rata = total_nilai / jumlah_mapel if jumlah_mapel > 0 else 0
-    jumlah_lulus = nilai_siswa.filter(status='lulus').count()
-    jumlah_tidak_lulus = nilai_siswa.filter(status='tidak lulus').count()
+    # Get nilai objects ordered properly for grouping
+    nilai_queryset = Nilai.objects.filter(filters).order_by(
+        'level_study', 
+        'kelas', 
+        'mata_pelajaran', 
+        'tanggal_ujian'
+    )
 
+    # Initialize counters for rowspans
+    level_counts = defaultdict(int)
+    kelas_counts = defaultdict(int)
+    mapel_counts = defaultdict(int)
+    
+    # First pass: count for rowspans
+    for nilai in nilai_queryset:
+        level_key = nilai.level_study
+        kelas_key = f"{nilai.level_study}-{nilai.kelas}"
+        mapel_key = f"{nilai.level_study}-{nilai.kelas}-{nilai.mata_pelajaran}"
+        
+        level_counts[level_key] += 1
+        kelas_counts[kelas_key] += 1
+        mapel_counts[mapel_key] += 1
+
+    # Second pass: create processed data with rowspans
+    processed_data = []
+    current_level = None
+    current_kelas = None
+    current_mapel = None
+    
+    for nilai in nilai_queryset:
+        level_key = nilai.level_study
+        kelas_key = f"{nilai.level_study}-{nilai.kelas}"
+        mapel_key = f"{nilai.level_study}-{nilai.kelas}-{nilai.mata_pelajaran}"
+        
+        record = {
+            'level_study': nilai.level_study,
+            'kelas': nilai.kelas,
+            'mata_pelajaran': nilai.mata_pelajaran,
+            'tanggal_ujian': nilai.tanggal_ujian,
+            'nilai': nilai.nilai,
+            'predikat': nilai.predikat,
+            'status': nilai.status,
+            'level_rowspan': level_counts[level_key] if current_level != level_key else 0,
+            'kelas_rowspan': kelas_counts[kelas_key] if current_kelas != kelas_key else 0,
+            'mapel_rowspan': mapel_counts[mapel_key] if current_mapel != mapel_key else 0,
+        }
+        
+        if current_level != level_key:
+            current_level = level_key
+        if current_kelas != kelas_key:
+            current_kelas = kelas_key
+        if current_mapel != mapel_key:
+            current_mapel = mapel_key
+        
+        processed_data.append(record)
+
+    # Calculate statistics
+    stats = nilai_queryset.aggregate(
+        rata_rata=Avg('nilai'),
+        jumlah_lulus=Count(Case(When(status='lulus', then=1))),
+        jumlah_tidak_lulus=Count(Case(When(status='tidak lulus', then=1)))
+    )
     current_date = datetime.date.today()
     domain = get_current_site(request).domain
     protocol = request.scheme
@@ -452,16 +578,15 @@ def laporan_nilai_persiswa(request):
 
     qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     context = {
-        'nilai_siswa': nilai_siswa,
-        'rata_rata': rata_rata,
-        'jumlah_lulus': jumlah_lulus,
-        'jumlah_tidak_lulus': jumlah_tidak_lulus,
-        'qr_code': qr_code_b64, 
-        'current_date': current_date,
+        'data': processed_data,
+        'rata_rata': round(stats['rata_rata'] or 0, 2),
+        'total_lulus': stats['jumlah_lulus'],
+        'total_tidak_lulus': stats['jumlah_tidak_lulus'],
+        'status': status_param if status_param else "Semua Ujian",
         'dari_tanggal': dari_tanggal,
         'sampai_tanggal': sampai_tanggal,
-        'status':status_param if status_param else "Semua Ujian",
-        'profile_obj':Profile.objects.get(user=request.user)
+        'qr_code': qr_code_b64, 
+        'current_date': current_date,
     }
     return render(request, 'laporan/laporan_nilai_persiswa.html', context)
 

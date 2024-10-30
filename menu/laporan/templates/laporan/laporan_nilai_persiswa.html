@@ -1,17 +1,13 @@
 {% extends "laporan_base.html" %}
-{% block title %}{% endblock title %}
+{% block title %}Laporan Nilai{% endblock title %}
 
 {% block content %}
 <div class="container table-container">
     <h2 class="text-center">Laporan Nilai</h2>
-    <p class="mb-0 mr-3"><strong>Nama Lengkap &nbsp&nbsp: </strong>{{request.user.full_name}}</p>
-    <p class="mb-0 mr-3"><strong>Tanggal Lahir &nbsp&nbsp&nbsp&nbsp&nbsp: </strong>{{profile_obj.tanggal_lahir}}</p>
-    <p class="mb-0 mr-3"><strong>Tempat Tinggal &nbsp: </strong>{{profile_obj.tempat_tinggal}}</p>
     <div class="d-flex justify-content-center align-items-center mb-3">
-        <p class="mb-0 mr-3"><strong>Periode Ujian : </strong>{% if dari_tanggal %}{{dari_tanggal|date}}{% else %}Semua Waktu{% endif %} <strong>sd</strong> {% if sampai_tanggal %}{{sampai_tanggal|date}}{% else %}Semua Waktu{% endif %}</p>
-        <p class="mb-0"><strong>Status Ujian : </strong>{{status|capfirst}}</p>
+        <p class="mb-0 mr-3"><strong>Status:</strong> {{ status }}</p>
     </div>
-    <table>
+    <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Level Study</th>
@@ -23,33 +19,45 @@
             </tr>
         </thead>
         <tbody>
-            {% for nilai in nilai_siswa %}
+            {% for item in data %}
             <tr>
-                <td>{{ nilai.level_study }}</td>
-                <td>{{ nilai.kelas }}</td>
-                <td>{{ nilai.mata_pelajaran }}</td>
-                <td>{{ nilai.tanggal_ujian }}</td>
-                <td>{{ nilai.nilai }}</td>
-                <td>{{ nilai.status }}</td>
+                {% comment %} {% if item.level_rowspan > 0 %}
+                <td rowspan="{{ item.level_rowspan }}" class="align-middle">{{ item.level_study }}</td>
+                {% endif %}
+                {% if item.kelas_rowspan > 0 %}
+                <td rowspan="{{ item.kelas_rowspan }}" class="align-middle">{{ item.kelas }}</td>
+                {% endif %}
+                {% if item.mapel_rowspan > 0 %}
+                <td rowspan="{{ item.mapel_rowspan }}" class="align-middle">{{ item.mata_pelajaran }}</td>
+                {% endif %} {% endcomment %}
+                <td>{{ item.level_study }}</td>
+                <td>{{ item.kelas }}</td>
+                <td>{{ item.mata_pelajaran }}</td>
+
+                <td>{{ item.tanggal_ujian|date:"d M Y, H:i" }}</td>
+                <td>{{ item.nilai }}</td>
+                <td>{{ item.status }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6">Tidak ada data nilai siswa.</td>
+                <td colspan="6" class="text-center">Tidak ada data</td>
             </tr>
             {% endfor %}
-            <tr class=" font-weight-bold">
-                <td colspan="4">Rata Rata</td>
-                <td>{{ rata_rata|floatformat:0 }}</td>
-            </tr>
-            <tr class=" font-weight-bold">
-                <td colspan="5">Jumlah Lulus</td>
-                <td>{{ jumlah_lulus }}</td>
-            </tr>
-            <tr class=" font-weight-bold">
-                <td colspan="5">Jumlah Tidak Lulus</td>
-                <td>{{ jumlah_tidak_lulus }}</td>
-            </tr>
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" class="text-end fw-bold">Rata-Rata</td>
+                <td colspan="2" class="fw-bold">{{ rata_rata }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-end fw-bold">Jumlah Lulus</td>
+                <td colspan="2" class="fw-bold">{{ total_lulus }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-end fw-bold">Jumlah Tidak Lulus</td>
+                <td colspan="2" class="fw-bold">{{ total_tidak_lulus }}</td>
+            </tr>
+        </tfoot>
     </table>
 </div>
 {% endblock content %}
