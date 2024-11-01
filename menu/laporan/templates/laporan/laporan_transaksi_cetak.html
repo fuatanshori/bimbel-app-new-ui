@@ -1,4 +1,5 @@
 {% extends "laporan_base.html" %}
+{% load custom_filters %}
 {% block title %}Laporan Transaksi{% endblock title %}
 {% block content %}
 <div class="container table-container">
@@ -12,6 +13,8 @@
             <tr>
                 <th>No</th>
                 <th>Nama</th>
+                <th>Nama Diskon</th>
+                <th>Layanan Pembayaran</th>
                 <th>Tanggal Transaksi</th>
                 <th>Status Pembayaran</th>
                 <th>Harga Awal</th>
@@ -25,12 +28,14 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ item.nama }}</td>
+                <td>{{ item.diskon_name }}</td>
+                <td>{{ item.layanan_pembayaran }}</td>
                 <td>{{ item.tanggal_transaksi }}</td>
                 <td>{{ item.transaksi_status }}</td>
-                <td>Rp. {{ item.harga_awal }}</td>
+                <td>Rp. {{ item.harga_awal|rupiah }}</td>
                 <td>{{ item.diskon }}%</td>
-                <td>Rp. {{ item.potongan }}</td>
-                <td>Rp. {{ item.harga_akhir }}</td>
+                <td>Rp. {{ item.potongan|rupiah }}</td>
+                <td>Rp. {{ item.harga_akhir|rupiah }}</td>
             </tr>
             {% endfor %}
             <tr class="total-row">

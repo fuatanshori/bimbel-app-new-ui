@@ -77,6 +77,8 @@ def laporan_transaksi(request):
             'harga_akhir': transaksi.harga_akhir,
             'layanan_pembayaran':transaksi.layanan_pembayaran,
             'transaksi_status': midtrans.PAYMENT_STATUS[transaksi.transaksi_status],
+            'diskon_name':transaksi.diskon.diskon_name if transaksi.diskon else "N/A",
+            'layanan_pembayaran':transaksi.layanan_pembayaran,
         })
 
     total_data = {
