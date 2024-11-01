@@ -10,21 +10,28 @@
     <table>
         <thead>
             <tr>
+                <th>No</th>
                 <th>Layanan Pembayaran</th>
                 <th>Jumlah</th>
+                <th>Total Harga</th>
             </tr>
         </thead>
         <tbody>
             {% for item in payment_method_counts %}
-            <tr>
                 {% if item.layanan_pembayaran == 'total' %}
-                    <td><strong>{{ item.layanan_pembayaran|capfirst }}</strong></td>
-                    <td><strong>{{ item.jumlah }}</strong></td>
+                    <tr >
+                        <td colspan="2"><strong>{{ item.layanan_pembayaran|capfirst }}</strong></td>
+                        <td><strong>{{ item.jumlah }}</strong></td>
+                        <td><strong>Rp. {{ item.total_harga|floatformat:0|default:"0" }}</strong></td>
+                    </tr>
                 {% else %}
-                    <td>{{ item.layanan_pembayaran }}</td>
-                    <td>{{ item.jumlah }}</td>
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{ item.layanan_pembayaran }}</td>
+                        <td>{{ item.jumlah }}</td>
+                        <td>Rp. {{ item.total_harga|floatformat:0|default:"0" }}</td>
+                    </tr>
                 {% endif %}
-            </tr>
             {% endfor %}
         </tbody>
     </table>

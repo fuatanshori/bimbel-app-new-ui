@@ -10,9 +10,11 @@
     <table>
         <thead>
             <tr>
+                <th>No</th>
                 <th>Nama</th>
                 <th>Tanggal Transaksi</th>
                 <th>Status Pembayaran</th>
+                <th>Layanan Pembayaran</th>
                 <th>Harga Awal</th>
                 <th>Diskon</th>
                 <th>Potongan</th>
@@ -22,9 +24,11 @@
         <tbody>
             {% for item in laporan_data %}
             <tr>
+                <td>{{ forloop.counter }}</td>
                 <td>{{ item.nama }}</td>
                 <td>{{ item.tanggal_transaksi }}</td>
                 <td>{{ item.transaksi_status }}</td>
+                <td>{{ item.layanan_pembayaran }}</td>
                 <td>Rp. {{ item.harga_awal }}</td>
                 <td>{{ item.diskon }}%</td>
                 <td>Rp. {{ item.potongan }}</td>
@@ -32,7 +36,7 @@
             </tr>
             {% endfor %}
             <tr class="total-row">
-                <td colspan="3">Total</td>
+                <td colspan="5">Total</td>
                 <td>Rp. {{ total_data.total_harga_awal }}</td>
                 <td></td>
                 <td>Rp. {{total_data.total_potongan}}</td>

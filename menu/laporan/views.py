@@ -75,6 +75,7 @@ def laporan_transaksi(request):
             'diskon': diskon_persen,
             'potongan': transaksi.harga_terpotong,
             'harga_akhir': transaksi.harga_akhir,
+            'layanan_pembayaran':transaksi.layanan_pembayaran,
             'transaksi_status': midtrans.PAYMENT_STATUS[transaksi.transaksi_status],
         })
 
@@ -124,36 +125,46 @@ def laporan_penggunaan_diskon(request):
     total_diskon_terpakai = 0
     total_harga_terpotong = 0
     today = timezone.localtime().date()
+    number = 1  # Initialize counter
+    
     ft = {
         'active':'Diskon Aktif',
         'all':'Semua Diskon',
         'expired':"Diskon Kedaluwarsa"
     }
+
     for tarif in tarif_list:
         diskon_query = Diskon.objects.filter(tarif=tarif)
         if filter_type == 'active':
             diskon_query = diskon_query.filter(kedaluwarsa__gte=today)
         elif filter_type == 'expired':
             diskon_query = diskon_query.filter(kedaluwarsa__lt=today)
-        
+            
         diskon_list = diskon_query.annotate(
             jumlah_terpakai=Count('transaksi')
         )
-        if diskon_list.exists(): 
-            tarif_diskon_data[tarif] = []
+
+        if diskon_list.exists():
+            # Initialize with dictionary containing number and empty list
+            tarif_diskon_data[tarif] = {
+                'number': number,
+                'diskon_list': []
+            }
+            number += 1
+
             for diskon in diskon_list:
                 total_diskon_terpakai += diskon.jumlah_terpakai
                 
                 potongan_harga_query = Transaksi.objects.filter(diskon=diskon)
                 
-
                 potongan_harga = potongan_harga_query.aggregate(
                     total_potongan=Sum('harga_terpotong')
                 )['total_potongan'] or 0
                 
                 total_harga_terpotong += potongan_harga
                 
-                tarif_diskon_data[tarif].append({
+                # Use append on the diskon_list inside the dictionary
+                tarif_diskon_data[tarif]['diskon_list'].append({
                     'nama_diskon': diskon.diskon_name,
                     'jumlah_terpakai': diskon.jumlah_terpakai,
                     'kedaluwarsa': diskon.kedaluwarsa,
@@ -173,13 +184,13 @@ def laporan_penggunaan_diskon(request):
     )
     qr_img.add_data(qr_data)
     qr_img.make(fit=True)
-
+    
     img = qr_img.make_image(fill_color="black", back_color="transparent")
-
+    
     qr_io = BytesIO()
     img.save(qr_io, format='PNG')
     qr_io.seek(0)
-
+    
     qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     context = {
         'tarif_diskon_data': tarif_diskon_data,
@@ -187,9 +198,9 @@ def laporan_penggunaan_diskon(request):
         'total_harga_terpotong': total_harga_terpotong,
         'current_date': current_date,
         'filter_type': ft[filter_type],
-        'qr_code': qr_code_b64, 
+        'qr_code': qr_code_b64,
     }
-
+    
     return render(request, 'laporan/laporan_diskon_terpakai_cetak.html', context)
 
 @login_required(login_url='user:masuk')
@@ -199,9 +210,26 @@ def laporan_penggunaan_layanan_pembayaran(request):
     filters = Q()
     if layanan_pembayaran:
         filters &= Q(layanan_pembayaran__icontains=layanan_pembayaran)
-
-    payment_method_counts = Transaksi.objects.filter(filters).values('layanan_pembayaran').annotate(jumlah=Count('layanan_pembayaran'))
+    
+    # Annotate with both count and sum of harga_akhir
+    payment_method_counts = Transaksi.objects.filter(filters).values(
+        'layanan_pembayaran'
+    ).annotate(
+        jumlah=Count('layanan_pembayaran'),
+        total_harga=Sum('harga_akhir')  # Add sum of harga_akhir
+    ).order_by('layanan_pembayaran')  # Optional: order by payment service
+    
+    # Calculate grand total
+    total_transaksi = sum(item['jumlah'] for item in payment_method_counts)
+    total_harga = sum(item['total_harga'] or 0 for item in payment_method_counts)
+    
+    # Add total row to the list
     payment_method_counts = list(payment_method_counts)
+    payment_method_counts.append({
+        'layanan_pembayaran': 'total',
+        'jumlah': total_transaksi,
+        'total_harga': total_harga
+    })
     
     current_date = datetime.date.today()
     domain = get_current_site(request).domain
@@ -215,13 +243,13 @@ def laporan_penggunaan_layanan_pembayaran(request):
     )
     qr_img.add_data(qr_data)
     qr_img.make(fit=True)
-
+    
     img = qr_img.make_image(fill_color="black", back_color="transparent")
-
+    
     qr_io = BytesIO()
     img.save(qr_io, format='PNG')
     qr_io.seek(0)
-
+    
     qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     return render(request, 'laporan/laporan_layanan_pembayaran_cetak.html', {
         'payment_method_counts': payment_method_counts,
@@ -229,7 +257,6 @@ def laporan_penggunaan_layanan_pembayaran(request):
         'qr_code':qr_code_b64,
         'layanan_pembayaran':layanan_pembayaran if layanan_pembayaran else "Semua layanan Pembayaran"
     })
-
 
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
@@ -280,7 +307,7 @@ def laporan_ujian_diikuti(request):
     current_level = None
     current_kelas = None
     current_level_kelas = None
-    
+    no =1
     for item in current_data:
         level = item['level_study__level_study']
         kelas = item['level_study__kelas']
@@ -290,9 +317,12 @@ def laporan_ujian_diikuti(request):
         level_rowspan = level_count.get(level, 1) if level != current_level else 0
         
         # Tentukan rowspan untuk kelas
+        cn= no if level != current_level else 0
         kelas_rowspan = kelas_count.get(level_kelas, 1) if level_kelas != current_level_kelas else 0
-        
+        if level != current_level:
+            no +=1
         formatted_data.append({
+            'no':cn,
             'level_study': level,
             'level_rowspan': level_rowspan,
             'kelas': kelas,
@@ -384,7 +414,7 @@ def laporan_nilai(request):
     level_count = defaultdict(int)
     kelas_count = defaultdict(int)
     mapel_count = defaultdict(int)
-
+    no = 1
     # First pass: count spans
     for item in nilai_data:
         user_key = item['user__full_name']
@@ -405,6 +435,7 @@ def laporan_nilai(request):
         mapel_key = f"{kelas_key}-{item['mata_pelajaran']}"
         
         record = {
+            'no':no,
             'nama': item['user__full_name'],
             'level_study': item['level_study'],
             'kelas': item['kelas'],
@@ -421,6 +452,7 @@ def laporan_nilai(request):
         
         if current_user != user_key:
             current_user = user_key
+            no+=1
         if current_level != level_key:
             current_level = level_key
         if current_kelas != kelas_key:

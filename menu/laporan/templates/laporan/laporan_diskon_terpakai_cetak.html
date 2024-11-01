@@ -9,6 +9,7 @@
     <table>
         <thead>
             <tr>
+                <th>No</th>
                 <th>Nama Tarif</th>
                 <th>Nama Diskon</th>
                 <th>Tanggal Kedaluwarsa</th>
@@ -18,13 +19,13 @@
             </tr>
         </thead>
         <tbody>
-            {% for tarif, diskon_list in tarif_diskon_data.items %}
-                {% for diskon in diskon_list %}
+            {% for tarif, data in tarif_diskon_data.items %}
+                {% for diskon in data.diskon_list %}
                     <tr>
-                        {% comment %} {% if forloop.first %} 
-                        <td rowspan="{{ diskon_list|length }}">{{ tarif.subject }}</td> 
-                        {% endif %} {% endcomment %}
-                        <td>{{ tarif.subject }}</td>
+                        {% if forloop.first %} 
+                        <td rowspan="{{ data.diskon_list|length }}">{{ data.number }}</td>
+                        <td rowspan="{{ data.diskon_list|length }}">{{ tarif.subject }}</td> 
+                        {% endif %}
                         <td>{{ diskon.nama_diskon }}</td>
                         <td>{{ diskon.kedaluwarsa|date:"d F Y" }}</td>
                         <td class="{% if diskon.status == 'Aktif' %}status-active{% else %}status-expired{% endif %}">
@@ -36,7 +37,7 @@
                 {% endfor %}
             {% endfor %}
             <tr class="total-row">
-                <td colspan="4">Total</td>
+                <td colspan="5">Total</td>
                 <td>{{ total_diskon_terpakai }}</td>
                 <td>Rp. {{ total_harga_terpotong|floatformat:0 }}</td>
             </tr>

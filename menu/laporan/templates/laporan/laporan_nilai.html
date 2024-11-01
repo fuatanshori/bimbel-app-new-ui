@@ -10,6 +10,7 @@
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th>No</th>
                 <th>Nama</th>
                 <th>Level Study</th>
                 <th>Kelas</th>
@@ -23,7 +24,8 @@
         <tbody>
             {% for item in data %}
             <tr>
-                {% comment %} {% if item.nama_rowspan > 0 %}
+                {% if item.nama_rowspan > 0 %}
+                <td rowspan="{{ item.nama_rowspan }}" class="align-middle">{{ item.no }}</td>
                 <td rowspan="{{ item.nama_rowspan }}" class="align-middle">{{ item.nama }}</td>
                 {% endif %}
                 {% if item.level_rowspan > 0 %}
@@ -34,11 +36,11 @@
                 {% endif %}
                 {% if item.mapel_rowspan > 0 %}
                 <td rowspan="{{ item.mapel_rowspan }}" class="align-middle">{{ item.mata_pelajaran }}</td>
-                {% endif %} {% endcomment %}
-                <td>{{ item.nama }}</td>
+                {% endif %} 
+                {% comment %} <td>{{ item.nama }}</td>
                 <td>{{ item.level_study }}</td>
                 <td>{{ item.kelas }}</td>
-                <td>{{ item.mata_pelajaran }}</td>
+                <td>{{ item.mata_pelajaran }}</td> {% endcomment %}
 
                 <td>{{ item.nilai }}</td>
                 <td>{{ item.predikat }}</td>

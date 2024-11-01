@@ -11,6 +11,7 @@
     <table >
         <thead >
             <tr>
+                <th>No</th>
                 <th>Level Study</th>
                 <th>Kelas</th>
                 <th>Mata Pelajaran</th>
@@ -20,19 +21,20 @@
         <tbody>
             {% for item in data %}
             <tr>
-                {% comment %} {% if item.level_rowspan > 0 %}
+                {% if item.level_rowspan > 0 %}
+                <td rowspan="{{ item.level_rowspan }}" class="align-middle">{{ item.no }}</td>
                 <td rowspan="{{ item.level_rowspan }}" class="align-middle">{{ item.level_study }}</td>
                 {% endif %}
                 {% if item.kelas_rowspan > 0 %}
                 <td rowspan="{{ item.kelas_rowspan }}" class="align-middle">{{ item.kelas }}</td>
                 {% endif %}
                 <td>{{ item.mata_pelajaran }}</td>
-                <td class="text-center">{{ item.jumlah_pengikut }}</td>  {% endcomment %}
+                <td class="text-center">{{ item.jumlah_pengikut }}</td>
                 
-                <td>{{ item.level_study }}</td>
+                {% comment %} <td>{{ item.level_study }}</td>
                 <td>{{ item.kelas }}</td>
                 <td>{{ item.mata_pelajaran }}</td>
-                <td class="text-center">{{ item.jumlah_pengikut }}</td>
+                <td class="text-center">{{ item.jumlah_pengikut }}</td> {% endcomment %}
 
             </tr>
             {% empty %}
