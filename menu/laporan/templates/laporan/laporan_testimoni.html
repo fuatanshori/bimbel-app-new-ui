@@ -55,8 +55,8 @@
 
     <!-- Tabel Testimoni -->
     <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
+        <table >
+            <thead>
                 <tr>
                     <th>Nama Pengguna</th>
                     <th>Rating</th>
@@ -80,11 +80,11 @@
                         {% endif %}
                     </td>
                     <td>{{ testimoni.testimonial_review|truncatechars:40 }}</td>
-                    <td>{{ testimoni.tanggal|date:"d/m/Y H:i" }}</td>
+                    <td>{{ testimoni.tanggal|date:"d/m/Y" }}</td>
                 </tr>
                 {% endfor %}
-                <tr class="table-light">
-                    <td colspan="4" class="text-end"><strong>TOTAL TESTIMONI</strong></td>
+                <tr>
+                    <td colspan="4"><strong>TOTAL TESTIMONI</strong></td>
                     <td><strong>{{ total_testimoni }}</strong></td>
                 </tr>
             </tbody>
