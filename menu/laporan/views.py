@@ -320,16 +320,36 @@ def laporan_penggunaan_layanan_pembayaran(request):
 @login_required(login_url='user:masuk')
 @admin_pemateri_required
 def laporan_ujian_diikuti(request):
+    dari_tanggal = request.GET.get('dari_tanggal')
+    sampai_tanggal = request.GET.get('sampai_tanggal')
+    try:
+        if dari_tanggal:
+            dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
+        if sampai_tanggal:
+            sampai_tanggal = timezone.make_aware(timezone.datetime.strptime(sampai_tanggal, '%Y-%m-%d'))
+
+        if dari_tanggal and sampai_tanggal and dari_tanggal > sampai_tanggal:
+            messages.error(request, "Tanggal 'dari' tidak boleh lebih besar dari tanggal 'sampai'.")
+            return redirect("menu:laporan")
+    except ValueError:
+        messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
+        return redirect("menu:laporan")
+    
     mapel = request.GET.get('mapel')
     filters = Q()
     if mapel:
         filters &= Q(nama_mapel__icontains=mapel)
+    nilai_filters = Q()
+    if dari_tanggal:
+        nilai_filters &= Q(nilai__tanggal_ujian__date__gte=dari_tanggal)
+    if sampai_tanggal:
+        nilai_filters &= Q(nilai__tanggal_ujian__date__lte=sampai_tanggal)
     mapel_dengan_nilai = MataPelajaran.objects.select_related('level_study').values(
         'level_study__level_study',
         'level_study__kelas',
         'nama_mapel'
     ).annotate(
-        jumlah_pengikut=Count('nilai', distinct=True)
+        jumlah_pengikut=Count('nilai', distinct=True,filter=nilai_filters)
     ).order_by(
         'level_study__level_study',
         'level_study__kelas',
@@ -418,7 +438,8 @@ def laporan_ujian_diikuti(request):
         'title': 'Laporan Jumlah Peserta Ujian',
         'qr_code': qr_code_b64, 
         'current_date': current_date,
-        
+        'dari_tanggal': dari_tanggal,
+        'sampai_tanggal': sampai_tanggal,
     }
     return render(request, 'laporan/laporan_ujian_diikuti_cetak.html', context)
 

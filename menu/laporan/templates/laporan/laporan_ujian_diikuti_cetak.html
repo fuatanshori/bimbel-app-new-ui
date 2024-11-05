@@ -6,6 +6,7 @@
 <div class="container table-container">
     <h2 class="text-center">Laporan Peserta Ujian Per Mata Pelajaran</h2>
     <div class="d-flex justify-content-center align-items-center mb-3">
+        <p class="mb-0 mr-3"><strong>Periode Ujian : </strong>{% if dari_tanggal %}{{dari_tanggal|date:"d/m/Y"}}{% else %}Semua Waktu{% endif %} <strong>sd</strong> {% if sampai_tanggal %}{{sampai_tanggal|date:"d/m/Y"}}{% else %}Semua Waktu{% endif %}</p>
         <p class="mb-0 mr-3"><strong>Mata Plajaran :</strong> {% if mapel %}{{mapel}}{% else %}Semua Mata Plajaran{% endif %}</p>
     </div>
     <table >
@@ -44,7 +45,7 @@
             {% endfor %}
             <!-- Baris Total -->
             <tr class=" font-weight-bold">
-                <td colspan="3" class="text-end">Total Peserta Ujian</td>
+                <td colspan="4" class="text-end">Total Peserta Ujian</td>
                 <td >{{ total_pengikut }}</td>
             </tr>
         </tbody>
