@@ -7,7 +7,7 @@
     <div class="d-flex justify-content-center align-items-center mb-3">
         <p class="mb-0 mr-3"><strong>Status:</strong> {{ status }}</p>
     </div>
-    <table class="table table-bordered">
+    <table>
         <thead>
             <tr>
                 <th>No</th>
@@ -53,12 +53,12 @@
             </tr>
             {% endfor %}
             <!-- Baris Total -->
-            <tr class="font-weight-bold">
-                <td colspan="7" class="text-end">Total Lulus</td>
+            <tr>
+                <td colspan="8" class="text-end">Total Lulus</td>
                 <td class="text-center">{{ total_lulus }}</td>
             </tr>
-            <tr class="font-weight-bold">
-                <td colspan="7" class="text-end">Total Tidak Lulus</td>
+            <tr>
+                <td colspan="8" class="text-end">Total Tidak Lulus</td>
                 <td class="text-center">{{ total_tidak_lulus }}</td>
             </tr>
         </tbody>
