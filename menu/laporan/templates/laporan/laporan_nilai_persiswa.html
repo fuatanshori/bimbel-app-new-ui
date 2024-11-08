@@ -4,10 +4,24 @@
 {% block content %}
 <div class="container table-container">
     <h2 class="text-center">Laporan Nilai</h2>
+    <div class="student-info mb-4">
+        <p class="mb-2">
+            <strong class="label">Nama Lengkap</strong> : {{profile_obj.nama_lengkap}}
+        </p>
+        <p class="mb-2">
+            <strong class="label">Tanggal Lahir</strong> : {{profile_obj.tanggal_lahir}}
+        </p>
+        <p class="mb-2">
+            <strong class="label">Tempat Tinggal</strong> : {{profile_obj.tempat_tinggal}}
+        </p>
+    </div>
+    
+    
     <div class="d-flex justify-content-center align-items-center mb-3">
+        <p class="mb-0 mr-3"><strong>Periode Ujian : </strong>{% if dari_tanggal %}{{dari_tanggal|date:"d/m/Y"}}{% else %}Semua Waktu{% endif %} <strong>sd</strong> {% if sampai_tanggal %}{{sampai_tanggal|date:"d/m/Y"}}{% else %}Semua Waktu{% endif %}</p>
         <p class="mb-0 mr-3"><strong>Status:</strong> {{ status }}</p>
     </div>
-    <table class="table table-bordered">
+    <table>
         <thead>
             <tr>
                 <th>Level Study</th>
@@ -21,7 +35,7 @@
         <tbody>
             {% for item in data %}
             <tr>
-                {% comment %} {% if item.level_rowspan > 0 %}
+                {% if item.level_rowspan > 0 %}
                 <td rowspan="{{ item.level_rowspan }}" class="align-middle">{{ item.level_study }}</td>
                 {% endif %}
                 {% if item.kelas_rowspan > 0 %}
@@ -29,10 +43,10 @@
                 {% endif %}
                 {% if item.mapel_rowspan > 0 %}
                 <td rowspan="{{ item.mapel_rowspan }}" class="align-middle">{{ item.mata_pelajaran }}</td>
-                {% endif %} {% endcomment %}
-                <td>{{ item.level_study }}</td>
+                {% endif %}
+                {% comment %} <td>{{ item.level_study }}</td>
                 <td>{{ item.kelas }}</td>
-                <td>{{ item.mata_pelajaran }}</td>
+                <td>{{ item.mata_pelajaran }}</td> {% endcomment %}
 
                 <td>{{ item.tanggal_ujian|date:"d M Y, H:i" }}</td>
                 <td>{{ item.nilai }}</td>
@@ -40,14 +54,14 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="6" class="text-center">Tidak ada data</td>
+                <td colspan="6">Tidak ada data</td>
             </tr>
             {% endfor %}
         </tbody>
         <tfoot>
             <tr>
                 <td colspan="4" class="text-end fw-bold">Rata-Rata</td>
-                <td colspan="2" class="fw-bold">{{ rata_rata }}</td>
+                <td colspan="2" class="fw-bold">{{ rata_rata|floatformat:0 }}</td>
             </tr>
             <tr>
                 <td colspan="4" class="text-end fw-bold">Jumlah Lulus</td>

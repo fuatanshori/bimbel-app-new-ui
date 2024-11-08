@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="cetakTransaksiTitle"></h5>
+          <h5 class="modal-title" id="cetakTransaksiTitle">Laporan Transaksi</h5>
           <button
             type="button"
             class="btn-close"
@@ -61,7 +61,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="cetakPenggunaanDiskonTitle"></h5>
+          <h5 class="modal-title" id="cetakPenggunaanDiskonTitle">Laporan Penggunaan Diskon</h5>
           <button
             type="button"
             class="btn-close"
@@ -118,7 +118,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="cetakTotalLayananPembayaranTitle"></h5>
+        <h5 class="modal-title" id="cetakTotalLayananPembayaranTitle">Laporan Total Layanan Pembayaran</h5>
         <button
           type="button"
           class="btn-close"
@@ -178,7 +178,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="cetakUjianDiikutiTitle"></h5>
+        <h5 class="modal-title" id="cetakUjianDiikutiTitle">Laporan peserta ujian per mata pelajaran</h5>
         <button
           type="button"
           class="btn-close"
@@ -190,6 +190,26 @@
       <div class="modal-body">
         <div class="col g-2">
           <div class="row g-2">
+            <div class="row g-2">
+              <div class="col mb-2">
+                  <label for="dari_tanggal" class="form-label">Dari Tanggal:</label>
+                  <input 
+                      id="dari_tanggal" 
+                      type="date" 
+                      name="dari_tanggal"
+                      class="form-control text-black" 
+                  >
+              </div>
+              <div class="col mb-2">
+                  <label for="sampai_tanggal" class="form-label">Sampai Tanggal:</label>
+                  <input 
+                      id="sampai_tanggal" 
+                      type="date" 
+                      name="sampai_tanggal" 
+                      class="form-control text-black"
+                  >
+              </div>
+              </div>
             <div class="col mb-2">
               <label for="mapel" class="form-label">Mata Pelajaran</label>
                 <select name="mapel" class="form-control mr-2">
@@ -218,7 +238,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="cetakNilaiTitle"></h5>
+        <h5 class="modal-title" id="cetakNilaiTitle">Laporan Nilai</h5>
         <button
           type="button"
           class="btn-close"
@@ -259,6 +279,18 @@
                 </select>
           </div>
           </div>
+          {% if request.user.role != "pelajar" %}
+          <div class="col mb-2">
+            <label for="email" class="form-label">Cari Email</label>
+            <input 
+                id="email" 
+                type="email" 
+                name="email" 
+                placeholder="cari email example@gmail.com"
+                class="form-control text-black"
+            >
+        </div>
+          {% endif %}
         </div>
       </div>
       <div class="modal-footer">
@@ -277,7 +309,7 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="cetakTestimoniTitle"></h5>
+        <h5 class="modal-title" id="cetakTestimoniTitle">Laporan Testimoni</h5>
         <button
           type="button"
           class="btn-close"

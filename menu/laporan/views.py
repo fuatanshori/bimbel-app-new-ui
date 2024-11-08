@@ -18,6 +18,8 @@ from django.db import connection
 from user.models import Profile
 from menu.testimoni.models import Testimoni
 from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 
 @login_required(login_url='user:masuk')
 def laporan(request):
@@ -450,6 +452,11 @@ def laporan_nilai(request):
     status_param = request.GET.get('status')
     dari_tanggal = request.GET.get('dari_tanggal')
     sampai_tanggal = request.GET.get('sampai_tanggal')
+    email = request.GET.get('email')
+    if email:
+        url = reverse("menu:laporan-nilai-perpelajar")
+        redirect_url = f"{url}?email={email}&dari_tanggal={dari_tanggal}&sampai_tanggal={sampai_tanggal}"
+        return HttpResponseRedirect(redirect_url)
     
     try:
         if dari_tanggal:
@@ -585,7 +592,7 @@ def laporan_nilai_persiswa(request):
     status_param = request.GET.get('status')
     dari_tanggal = request.GET.get('dari_tanggal')
     sampai_tanggal = request.GET.get('sampai_tanggal')
-    
+    email = request.GET.get('email')
     try:
         if dari_tanggal:
             dari_tanggal = timezone.make_aware(timezone.datetime.strptime(dari_tanggal, '%Y-%m-%d'))
@@ -599,15 +606,29 @@ def laporan_nilai_persiswa(request):
         messages.error(request, "Format tanggal tidak valid. Gunakan format YYYY-MM-DD.")
         return redirect("menu:laporan")
     
+
+    filters_profile = Q()
+    if email:
+        filters_profile &= Q(user__email=email)
+    else:
+        filters_profile &= Q(user=request.user)
+    try:
+        profile_obj = Profile.objects.get(filters_profile)
+    except Profile.DoesNotExist:
+        profile_obj = None
+
     # Build filter
-    filters = Q(user=request.user)
+    filters = Q()
     if dari_tanggal:
         filters &= Q(tanggal_ujian__date__gte=dari_tanggal)
     if sampai_tanggal:
         filters &= Q(tanggal_ujian__date__lte=sampai_tanggal)
     if status_param:
         filters &= Q(status=status_param)
-
+    if email:
+        filters &= Q(user__email=email)
+    else:
+        filters &= Q(user=request.user)
     # Get nilai objects ordered properly for grouping
     nilai_queryset = Nilai.objects.filter(filters).order_by(
         'level_study', 
@@ -663,7 +684,8 @@ def laporan_nilai_persiswa(request):
             current_mapel = mapel_key
         
         processed_data.append(record)
-
+    
+    
     # Calculate statistics
     stats = nilai_queryset.aggregate(
         rata_rata=Avg('nilai'),
@@ -700,6 +722,7 @@ def laporan_nilai_persiswa(request):
         'sampai_tanggal': sampai_tanggal,
         'qr_code': qr_code_b64, 
         'current_date': current_date,
+        'profile_obj':profile_obj,
     }
     return render(request, 'laporan/laporan_nilai_persiswa.html', context)
 
