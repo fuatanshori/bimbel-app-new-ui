@@ -5,6 +5,7 @@
 <div class="container table-container">
     <h2 class="text-center">Laporan Nilai</h2>
     <div class="d-flex justify-content-center align-items-center mb-3">
+        <p class="mb-0 mr-3"><strong>Periode Ujian : </strong>{% if dari_tanggal %}{{dari_tanggal|date:"d/m/Y"}}{% else %}Semua Waktu{% endif %} <strong>sd</strong> {% if sampai_tanggal %}{{sampai_tanggal|date:"d/m/Y"}}{% else %}Semua Waktu{% endif %}</p>
         <p class="mb-0 mr-3"><strong>Status:</strong> {{ status }}</p>
     </div>
     <table>
