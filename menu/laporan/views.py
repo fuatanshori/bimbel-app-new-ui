@@ -799,7 +799,7 @@ def laporan_testimoni(request):
 def autocomplete_email(request):
     query = request.GET.get('term', '')
     if query:
-        emails = Users.objects.filter(email__icontains=query)[:5]
+        emails = Users.objects.filter(email__icontains=query,role="pelajar")[:5]
         results = [user.email for user in emails]
         return JsonResponse(results, safe=False)
     return JsonResponse([], safe=False)
