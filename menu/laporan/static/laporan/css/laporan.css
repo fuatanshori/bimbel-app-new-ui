@@ -1,0 +1,90 @@
+.report-card {
+    transition: transform 0.2s ease-in-out;
+    height: 100%;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  }
+
+  .report-card .card-body {
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  .report-card .card-title {
+    color: #2c3e50;
+    font-size: 1.6rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+    line-height: 1.4;
+  }
+
+  .report-btn {
+    padding: 0.8rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  /* Gradient backgrounds for cards */
+  .bg-gradient-1 { background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); }
+  .bg-gradient-2 { background: linear-gradient(135deg, #ffffff 0%, #f1f8ff 100%); }
+  .bg-gradient-3 { background: linear-gradient(135deg, #ffffff 0%, #fff8f1 100%); }
+.row-2 .card-body {
+    min-height: 170px;
+  }
+  #email-suggestions {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#email-suggestions .list-group-item {
+    padding: 8px 12px;
+    border-left: none;
+    border-right: none;
+}
+
+#email-suggestions .list-group-item:first-child {
+    border-top: none;
+}
+
+#email-suggestions .list-group-item:last-child {
+    border-bottom: none;
+}
+
+#email-suggestions .list-group-item:hover,
+#email-suggestions .list-group-item.active {
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+#email-suggestions .list-group-item strong {
+    color: #007bff;
+}

@@ -15,11 +15,13 @@ from django.contrib.auth.decorators import login_required
 from config import midtrans
 from menu.levelstudy.models import LevelStudy 
 from django.db import connection
-from user.models import Profile
+from user.models import Profile,Users
 from menu.testimoni.models import Testimoni
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
+
 
 @login_required(login_url='user:masuk')
 def laporan(request):
@@ -790,3 +792,14 @@ def laporan_testimoni(request):
         'current_date': current_date,
     }
     return render(request, 'laporan/laporan_testimoni.html', context)
+
+
+@login_required(login_url='user:masuk')
+@admin_pemateri_required
+def autocomplete_email(request):
+    query = request.GET.get('term', '')
+    if query:
+        emails = Users.objects.filter(email__icontains=query)[:5]
+        results = [user.email for user in emails]
+        return JsonResponse(results, safe=False)
+    return JsonResponse([], safe=False)

@@ -246,11 +246,11 @@
           aria-label="Close"
         ></button>
       </div>
-      <form method="GET" action="{% if request.user.role == "pelajar" %}{% url "menu:laporan-nilai-perpelajar" %}{% else %}{% url "menu:laporan-nilai" %}{% endif %}">
+      <form method="GET" action="{% if request.user.role == 'pelajar' %}{% url 'menu:laporan-nilai-perpelajar' %}{% else %}{% url 'menu:laporan-nilai' %}{% endif %}">
       <div class="modal-body">
         <div class="col g-2">
           <div class="row g-2">
-          <div class="col mb-2">
+            <div class="col mb-2">
               <label for="dari_tanggal" class="form-label">Dari Tanggal:</label>
               <input 
                   id="dari_tanggal" 
@@ -258,8 +258,8 @@
                   name="dari_tanggal"
                   class="form-control text-black" 
               >
-          </div>
-          <div class="col mb-2">
+            </div>
+            <div class="col mb-2">
               <label for="sampai_tanggal" class="form-label">Sampai Tanggal:</label>
               <input 
                   id="sampai_tanggal" 
@@ -267,20 +267,20 @@
                   name="sampai_tanggal" 
                   class="form-control text-black"
               >
-          </div>
+            </div>
           </div>
           <div class="row g-2">
             <div class="col mb-2">
               <label for="" class="form-label">Status Ujian</label>
-                <select name="status" class="form-control mr-2">
-                    <option value="" >Semua Status Ujian</option>
-                    <option value="lulus">Lulus</option>
-                    <option value="tidak lulus">Tidak Lulus</option>
-                </select>
-          </div>
+              <select name="status" class="form-control mr-2">
+                <option value="">Semua Status Ujian</option>
+                <option value="lulus">Lulus</option>
+                <option value="tidak lulus">Tidak Lulus</option>
+              </select>
+            </div>
           </div>
           {% if request.user.role != "pelajar" %}
-          <div class="col mb-2">
+          <div class="col mb-2 position-relative">
             <label for="email" class="form-label">Cari Email</label>
             <input 
                 id="email" 
@@ -289,7 +289,8 @@
                 placeholder="cari email example@gmail.com"
                 class="form-control text-black"
             >
-        </div>
+            <div id="email-suggestions" class="position-absolute bg-white border" style="z-index: 1050; max-height: 150px; overflow-y: auto;"></div>
+          </div>
           {% endif %}
         </div>
       </div>
@@ -302,6 +303,7 @@
     </form>
     </div>
   </div>
+</div>
 </div>
 
 

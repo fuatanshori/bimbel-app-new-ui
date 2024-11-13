@@ -105,3 +105,8 @@ urlpatterns+=[
 urlpatterns +=[
     path("testimoni/",views_testimoni.testimoni,name="testimoni"),
 ]
+
+# auto-complete email search
+urlpatterns += [
+    path('autocomplete-email/', views_laporan.autocomplete_email, name='autocomplete-email'),
+]
