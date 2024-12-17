@@ -3,15 +3,18 @@ from .models import Testimoni
 from core.utils.decorator import admin_pemateri_required,transaksi_settlement_required
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from menu.utils.pagination import pagination_queryset
+
 # Create your views here.
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def testimoni(request):
     if request.user.role == "admin":
-        testimoni_objs = Testimoni.objects.all()
+        custom_range,testimoni_objs=pagination_queryset(request,Testimoni.objects.all(),7)
         context = {
             "testimoni_objs":testimoni_objs,
             "star_range" : range(1, 6),
+            "custom_range":custom_range,
         }
         return render(request,"testimoni/testimoni_admin.html", context)
     elif request.user.role == "pemateri":

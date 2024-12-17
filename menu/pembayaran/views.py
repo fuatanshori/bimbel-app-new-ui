@@ -21,13 +21,12 @@ import babel
 import logging
 from django.http import Http404
 import pytz
-from core.utils.decorator import admin_pemateri_required,admin_required
+from core.utils.decorator import admin_required
 from django.utils import timezone
 from .forms import TarifForm,DiskonForm
 from menu.utils.pagination import pagination_queryset
 from menu.utils.encode_url import decode_id
 from django.urls import reverse
-import csv
 
 MIDTRANS_CORE = midtrans.MIDTRANS_CORE
 PAYMENT_STATUS = midtrans.PAYMENT_STATUS
@@ -551,9 +550,10 @@ def pembayaran_admin_list(request):
             Q(va_number__iexact=cari_transaksi)
         )
     else:
-        transaksi_objs=Transaksi.objects.all()
+        custom_range,transaksi_objs=pagination_queryset(request,Transaksi.objects.all(),7)
     context = {
         "transaksi_objs": transaksi_objs,
+        "custom_range":custom_range
     }
     # return redirect("menu:mapel-modul")
     return render(request, 'pembayaran/pembayaran_admin.html',context)
