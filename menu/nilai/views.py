@@ -21,6 +21,7 @@ from menu.nilai.models import Sertifikat
 from menu.utils.encode_url import decode_id
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from menu.utils.pagination import pagination_queryset
 
 # Create your views here.
 
@@ -29,16 +30,18 @@ from django.urls import reverse
 def daftar_nilai(request):
     try:
         if request.user.role in ['pemateri',"admin"]:
-            nilai_objs = Nilai.objects.all().select_related('sertifikat')
+            custom_range,nilai_objs=pagination_queryset(request,
+                                                        Nilai.objects.all().select_related('sertifikat'),7)
         else:
-            nilai_objs = Nilai.objects.filter(user=request.user).select_related('sertifikat')
-
+            custom_range,nilai_objs=pagination_queryset(request,Nilai.objects.filter(
+                user=request.user).select_related('sertifikat'),5)
     except Nilai.DoesNotExist:
         pass
     levelstudy_objs = LevelStudy.objects.all()
     context = {
         "nilai_objs": nilai_objs,
         "levelstudy_objs":levelstudy_objs,
+        "custom_range":custom_range
     }
     return render(request, 'nilai/nilai.html', context)
 

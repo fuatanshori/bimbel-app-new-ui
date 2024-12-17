@@ -1,74 +1,69 @@
 {% extends "menu_base.html" %}
 
-{% block title %}nilai  {% endblock title %}
-{% block content %}
-<div class="container-xxl flex-grow-1 container-p-y ">
-    <div class="row justify-content-center">
-      <div class="col-lg-12">
-      <div class="card py-4">
-        <div class="card-header">
-          <div><h4 class="mb-3">Nilai Ujian</h4></div>
-          {% comment %} <div class="col-lg col-sm col-md col-6 flex-grow-0">
-            <div class="category-wrap dropdown d-inline-block float-start">
-                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> 
-                    {% if request.path == '/menu/' or request.path|slice:'0:26' == "/menu/nilai-perlevelstudy/" %}
-                        <i class="mdi mdi-format-list-bulleted"></i> {{level_study}}
-                    {% else %}
-                        <i class="mdi mdi-format-list-bulleted"></i> Semua Level Study
-                    {% endif %}
-                </button>
-                <div class="dropdown-menu dropdown-menu-end">
-                    <a class="dropdown-item" href="{% url "menu:daftar-nilai" %}">Semua Level Study</a>
-                    {% for levelstudy_obj in levelstudy_objs %}
-                        <a class="dropdown-item" href="{% url "menu:daftar-nilai-perlevelstudy" id_levelstudy=levelstudy_obj.get_id_safe %}">{{levelstudy_obj.level_study}}</a>
-                    {% endfor %}
-                </div>
-            </div> <!-- category-wrap.// -->
-          </div> <!-- col.// --> {% endcomment %}
-        </div>
-        
-            <div class="table-responsive text-nowrap">
-                <table class="table table-borderless">
-                  <thead>
-                    <tr>
-                        <th>Nama</th>
-                        <th>Kelas</th>
-                        <th>Tingkat Studi</th>
-                        <th>Mata Pelajaran</th>
-                        <th>Nilai</th>
-                        <th>Predikat</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+{% block title %}Nilai{% endblock title %}
 
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for nilai_obj in nilai_objs %}
-                    <tr>  
-                        <td>{{nilai_obj.user.full_name}}</td>
-                        <td>{{nilai_obj.kelas}}</td>
-                        <td>{{nilai_obj.level_study}}</td>
-                        <td>{{nilai_obj.mata_pelajaran}}</td>
-                        <td>{{nilai_obj.nilai}}</td>
-                        <td>{{nilai_obj.predikat}}</td>
-                        <td><label class="badge bg-{% if nilai_obj.status == "lulus" %}success{% else %}danger{% endif %}">{{nilai_obj.status}}</label></td>
-                        <td>
-                        {% if nilai_obj.sertifikat %}
-                            <a href="{% url "menu:generate-certificate" id_sertifikat=nilai_obj.sertifikat.get_id_safe %}"class="badge bg-primary text-decoration-none text-white">Sertifikat</a>
-                        {% else %}
-                            <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran_obj.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="btn btn-sm btn-danger">
-                                Lakukan Ujian Ulang
-                            </a>
-                        {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
+{% block content %}
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Nilai Ujian</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Kelas</th>
+                                    <th>Tingkat Studi</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th>Nilai</th>
+                                    <th>Predikat</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for nilai_obj in nilai_objs %}
+                                    <tr>  
+                                        <td>{{nilai_obj.user.full_name}}</td>
+                                        <td>{{nilai_obj.kelas}}</td>
+                                        <td>{{nilai_obj.level_study}}</td>
+                                        <td>{{nilai_obj.mata_pelajaran}}</td>
+                                        <td>{{nilai_obj.nilai}}</td>
+                                        <td>{{nilai_obj.predikat}}</td>
+                                        <td>
+                                            <span class="badge bg-{% if nilai_obj.status == "lulus" %}primary{% else %}danger{% endif %}">
+                                                {{nilai_obj.status}}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if nilai_obj.sertifikat %}
+                                                <a href="{% url "menu:generate-certificate" id_sertifikat=nilai_obj.sertifikat.get_id_safe %}" class="badge bg-success text-white">Sertifikat</a>
+                                            {% else %}
+                                                <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran_obj.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="btn btn-sm btn-danger">
+                                                    Lakukan Ujian Ulang
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">Tidak ada nilai ditemukan</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% include "includes/menu/pagination.html" with queryset=nilai_objs custom_range=custom_range %}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-    </div>
-  </div>
+</div>
 {% endblock content %}

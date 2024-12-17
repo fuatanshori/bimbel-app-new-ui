@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from .models import MataPelajaran
-from menu.pembayaran.models import Transaksi
 from config import midtrans
 from django.contrib.auth.decorators import login_required
 from .forms import MapelForm
