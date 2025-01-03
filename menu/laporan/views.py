@@ -457,7 +457,7 @@ def laporan_nilai(request):
     email = request.GET.get('email')
     if email:
         url = reverse("menu:laporan-nilai-perpelajar")
-        redirect_url = f"{url}?email={email}&dari_tanggal={dari_tanggal}&sampai_tanggal={sampai_tanggal}"
+        redirect_url = f"{url}?email={email}&dari_tanggal={dari_tanggal}&sampai_tanggal={sampai_tanggal}&status={status_param}"
         return HttpResponseRedirect(redirect_url)
     
     try:
@@ -712,7 +712,7 @@ def laporan_nilai_persiswa(request):
     qr_io = BytesIO()
     img.save(qr_io, format='PNG')
     qr_io.seek(0)
-
+    print(status_param)
     qr_code_b64 = base64.b64encode(qr_io.getvalue()).decode('utf-8')
     context = {
         'data': processed_data,
