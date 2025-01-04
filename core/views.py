@@ -12,43 +12,27 @@ import hashlib
 from django.views.decorators.cache import cache_control
 from django.utils.decorators import method_decorator
 from django.views.generic.base import RedirectView
+from core.utils.decorator import transaksi_settlement_required
 
 
 @login_required(login_url="user:masuk")
+@transaksi_settlement_required
 def pdf_protect_membership(request, pdf_file):
     cache_key = f"pdf_{request.user.id}_{pdf_file}"
     pdf_content = cache.get(cache_key)
     if pdf_content is None:
-        try:
-            transaksi_obj = Transaksi.objects.get(
-                user=request.user, transaksi_status="settlement")
-            if transaksi_obj:
-                file_path = os.path.join(settings.MEDIA_ROOT, 'pdf', pdf_file)
-                if os.path.exists(file_path):
-                    with open(file_path, 'rb') as file:
-                        pdf_content = file.read()
-                    cache.set(cache_key, pdf_content, timeout=60*15)
-                else:
-                    raise Http404("File tidak ditemukan")
-            else:
-                return redirect("menu:pembayaran")
-                
-        except Transaksi.DoesNotExist:
-            if request.user.role in ["admin", "pemateri"]:
-                file_path = os.path.join(settings.MEDIA_ROOT, 'pdf', pdf_file)
-                if os.path.exists(file_path):
-                    with open(file_path, 'rb') as file:
-                        pdf_content = file.read()
-                    cache.set(cache_key, pdf_content, timeout=60*15)  # Cache selama 15 menit
-                else:
-                    raise Http404("File tidak ditemukan")
-            if request.user.role == "pelajar":
-                return redirect("menu:pembayaran")
-    
+        file_path = os.path.join(settings.MEDIA_ROOT, 'pdf', pdf_file)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as file:
+                pdf_content = file.read()
+            cache.set(cache_key, pdf_content, timeout=60*15)
+        else:
+            raise Http404("File tidak ditemukan")
     response = FileResponse(io.BytesIO(pdf_content), content_type='application/pdf')
     response['Cache-Control'] = 'public, max-age=86400'  # Cache selama 1 hari (24 * 60 * 60)
     response['Expires'] = (datetime.now() + timedelta(days=1)).strftime('%a, %d %b %Y %H:%M:%S GMT')
     return response
+
 
 # hanya pelajar yang sukses melakukan pembayaran akan diizinkan melihat vidio. admin/pemateri
 @login_required(login_url="user:masuk")
