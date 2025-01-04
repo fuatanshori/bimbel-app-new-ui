@@ -179,7 +179,7 @@ def generate_certificate(request,id_sertifikat):
     qr_image = ImageReader(qr_buffer)
 
     qr_code_position = (50, 50)
-    qr_code_size = 200 
+    qr_code_size = 170 
 
     pdf.drawImage(qr_image, qr_code_position[0], qr_code_position[1], qr_code_size, qr_code_size)
      
