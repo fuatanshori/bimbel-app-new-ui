@@ -20,6 +20,14 @@ from core.utils.decorator import transaksi_settlement_required
 def pdf_protect_membership(request, pdf_file):
     cache_key = f"pdf_{request.user.id}_{pdf_file}"
     pdf_content = cache.get(cache_key)
+    
+    # Tambahkan ETag untuk validasi cache
+    etag = f'"{hashlib.md5(str(request.user.id).encode() + pdf_file.encode()).hexdigest()}"'
+    if_none_match = request.headers.get('If-None-Match')
+    
+    if if_none_match and if_none_match == etag:
+        return HttpResponse(status=304)  # Not Modified
+    
     if pdf_content is None:
         file_path = os.path.join(settings.MEDIA_ROOT, 'pdf', pdf_file)
         if os.path.exists(file_path):
@@ -28,9 +36,12 @@ def pdf_protect_membership(request, pdf_file):
             cache.set(cache_key, pdf_content, timeout=60*15)
         else:
             raise Http404("File tidak ditemukan")
+    
     response = FileResponse(io.BytesIO(pdf_content), content_type='application/pdf')
-    response['Cache-Control'] = 'public, max-age=86400'  # Cache selama 1 hari (24 * 60 * 60)
+    response['Cache-Control'] = 'public, max-age=86400'
     response['Expires'] = (datetime.now() + timedelta(days=1)).strftime('%a, %d %b %Y %H:%M:%S GMT')
+    response['ETag'] = etag
+    
     return response
 
 
