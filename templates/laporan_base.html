@@ -23,7 +23,7 @@
 
     <div class="container signature-container">
         <div class="signature-block">
-            <p class="signature-date">Banjarmasin, {{ current_date }}</p>
+            <p class="signature-date">Banjarmasin, {{ current_date|date:"d-m-Y" }}</p>
             <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="signature-qr"/>
             <p class="signature-name">Matini Raufina</p>
             <div class="signature-line"></div>
