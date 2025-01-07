@@ -44,9 +44,15 @@
                                             {% if nilai_obj.sertifikat %}
                                                 <a href="{% url "menu:generate-certificate" id_sertifikat=nilai_obj.sertifikat.get_id_safe %}" class="badge bg-success text-white">Sertifikat</a>
                                             {% else %}
+                                                {% if nilai_obj.mata_pelajaran_obj is not None %}
                                                 <a href="{% url "menu:ujian-ulang" id_mapel=nilai_obj.mata_pelajaran_obj.get_id_safe id_nilai=nilai_obj.get_id_safe %}" class="btn btn-sm btn-danger">
                                                     Lakukan Ujian Ulang
                                                 </a>
+                                                {% else %}
+                                                <a href="" class="btn btn-sm btn-danger">
+                                                    Mata Pelajaran dan Ujian Telah di Hapus
+                                                </a>
+                                                {% endif %}
                                             {% endif %}
                                         </td>
                                     </tr>
