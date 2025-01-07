@@ -13,7 +13,7 @@ class Nilai(models.Model):
     }
     id_nilai            = models.BigAutoField(primary_key=True,unique=True,db_index=True)
     user                = models.ForeignKey(Users,on_delete=models.CASCADE,db_index=True)
-    mata_pelajaran_obj  = models.ForeignKey(MataPelajaran,on_delete=models.SET_NULL,db_index=True,null=True)
+    mata_pelajaran_obj  = models.ForeignKey(MataPelajaran,on_delete=models.CASCADE,db_index=True,null=True)
     mata_pelajaran      = models.CharField(max_length=100,null=True)
     kelas               = models.CharField(max_length=100,null=True)
     level_study         = models.CharField(max_length=100,null=True)
