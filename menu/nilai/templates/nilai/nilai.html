@@ -49,8 +49,8 @@
                                                     Lakukan Ujian Ulang
                                                 </a>
                                                 {% else %}
-                                                <a href="" class="btn btn-sm btn-secondary d-block" disabled>
-                                                    Mata Pelajaran, Ujian dan Nilai Terkait Telah di Hapus
+                                                <a href="{% url "menu:hapus-nilai-ujian" id_nilai=nilai_obj.get_id_safe %}" class="btn btn-sm btn-secondary">
+                                                    Mata Pelajaran dan Nilai Terkait Telah di Hapus, Hapus Nilai?
                                                 </a>
                                                 {% endif %}
                                             {% endif %}

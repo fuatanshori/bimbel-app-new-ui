@@ -63,6 +63,23 @@ def lakukan_ujian_ulang(request,id_mapel,id_nilai):
         raise Http404()
     except Nilai.DoesNotExist:
         raise Http404()
+    
+@login_required(login_url='user:masuk')
+def hapus_nilai_ujian(request,id_nilai):
+    pk_nilai = decode_id(id_nilai)
+    try:
+        if request.user.role == "pemateri" or request.user.role == "admin":
+            nilai_obj = Nilai.objects.get(pk=pk_nilai,status="tidak lulus")
+            nilai_obj.delete()
+            return redirect("menu:daftar-nilai")
+        elif request.user.role == "pelajar":
+            nilai_obj = Nilai.objects.get(pk=pk_nilai,status="tidak lulus",user=request.user)
+            nilai_obj.delete()
+            return redirect("menu:levelstudy-ujian")
+    except MataPelajaran.DoesNotExist:
+        raise Http404()
+    except Nilai.DoesNotExist:
+        raise Http404()
 
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required

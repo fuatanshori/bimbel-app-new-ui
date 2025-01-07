@@ -67,6 +67,7 @@ urlpatterns+=[
     path("nilai/", views_nilai.daftar_nilai, name='daftar-nilai'),
     path("nilai-perlevelstudy/<id_levelstudy>/", views_nilai.daftar_nilai_perlevelstudy, name='daftar-nilai-perlevelstudy'),
     path("nilai/ujian_ulang/<id_mapel>/<id_nilai>/",views_nilai.lakukan_ujian_ulang,name='ujian-ulang'),
+    path("nilai/hapus/<id_nilai>/",views_nilai.hapus_nilai_ujian,name='hapus-nilai-ujian'),
     path("sertifikat/<id_sertifikat>/",views_nilai.generate_certificate,name='generate-certificate'),
     path("search/sertifikat/",views_nilai.search_certificate,name='search-certificate')
 ]
