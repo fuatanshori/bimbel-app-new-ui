@@ -36,8 +36,8 @@
         <tbody>
             {% for item in data %}
             <tr>
-                <td>{{forloop.counter}}</td>
                 {% if item.level_rowspan > 0 %}
+                <td rowspan="{{ item.level_rowspan }}" class="align-middle">{{ item.no }}</td>
                 <td rowspan="{{ item.level_rowspan }}" class="align-middle">{{ item.level_study }}</td>
                 {% endif %}
                 {% if item.kelas_rowspan > 0 %}

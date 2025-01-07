@@ -482,8 +482,9 @@ def laporan_nilai(request):
     if status_param:
         filters &= Q(status=status_param)
 
-    # Get nilai objects with annotations
+    # Modified query to include email
     nilai_data = Nilai.objects.filter(filters).values(
+        'user__email',  # Add email field
         'user__full_name',
         'level_study',
         'mata_pelajaran',
@@ -492,41 +493,42 @@ def laporan_nilai(request):
         'predikat',
         'tanggal_ujian',
         'status',
-    ).order_by('user__full_name', 'level_study', 'kelas', 'mata_pelajaran', 'tanggal_ujian')
+    ).order_by('user__email', 'level_study', 'kelas', 'mata_pelajaran', 'tanggal_ujian')  # Changed ordering
 
     # Process data for rowspans
     processed_data = []
-    current_user = None
+    current_email = None
     current_level = None
     current_kelas = None
     current_mapel = None
-    user_count = defaultdict(int)
+    email_count = defaultdict(int)
     level_count = defaultdict(int)
     kelas_count = defaultdict(int)
     mapel_count = defaultdict(int)
     no = 1
+
     # First pass: count spans
     for item in nilai_data:
-        user_key = item['user__full_name']
-        level_key = f"{user_key}-{item['level_study']}"
+        email_key = item['user__email']
+        level_key = f"{email_key}-{item['level_study']}"
         kelas_key = f"{level_key}-{item['kelas']}"
         mapel_key = f"{kelas_key}-{item['mata_pelajaran']}"
         
-        user_count[user_key] += 1
+        email_count[email_key] += 1
         level_count[level_key] += 1
         kelas_count[kelas_key] += 1
         mapel_count[mapel_key] += 1
 
     # Second pass: create final data structure with grouping
     for item in nilai_data:
-        user_key = item['user__full_name']
-        level_key = f"{user_key}-{item['level_study']}"
+        email_key = item['user__email']
+        level_key = f"{email_key}-{item['level_study']}"
         kelas_key = f"{level_key}-{item['kelas']}"
         mapel_key = f"{kelas_key}-{item['mata_pelajaran']}"
         
         record = {
-            'no':no,
-            'nama': item['user__full_name'],
+            'no': no,
+            'nama': item['user__full_name'],  # Still display full_name
             'level_study': item['level_study'],
             'kelas': item['kelas'],
             'mata_pelajaran': item['mata_pelajaran'],
@@ -534,15 +536,15 @@ def laporan_nilai(request):
             'predikat': item['predikat'],
             'tanggal': timezone.localtime(item['tanggal_ujian']).strftime('%d %b. %Y, %H.%M'),
             'status': item['status'],
-            'nama_rowspan': user_count[user_key] if current_user != user_key else 0,
+            'nama_rowspan': email_count[email_key] if current_email != email_key else 0,  # Using email for rowspan
             'level_rowspan': level_count[level_key] if current_level != level_key else 0,
             'kelas_rowspan': kelas_count[kelas_key] if current_kelas != kelas_key else 0,
             'mapel_rowspan': mapel_count[mapel_key] if current_mapel != mapel_key else 0,
         }
         
-        if current_user != user_key:
-            current_user = user_key
-            no+=1
+        if current_email != email_key:
+            current_email = email_key
+            no += 1
         if current_level != level_key:
             current_level = level_key
         if current_kelas != kelas_key:
@@ -643,7 +645,7 @@ def laporan_nilai_persiswa(request):
     level_counts = defaultdict(int)
     kelas_counts = defaultdict(int)
     mapel_counts = defaultdict(int)
-    
+    no = 1
     # First pass: count for rowspans
     for nilai in nilai_queryset:
         level_key = nilai.level_study
@@ -666,6 +668,7 @@ def laporan_nilai_persiswa(request):
         mapel_key = f"{nilai.level_study}-{nilai.kelas}-{nilai.mata_pelajaran}"
         
         record = {
+            'no': no,
             'level_study': nilai.level_study,
             'kelas': nilai.kelas,
             'mata_pelajaran': nilai.mata_pelajaran,
@@ -677,9 +680,11 @@ def laporan_nilai_persiswa(request):
             'kelas_rowspan': kelas_counts[kelas_key] if current_kelas != kelas_key else 0,
             'mapel_rowspan': mapel_counts[mapel_key] if current_mapel != mapel_key else 0,
         }
-        
+      
+         
         if current_level != level_key:
             current_level = level_key
+            no += 1
         if current_kelas != kelas_key:
             current_kelas = kelas_key
         if current_mapel != mapel_key:
