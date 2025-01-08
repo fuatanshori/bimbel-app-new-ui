@@ -37,9 +37,6 @@ class SoalUjianForm(forms.ModelForm):
     class Meta:
         model = SoalUjian
         exclude = ['mata_pelajaran']
-
-    class Meta:
-        model = SoalUjian
         widgets = {
               "soal": CKEditor5Widget(
                 attrs={"class": "django_ckeditor_5"}, config_name="extends"
