@@ -4,7 +4,7 @@ from django_ckeditor_5.widgets import CKEditor5Widget
 
 class SoalUjianForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(SoalUjianForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['gambar_soal'].widget.attrs['class'] = 'form-control w-100'
         self.fields['soal'].required = True
         self.fields['jawaban_1'].required = True
