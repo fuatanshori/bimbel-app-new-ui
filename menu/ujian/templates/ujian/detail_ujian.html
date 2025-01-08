@@ -15,7 +15,7 @@
                     <img class="img-fluid" src="{{soal_ujian_obj.gambar_soal.url}}" alt="Card image cap" style="max-height: 250px; object-fit: cover; width: 100%; border-radius: 8px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal">
                     {% endif %}
                     <p class="card-text mt-3 text-start">
-                      {{soal_ujian_obj.soal}}
+                      {{soal_ujian_obj.soal|safe}}
                     </p>
                   </div>
                 </div>
@@ -29,36 +29,36 @@
                   <!-- Pilihan Jawaban -->
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="jawaban" id="jawaban1" value="jawaban1">
-                    <label class="form-check-label" for="jawaban1">{{soal_ujian_obj.jawaban_1}}</label>
+                    <label class="form-check-label" for="jawaban1">{{soal_ujian_obj.jawaban_1|safe}}</label>
                   </div>
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="jawaban" id="jawaban2" value="jawaban2">
-                    <label class="form-check-label" for="jawaban2">{{soal_ujian_obj.jawaban_2}}</label>
+                    <label class="form-check-label" for="jawaban2">{{soal_ujian_obj.jawaban_2|safe}}</label>
                   </div>
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="jawaban" id="jawaban3" value="jawaban3">
-                    <label class="form-check-label" for="jawaban3">{{soal_ujian_obj.jawaban_3}}</label>
+                    <label class="form-check-label" for="jawaban3">{{soal_ujian_obj.jawaban_3|safe}}</label>
                   </div>
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="jawaban" id="jawaban4" value="jawaban4">
-                    <label class="form-check-label" for="jawaban4">{{soal_ujian_obj.jawaban_4}}</label>
+                    <label class="form-check-label" for="jawaban4">{{soal_ujian_obj.jawaban_4|safe}}</label>
                   </div>
                   {% if soal_ujian_obj.jawaban_5 %}
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="jawaban" id="jawaban5" value="jawaban5">
-                    <label class="form-check-label" for="jawaban5">{{soal_ujian_obj.jawaban_5}}</label>
+                    <label class="form-check-label" for="jawaban5">{{soal_ujian_obj.jawaban_5|safe}}</label>
                   </div>
                   {% endif %}
                   {% if soal_ujian_obj.jawaban_6 %}
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="jawaban" id="jawaban6" value="jawaban6">
-                    <label class="form-check-label" for="jawaban6">{{soal_ujian_obj.jawaban_6}}</label>
+                    <label class="form-check-label" for="jawaban6">{{soal_ujian_obj.jawaban_6|safe}}</label>
                   </div>
                   {% endif %}
                   {% if soal_ujian_obj.jawaban_7 %}
                   <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="jawaban" id="jawaban7" value="jawaban7">
-                    <label class="form-check-label" for="jawaban7">{{soal_ujian_obj.jawaban_7}}</label>
+                    <label class="form-check-label" for="jawaban7">{{soal_ujian_obj.jawaban_7|safe}}</label>
                   </div>
                   {% endif %}
                   <div class="my-3">
