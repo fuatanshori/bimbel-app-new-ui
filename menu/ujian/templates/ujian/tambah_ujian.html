@@ -1,6 +1,6 @@
 {% extends "menu_base.html" %}
 {% block title %}ujian  {% endblock title %}
-{% block style %}{{soal_ujian_forms.media}}{% endblock style %}
+
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
   <!-- Basic Layout & Basic with Icons -->
@@ -96,17 +96,4 @@
     </div>
   </div>
 </div>
-<script>
-  document.querySelector('form').addEventListener('submit', function(event) {
-    var editor = CKEDITOR.instances['id_soal'];  // Pastikan ID sesuai dengan nama atau ID textarea yang digunakan
-    if (!editor || !editor.getData().trim()) {
-        event.preventDefault();  // Mencegah form disubmit
-        alert('Soal wajib diisi!');
-    }
-});
-document.addEventListener('DOMContentLoaded', function() {
-  CKEDITOR.replace('id_soal');  // Pastikan ID sesuai dengan ID textarea
-});
-
-</script>
 {% endblock content %}
