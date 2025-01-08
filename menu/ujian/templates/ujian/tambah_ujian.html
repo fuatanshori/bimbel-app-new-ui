@@ -96,15 +96,16 @@
     </div>
   </div>
 </div>
-<script>document.querySelector('form').addEventListener('submit', function(event) {
-  console.log('Form submitted');
+<script>
+  document.querySelector('form').addEventListener('submit', function(event) {
+    var editor = CKEDITOR.instances['id_soal'];  // Pastikan ID sesuai dengan nama atau ID textarea yang digunakan
+    if (!editor || !editor.getData().trim()) {
+        event.preventDefault();  // Mencegah form disubmit
+        alert('Soal wajib diisi!');
+    }
 });
-document.querySelector('form').addEventListener('submit', function(event) {
-  var editor = CKEDITOR.instances['id_soal'];
-  if (!editor.getData().trim()) {
-      event.preventDefault(); // Mencegah pengiriman form
-      alert('Soal wajib diisi!');
-  }
+document.addEventListener('DOMContentLoaded', function() {
+  CKEDITOR.replace('id_soal');  // Pastikan ID sesuai dengan ID textarea
 });
 
 </script>
