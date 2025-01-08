@@ -1,11 +1,10 @@
 {% extends "menu_base.html" %}
-{% load static %}
-{% block title %}ujian{% endblock title %}
-{% block style %}{{soal_ujian_forms.media}}{% endblock style %}
-
+{% block title %}ujian  {% endblock title %}
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y">
+  <!-- Basic Layout & Basic with Icons -->
 <div class="row">
+  <!-- Basic Layout -->
   <div class="col-xxl">
     <div class="card mb-4">
       <div class="card-header d-flex align-items-center justify-content-between">
@@ -88,7 +87,7 @@
           </div>
           <div class="row justify-content-end">
             <div class="col-sm-10">
-              <button type="submit" class="btn btn-primary">Edit</button>
+              <button type="submit" class="btn btn-primary">Tambah</button>
             </div>
           </div>
         </form>
@@ -96,8 +95,4 @@
     </div>
   </div>
 </div>
-
 {% endblock content %}
-{% block script %}
-<script src="{% static "ujian/js/forms.js" %}"></script>
-{% endblock script %}
