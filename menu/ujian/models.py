@@ -4,7 +4,7 @@ from django.core.validators import FileExtensionValidator
 from menu.utils.encode_url import encode_id
 import uuid
 # Create your models here.
-
+from django_ckeditor_5.fields import CKEditor5Field
 
 class SoalUjian(models.Model):
     choices = {
@@ -18,7 +18,7 @@ class SoalUjian(models.Model):
     }
     id_soal = models.BigAutoField(primary_key=True,unique=True)
     gambar_soal = models.ImageField(upload_to="soal",blank=True,null=True,validators=[FileExtensionValidator(["jpg","png"])])
-    soal = models.CharField(max_length=200)
+    soal = CKEditor5Field('soal', config_name='extends',null=True)
     jawaban_1 = models.CharField(max_length=200,null=True)
     jawaban_2 = models.CharField(max_length=200,null=True)
     jawaban_3 = models.CharField(max_length=200)
