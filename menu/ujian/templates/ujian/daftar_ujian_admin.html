@@ -56,14 +56,14 @@
                   <tbody>
                     {% for soal_ujian_obj in soal_ujian_objs %}
                     <tr>
-                      <td>{{soal_ujian_obj.soal|truncatechars:20}}</td>
-                      <td>{{soal_ujian_obj.jawaban_1}}</td>
-                      <td>{{soal_ujian_obj.jawaban_2}}</td>
-                      <td>{{soal_ujian_obj.jawaban_3}}</td>
-                      <td>{{soal_ujian_obj.jawaban_4}}</td>
-                      <td>{% if soal_ujian_obj.jawaban_5 %}{{soal_ujian_obj.jawaban_5}} {% else %} N/A {% endif %}</td>
-                      <td>{% if soal_ujian_obj.jawaban_6 %}{{soal_ujian_obj.jawaban_6}} {% else %} N/A {% endif %}</td>
-                      <td>{% if soal_ujian_obj.jawaban_7 %}{{soal_ujian_obj.jawaban_7}} {% else %} N/A {% endif %}</td>
+                      <td>{{soal_ujian_obj.soal|truncatechars:20|safe}}</td>
+                      <td>{{soal_ujian_obj.jawaban_1|safe}}</td>
+                      <td>{{soal_ujian_obj.jawaban_2|safe}}</td>
+                      <td>{{soal_ujian_obj.jawaban_3|safe}}</td>
+                      <td>{{soal_ujian_obj.jawaban_4|safe}}</td>
+                      <td>{% if soal_ujian_obj.jawaban_5 %}{{soal_ujian_obj.jawaban_5|safe}} {% else %} N/A {% endif %}</td>
+                      <td>{% if soal_ujian_obj.jawaban_6 %}{{soal_ujian_obj.jawaban_6|safe}} {% else %} N/A {% endif %}</td>
+                      <td>{% if soal_ujian_obj.jawaban_7 %}{{soal_ujian_obj.jawaban_7|safe}} {% else %} N/A {% endif %}</td>
                       <td>{{soal_ujian_obj.pilih_jawaban_benar}}</td>
                       </td>
                       <td>
