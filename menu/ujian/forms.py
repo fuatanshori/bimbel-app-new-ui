@@ -5,21 +5,27 @@ from django_ckeditor_5.widgets import CKEditor5Widget
 class SoalUjianForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Mengatur atribut class untuk widget gambar_soal
         self.fields['gambar_soal'].widget.attrs['class'] = 'form-control w-100'
-        
-        # Mengatur field yang wajib diisi (required)
-        required_fields = ['soal', 'jawaban_1', 'jawaban_2', 'jawaban_3', 'jawaban_4']
-        for field in required_fields:
-            self.fields[field].required = True
-            
-        # Mengatur field yang opsional (tidak required)
-        optional_fields = ['jawaban_5', 'jawaban_6', 'jawaban_7']
-        for field in optional_fields:
-            self.fields[field].required = False
-        
-        # Mengatur class untuk pilihan jawaban benar
         self.fields['pilih_jawaban_benar'].widget.attrs['class'] = 'form-select'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Field yang wajib diisi
+        required_fields = ['soal', 'jawaban_1', 'jawaban_2', 'jawaban_3', 'jawaban_4']
+        
+        # Cek setiap field required
+        for field_name in required_fields:
+            value = cleaned_data.get(field_name)
+            if not value or value.strip() == '':
+                self.add_error(field_name, f'{field_name.replace("_", " ").title()} tidak boleh kosong.')
+
+        # Validasi pilihan jawaban benar
+        pilih_jawaban = cleaned_data.get('pilih_jawaban_benar')
+        if not pilih_jawaban:
+            self.add_error('pilih_jawaban_benar', 'Pilih jawaban yang benar.')
+
+        return cleaned_data
 
     class Meta:
         model = SoalUjian
