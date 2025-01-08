@@ -99,5 +99,13 @@
 <script>document.querySelector('form').addEventListener('submit', function(event) {
   console.log('Form submitted');
 });
+document.querySelector('form').addEventListener('submit', function(event) {
+  var editor = CKEDITOR.instances['id_soal'];
+  if (!editor.getData().trim()) {
+      event.preventDefault(); // Mencegah pengiriman form
+      alert('Soal wajib diisi!');
+  }
+});
+
 </script>
 {% endblock content %}
