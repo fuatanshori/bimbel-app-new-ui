@@ -18,7 +18,7 @@ class SoalUjian(models.Model):
     }
     id_soal     = models.BigAutoField(primary_key=True,unique=True)
     gambar_soal = models.ImageField(upload_to="soal",blank=True,null=True,validators=[FileExtensionValidator(["jpg","png"])])
-    soal        = CKEditor5Field('soal', config_name='extends')
+    soal        = CKEditor5Field('soal', config_name='extends',null=True, blank=True)
     jawaban_1   = CKEditor5Field('jawaban_1', config_name='extends')
     jawaban_2   = CKEditor5Field('jawaban_2', config_name='extends')
     jawaban_3   = CKEditor5Field('jawaban_3', config_name='extends')
