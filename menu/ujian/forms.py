@@ -14,7 +14,7 @@ class SoalUjianForm(forms.ModelForm):
         self.fields['jawaban_6'].widget.attrs['class'] = 'form-control '
         self.fields['jawaban_7'].widget.attrs['class'] = 'form-control '
         self.fields['pilih_jawaban_benar'].widget.attrs['class'] = 'form-select'
-        self.fields['soal'].required = False
+        self.fields['soal'].required = True
         
     # def clean(self):
     #     cleaned_data = super().clean()
