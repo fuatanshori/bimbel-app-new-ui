@@ -5,18 +5,21 @@ from django_ckeditor_5.widgets import CKEditor5Widget
 class SoalUjianForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Mengatur atribut class untuk widget gambar_soal
         self.fields['gambar_soal'].widget.attrs['class'] = 'form-control w-100'
-        self.fields['soal'].required = True
-        self.fields['jawaban_1'].required = True
-        self.fields['jawaban_2'].required = True
-        self.fields['jawaban_3'].required = True
-        self.fields['jawaban_4'].required = True
-        self.fields['jawaban_5'].required = False
-        self.fields['jawaban_6'].required = False
-        self.fields['jawaban_7'].required = False
+        
+        # Mengatur field yang wajib diisi (required)
+        required_fields = ['soal', 'jawaban_1', 'jawaban_2', 'jawaban_3', 'jawaban_4']
+        for field in required_fields:
+            self.fields[field].required = True
+            
+        # Mengatur field yang opsional (tidak required)
+        optional_fields = ['jawaban_5', 'jawaban_6', 'jawaban_7']
+        for field in optional_fields:
+            self.fields[field].required = False
+        
+        # Mengatur class untuk pilihan jawaban benar
         self.fields['pilih_jawaban_benar'].widget.attrs['class'] = 'form-select'
-    
-    
 
     class Meta:
         model = SoalUjian
@@ -47,4 +50,3 @@ class SoalUjianForm(forms.ModelForm):
                 attrs={"class": "django_ckeditor_5"}, config_name="extends"
             ),
         }
-        
