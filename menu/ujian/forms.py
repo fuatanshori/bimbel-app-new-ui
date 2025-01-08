@@ -14,24 +14,25 @@ class SoalUjianForm(forms.ModelForm):
         self.fields['jawaban_6'].widget.attrs['class'] = 'form-control '
         self.fields['jawaban_7'].widget.attrs['class'] = 'form-control '
         self.fields['pilih_jawaban_benar'].widget.attrs['class'] = 'form-select'
+        self.fields['soal'].required = False
         
-    def clean(self):
-        cleaned_data = super().clean()
-        required_fields = ['soal']
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     required_fields = ['soal']
         
-        for field in required_fields:
-            content = cleaned_data.get(field)
-            if not content:
-                self.add_error(field, f'{field.replace("_", " ").title()} wajib diisi.')
-                continue
+    #     for field in required_fields:
+    #         content = cleaned_data.get(field)
+    #         if not content:
+    #             self.add_error(field, f'{field.replace("_", " ").title()} wajib diisi.')
+    #             continue
                 
-            # Check for empty content
-            stripped_content = (content.replace('&nbsp;', '')
-                                    .replace('<p></p>', '')
-                                    .replace('<p> </p>', '')
-                                    .strip())
-            if not stripped_content:
-                self.add_error(field, f'{field.replace("_", " ").title()} tidak boleh kosong.')
+    #         # Check for empty content
+    #         stripped_content = (content.replace('&nbsp;', '')
+    #                                 .replace('<p></p>', '')
+    #                                 .replace('<p> </p>', '')
+    #                                 .strip())
+    #         if not stripped_content:
+    #             self.add_error(field, f'{field.replace("_", " ").title()} tidak boleh kosong.')
     
 
     class Meta:
