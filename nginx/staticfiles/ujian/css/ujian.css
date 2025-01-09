@@ -1,0 +1,18 @@
+.soal-container {
+    display: flex;
+    gap: 4px;  /* Spasi antara nomor dan konten soal */
+}
+
+.soal-number {
+    flex-shrink: 0;  /* Mencegah nomor dari mengecil */
+}
+
+.soal-content {
+    flex-grow: 1;    /* Mengambil sisa ruang yang tersedia */
+}
+
+/* Memastikan paragraf pertama dalam konten soal tampil inline dengan nomor */
+.soal-content > p:first-child {
+    display: inline;
+    margin: 0;
+}

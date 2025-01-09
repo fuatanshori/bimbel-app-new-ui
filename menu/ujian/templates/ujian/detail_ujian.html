@@ -1,7 +1,7 @@
 {% extends "menu_base.html" %}
-
-{% block title %}ujian  {% endblock title %}
-
+{% load static %}
+{% block title %}ujian{% endblock title %}
+{% block style %}<link rel="stylesheet" href="{% static "ujian/css/ujian.css" %}"/>{% endblock style %}
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y ">
     <div class="row justify-content-center">
@@ -14,9 +14,9 @@
                     {% if soal_ujian_obj.gambar_soal %}
                     <img class="img-fluid" src="{{soal_ujian_obj.gambar_soal.url}}" alt="Card image cap" style="max-height: 250px; object-fit: cover; width: 100%; border-radius: 8px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal">
                     {% endif %}
-                    <p class="card-text mt-3 text-start">
-                      1. {{soal_ujian_obj.soal|safe}}
-                    </p>
+                    <div class="card-text mt-3 text-start soal-container">
+                      <div class="soal-content">{{ soal_ujian_obj.soal|safe }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
