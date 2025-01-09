@@ -1,5 +1,27 @@
 {% extends "menu_base.html" %}
 {% block title %}ujian  {% endblock title %}
+{% block style %}
+<style>
+  .soal-container {
+      display: flex;
+      gap: 4px;  /* Spasi antara nomor dan konten soal */
+  }
+  
+  .soal-number {
+      flex-shrink: 0;  /* Mencegah nomor dari mengecil */
+  }
+  
+  .soal-content {
+      flex-grow: 1;    /* Mengambil sisa ruang yang tersedia */
+  }
+  
+  /* Memastikan paragraf pertama dalam konten soal tampil inline dengan nomor */
+  .soal-content > p:first-child {
+      display: inline;
+      margin: 0;
+  }
+  </style>
+{% endblock style %}
 {% block content %}
 <div class="container-xxl flex-grow-1 container-p-y ">
     <div class="row justify-content-center">
