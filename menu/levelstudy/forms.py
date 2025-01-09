@@ -12,14 +12,12 @@ class LevelStudyForm(forms.ModelForm):
         cleaned_data = super().clean()
         level_study = cleaned_data.get('level_study')
         kelas_input = cleaned_data.get('kelas')
-
-        # Split the input value into a list of kelas values (assuming comma separated)
-        kelas_values = [kelas.strip() for kelas in kelas_input.split(',')]
-
-        # Loop through each kelas value and check if the combination already exists
-        for kelas in kelas_values:
-            if LevelStudy.objects.filter(level_study=level_study, kelas=kelas).exists():
-                raise forms.ValidationError(f'The combination of Level Study and Kelas {kelas} already exists.')
+        level_study_objs = LevelStudy.objects.filter(level_study=level_study)
+        for level_study_obj in level_study_objs:
+            kelas = level_study_obj.kelas
+            integer_kelas = [int(x) for x in kelas.split(",")]
+            if kelas_input in integer_kelas:
+                raise forms.ValidationError(f'tidak bisa ditambahkan karena {kelas_input} berada didalam rentang {integer_kelas}')
 
         return cleaned_data
 
