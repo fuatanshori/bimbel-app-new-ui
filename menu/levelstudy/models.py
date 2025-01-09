@@ -16,7 +16,7 @@ class LevelStudy(models.Model):
 
     class Meta:
         verbose_name_plural = "Level Studi"  # Memperbaiki kesesuaian plural
-        ordering = ['level_study']  # Mengurutkan berdasarkan level_study
+        ordering = ['level_study','kelas']  # Mengurutkan berdasarkan level_study
         unique_together=("kelas","level_study")
     
     def get_id_safe(self):
