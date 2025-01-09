@@ -23,7 +23,7 @@ PAYMENT_STATUS = midtrans.PAYMENT_STATUS
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def levelstudy_ujian(request):
-    levelstudy_objs = LevelStudy.objects.annotate(mapel_count=Count('matapelajaran')).order_by("level_study")
+    levelstudy_objs = LevelStudy.objects.annotate(mapel_count=Count('matapelajaran')).order_by("level_study","kelas")
     context = {
         'levelstudy_objs': levelstudy_objs,
     }
