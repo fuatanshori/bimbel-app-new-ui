@@ -300,39 +300,38 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 500 * 1024 * 1024  # 300 MB
 LOGIN_URL='/users/masuk/'
 
 customColorPalette = [
-        {
-            'color': 'hsl(4, 90%, 58%)',
-            'label': 'Red'
-        },
-        {
-            'color': 'hsl(340, 82%, 52%)',
-            'label': 'Pink'
-        },
-        {
-            'color': 'hsl(291, 64%, 42%)',
-            'label': 'Purple'
-        },
-        {
-            'color': 'hsl(262, 52%, 47%)',
-            'label': 'Deep Purple'
-        },
-        {
-            'color': 'hsl(231, 48%, 48%)',
-            'label': 'Indigo'
-        },
-        {
-            'color': 'hsl(207, 90%, 54%)',
-            'label': 'Blue'
-        },
-    ]
+    {
+        'color': 'hsl(4, 90%, 58%)',
+        'label': 'Red'
+    },
+    {
+        'color': 'hsl(340, 82%, 52%)',
+        'label': 'Pink'
+    },
+    {
+        'color': 'hsl(291, 64%, 42%)',
+        'label': 'Purple'
+    },
+    {
+        'color': 'hsl(262, 52%, 47%)',
+        'label': 'Deep Purple'
+    },
+    {
+        'color': 'hsl(231, 48%, 48%)',
+        'label': 'Indigo'
+    },
+    {
+        'color': 'hsl(207, 90%, 54%)',
+        'label': 'Blue'
+    },
+]
 
-# CKEDITOR_5_CUSTOM_CSS = 'path_to.css' # optional
-# CKEDITOR_5_FILE_STORAGE = "path_to_storage.CustomStorage" # optional
 CKEDITOR_5_CONFIGS = {
     'default': {
         'toolbar': ['heading', '|', 'bold', 'italic', 'link',
                     'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
-
+        'removePlugins': ['Paragraph'],  # Tambahkan ini
+        'enterMode': 'BR',  # Tambahkan ini
     },
     'extends': {
         'blockToolbar': [
@@ -347,6 +346,8 @@ CKEDITOR_5_CONFIGS = {
                     'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', '|',
                     'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor',  'removeFormat',
                     'insertTable',],
+        'removePlugins': ['Paragraph'],  # Tambahkan ini
+        'enterMode': 'BR',  # Tambahkan ini
         'table': {
             'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
             'tableProperties', 'tableCellProperties' ],
