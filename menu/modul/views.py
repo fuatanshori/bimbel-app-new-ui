@@ -48,7 +48,7 @@ def modul_mapel(request,id_levelstudy):
 @transaksi_settlement_required
 def daftar_modul(request,id_levelstudy, id_mapel):
     pk = decode_id(id_mapel)
-    custom_range,modul_objs = pagination_queryset(request,Modul.objects.filter(mata_pelajaran__pk=pk),5)
+    custom_range,modul_objs = pagination_queryset(request,Modul.objects.filter(mata_pelajaran__pk=pk).order_by("nama_modul"),5)
     context = {
         'id_mapel':id_mapel,
         'modul_objs': modul_objs,
