@@ -18,9 +18,8 @@
                     {% if soal_ujian_obj.gambar_soal %}
                     <img class="img-fluid" src="{{soal_ujian_obj.gambar_soal.url}}" alt="Card image cap" style="max-height: 250px; object-fit: cover; width: 100%; border-radius: 8px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal{{soal_ujian_obj.pk}}">
                     {% endif %}
-                    {{ forloop.counter }}. {{ soal_ujian_obj.soal|safe }}
                     <p class="card-text mt-3 text-start fw-bolder">
-                      
+                      {{ forloop.counter }}. {{ soal_ujian_obj.soal|safe }}
                     </p>
                   </div>
                 </div>
