@@ -366,10 +366,7 @@ CKEDITOR_5_CONFIGS = {
                 { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
                 { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
             ]
-        },
-        'removePlugins': 'enterkey',
-        'enterMode': 2,  # CKEDITOR.ENTER_BR = 2
-        'shiftEnterMode': 1,  # CKEDITOR.ENTER_P = 1
+        }
     },
     'list': {
         'properties': {
