@@ -544,8 +544,8 @@ def menu_pembayaran(request):
 @admin_required
 def pembayaran_admin_list(request):
     cari_transaksi=request.GET.get('cari_transaksi', None)
-    custom_range = 0
     if cari_transaksi:
+        custom_range = 0
         transaksi_objs=Transaksi.objects.filter(
             Q(user__email__icontains=cari_transaksi)|
             Q(va_number__iexact=cari_transaksi)
