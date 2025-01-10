@@ -548,7 +548,8 @@ def pembayaran_admin_list(request):
         custom_range = 0
         transaksi_objs=Transaksi.objects.filter(
             Q(user__email__icontains=cari_transaksi)|
-            Q(va_number__iexact=cari_transaksi)
+            Q(va_number__iexact=cari_transaksi)|
+            Q(id_transaksi__iexact=cari_transaksi)
         )
     else:
         custom_range,transaksi_objs=pagination_queryset(request,Transaksi.objects.all(),7)
