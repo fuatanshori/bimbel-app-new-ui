@@ -203,8 +203,8 @@ def buat_pesanan(request):
                         transaksi_status=resp.get('transaction_status'),
                         va_number=resp.get('va_numbers')[0]['va_number'],
                         layanan_pembayaran=resp.get('va_numbers')[0]['bank'],
-                        transaction_time=resp.get('transaction_time'),
-                        expiry_time=resp.get('expiry_time'),
+                        transaction_time=transaction_time,
+                        expiry_time=expiry_time,
                     )
                     transaksi_obj.save()
             except Exception as e:
