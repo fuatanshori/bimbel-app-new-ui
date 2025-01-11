@@ -36,6 +36,7 @@ class Nilai(models.Model):
     
     class Meta:
         verbose_name_plural = "Nilai"
+        ordering = ['mata_pelajaran']
         
 class Sertifikat(models.Model):
     no_cert         = models.UUIDField(primary_key=True,unique=True,db_index=True,default=uuid.uuid4)

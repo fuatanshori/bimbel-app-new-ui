@@ -28,6 +28,7 @@ from menu.utils.pagination import pagination_queryset
 @login_required(login_url='user:masuk')
 @transaksi_settlement_required
 def daftar_nilai(request):
+    custom_range=0
     try:
         if request.user.role in ['pemateri',"admin"]:
             custom_range,nilai_objs=pagination_queryset(request,
