@@ -20,7 +20,7 @@ from reportlab.lib.pagesizes import A4
 import babel
 import logging
 from django.http import Http404
-import pytz
+from django.utils.timezone import make_aware
 from core.utils.decorator import admin_required
 from django.utils import timezone
 from .forms import TarifForm,DiskonForm
@@ -160,7 +160,12 @@ def buat_pesanan(request):
             resp = MIDTRANS_CORE.charge(parameters=params)
         except Exception as e:
             return HttpResponseServerError(str(f"error : {e}"))
-        
+        transaction_time = datetime.strptime(transaction_time, '%Y-%m-%d %H:%M:%S')
+        expiry_time = datetime.strptime(expiry_time, '%Y-%m-%d %H:%M:%S')
+
+        # Pastikan timezone-aware
+        transaction_time = make_aware(transaction_time)
+        expiry_time = make_aware(expiry_time)
         if resp:
             try:
                 if layanan_pembayaran == "gopay":
@@ -178,8 +183,8 @@ def buat_pesanan(request):
                         id_transaksi=str(resp.get('transaction_id')),
                         transaksi_status=resp.get('transaction_status'),
                         layanan_pembayaran=resp.get("payment_type"),
-                        transaction_time=resp.get('transaction_time'),
-                        expiry_time=resp.get('expiry_time'),
+                        transaction_time=transaction_time,
+                        expiry_time=expiry_time,
                         qrcode_link =resp.get("actions")[0]["url"],
                         deep_link_redirect=resp.get("actions")[1]["url"],
                     )
