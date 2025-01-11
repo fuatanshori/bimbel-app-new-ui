@@ -160,6 +160,8 @@ def buat_pesanan(request):
             resp = MIDTRANS_CORE.charge(parameters=params)
         except Exception as e:
             return HttpResponseServerError(str(f"error : {e}"))
+        transaction_time = resp.get('transaction_time')
+        expiry_time = resp.get('expiry_time')
         transaction_time = datetime.datetime.strptime(transaction_time, '%Y-%m-%d %H:%M:%S')
         expiry_time = datetime.datetime.strptime(expiry_time, '%Y-%m-%d %H:%M:%S')
         # Pastikan timezone-aware
