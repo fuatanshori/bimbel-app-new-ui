@@ -61,9 +61,9 @@
               </button>
             </li>
             {% endif %}
-            <li class="nav-item">
+            {% comment %} <li class="nav-item">
               <a href="{% url "menu:modul-chat" id_modul=modul_obj.get_id_safe %}" class="btn btn-icon btn-outline-dark"><i class='bx bx-message-dots' ></i></a>
-            </li>
+            </li> {% endcomment %}
           </ul>
           <div class="tab-content">
             <div class="tab-pane fade show active" id="detailmodul" role="tabpanel">
